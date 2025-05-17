@@ -24,59 +24,133 @@ class CategoryScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               /// Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Bí kíp",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundImage: NetworkImage(
-                      'https://i.pravatar.cc/150?img=3',
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-
-              /// Search Box
-              GestureDetector(
-                onTap: () {
-                  Get.toNamed(
-                    RouterName.search,
-                  ); // Sử dụng GetX để chuyển trang
-                },
-                child: Container(
-                  height: 46, // 👈 Fix quan trọng
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.search, color: Colors.grey),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'Tìm kiếm bằng từ khóa',
-                          style: TextStyle(color: Colors.grey),
-                          overflow:
-                              TextOverflow.ellipsis, // để tránh lỗi text dài
+                  // Header: Logo + menu
+                  ClipRect(
+                    child: Obx(
+                      () => Opacity(
+                        opacity: controller.opacityHeader.value,
+                        child: SizedBox(
+                          height: controller.heightHeader.value,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  // Image.asset(
+                                  //   'assets/images/logo.png', // 👈 thay bằng logo của bạn
+                                  //   height: 24,
+                                  // ),
+                                  SizedBox(width: 8),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Batdongsan",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                      Text(
+                                        "by PropertyGuru",
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.menu),
+                                onPressed: () {
+                                  // Xử lý mở menu
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      Icon(Icons.tune, color: Colors.grey),
+                    ),
+                  ),
+
+                  // Search box
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Get.toNamed(RouterName.search);
+                          },
+                          child: Container(
+                            height: 46,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.grey.shade300),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 12),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'Tìm kiếm bất động sản',
+                                    style: TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  height: 32,
+                                  width: 32,
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.search,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      ClipRect(
+                        child: Obx(
+                          () => Opacity(
+                            opacity: controller.opacityIcon.value,
+                            child: SizedBox(
+                              width: controller.widthIcon.value,
+                              child: IconButton(
+                                icon: Icon(Icons.menu),
+                                onPressed: () {
+                                  // Xử lý mở menu
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                ),
+                  SizedBox(height: 8),
+                ],
               ),
-              SizedBox(height: 16),
 
               /// Danh sách
               Expanded(
                 child: ListView.builder(
+                  controller: controller.scrollController,
                   itemCount: dataListings?.length ?? 0,
                   itemBuilder: (context, index) {
                     final listing = dataListings![index]; // lấy ListingModel
@@ -148,52 +222,141 @@ class CategoryScreen extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  // Title
                                   Text(
                                     listing.title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
                                   ),
                                   SizedBox(height: 8),
+
+                                  // Giá + Diện tích
+                                  Row(
+                                    children: [
+                                      Text(
+                                        _formatPrice(listing.listingPriceVnd),
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      SizedBox(width: 12),
+                                      Text(
+                                        '${listing.legalAreaSqm}m²',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue[50],
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          "Đã duyệt",
+                                          style: TextStyle(
+                                            color: Colors.blue,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 4),
+
+                                  // Vị trí
                                   Row(
                                     children: [
                                       Icon(
-                                        Icons.phone,
-                                        size: 16,
-                                        color: Colors.grey,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(listing.ownerName),
-                                      Spacer(),
-                                      Icon(
-                                        Icons.attach_money,
+                                        Icons.location_on,
                                         size: 16,
                                         color: Colors.grey,
                                       ),
                                       SizedBox(width: 4),
                                       Text(
-                                        _formatPrice(listing.listingPriceVnd),
+                                        '${listing.district}, ${listing.province}',
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 4),
+                                  SizedBox(height: 12),
+
+                                  // Dòng dưới cùng: avatar + tên, nút gọi, trái tim
                                   Row(
                                     children: [
-                                      Icon(
-                                        Icons.person,
-                                        size: 16,
-                                        color: Colors.grey,
+                                      // Avatar + Tên
+                                      CircleAvatar(
+                                        radius: 14,
+                                        backgroundColor: Colors.red,
+                                        child: Text(
+                                          listing.authorName[0].toUpperCase(),
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                          ),
+                                        ),
                                       ),
-                                      SizedBox(width: 4),
-                                      Text(listing.authorName),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        listing.authorName,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
                                       Spacer(),
+
+                                      // Nút gọi
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.teal,
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 6,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.phone,
+                                              color: Colors.white,
+                                              size: 14,
+                                            ),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              controller.maskPhone(
+                                                listing.phoneNumber,
+                                              ),
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      SizedBox(width: 12),
+
+                                      // Trái tim
                                       Icon(
-                                        Icons.square_foot,
-                                        size: 16,
+                                        Icons.favorite_border,
                                         color: Colors.grey,
                                       ),
-                                      SizedBox(width: 4),
-                                      Text('${listing.legalAreaSqm} m²'),
                                     ],
                                   ),
                                 ],

@@ -20,7 +20,7 @@ class LoginController extends GetxController {
     phoneController.addListener(validateForm);
     passwordController.addListener(validateForm);
     phoneController.text = "0985495876";
-    passwordController.text = "Hao2000@8x";
+    passwordController.text = "123";
   }
 
   void validateForm() {
@@ -55,10 +55,10 @@ class LoginController extends GetxController {
       'accessToken',
       result["accessToken"],
     );
-    await SharedPreferenceApp.handleSetString(
-      'refreshToken',
-      result["refreshToken"],
-    );
+    // await SharedPreferenceApp.handleSetString(
+    //   'refreshToken',
+    //   result["refreshToken"],
+    // );
     isLoading.value = false;
     Get.offAllNamed(RouterName.main);
   }

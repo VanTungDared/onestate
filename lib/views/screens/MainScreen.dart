@@ -1,7 +1,6 @@
 import 'package:app_real_estate/constants/color_constants.dart';
 import 'package:app_real_estate/controllers/main_controller.dart';
 import 'package:app_real_estate/views/screens/CategoryScreen.dart';
-import 'package:app_real_estate/views/screens/HomeScreen.dart';
 import 'package:app_real_estate/views/screens/ProfileScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
