@@ -1,41 +1,43 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:app_real_estate/api/api_client.dart';
 import 'package:app_real_estate/dblocal/shared_preferences.dart';
 import 'package:app_real_estate/routers/routerName.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class LoginController extends GetxController {
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
-  final apiClient = ApiClient();
-
   final isPasswordVisible = false.obs;
   final isLoading = false.obs;
   final isFormValid = false.obs;
+  final rememberMe = false.obs;
+
+  final apiClient = ApiClient();
 
   @override
   void onInit() {
     super.onInit();
-    phoneController.text = "0985495876";
-    passwordController.text = "Hao2000@8x";
     phoneController.addListener(validateForm);
     passwordController.addListener(validateForm);
+    phoneController.text = "0985495876";
+    passwordController.text = "Hao2000@8x";
   }
 
   void validateForm() {
     final phone = phoneController.text.trim();
-    final password = passwordController.text;
+    final password = passwordController.text.trim();
     isFormValid.value = phone.isNotEmpty && password.isNotEmpty;
-    isFormValid.value = true;
   }
 
   void login() async {
     if (!isFormValid.value) return;
+
     isLoading.value = true;
-    Map<String, dynamic> result = await apiClient.login(
-      phoneNumber: phoneController.text,
-      password: passwordController.text,
+    final result = await apiClient.login(
+      phoneNumber: phoneController.text.trim(),
+      password: passwordController.text.trim(),
     );
+
     if (result.containsKey("error")) {
       Get.snackbar(
         "Lỗi",
@@ -46,18 +48,19 @@ class LoginController extends GetxController {
         duration: Duration(seconds: 3),
       );
       isLoading.value = false;
-    } else {
-      await SharedPreferenceApp.handleSetString(
-        'accessToken',
-        result["accessToken"],
-      );
-      await SharedPreferenceApp.handleSetString(
-        'refreshToken',
-        result["refreshToken"],
-      );
-      isLoading.value = false;
-      Get.offAllNamed(RouterName.main);
+      return;
     }
+
+    await SharedPreferenceApp.handleSetString(
+      'accessToken',
+      result["accessToken"],
+    );
+    await SharedPreferenceApp.handleSetString(
+      'refreshToken',
+      result["refreshToken"],
+    );
+    isLoading.value = false;
+    Get.offAllNamed(RouterName.main);
   }
 
   @override
