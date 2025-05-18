@@ -1,221 +1,531 @@
-import 'package:app_real_estate/constants/color_constants.dart';
 import 'package:app_real_estate/controllers/detail_controller.dart';
-import 'package:app_real_estate/views/widgets/CommentSection.dart';
-import 'package:app_real_estate/views/widgets/buildDescriptionTab.dart';
-import 'package:app_real_estate/views/widgets/buildInfoRow.dart';
-import 'package:app_real_estate/views/widgets/buildLocationInfo.dart';
-import 'package:app_real_estate/views/widgets/buildPriceInfo.dart';
-import 'package:app_real_estate/views/widgets/buildProjectInformation.dart';
-import 'package:app_real_estate/views/widgets/buildTagsCriteria.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class DetailScreen extends StatelessWidget {
   final controller = Get.put(DetailController());
+
   DetailScreen({super.key});
+
+  final PageController _pageController = PageController();
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Kho tổng"),
-          centerTitle: true,
-          bottom: const TabBar(
-            labelColor: ColorConstant.greenColor,
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: ColorConstant.greenColor,
-            tabs: [
-              Tab(text: "Thông tin BĐS"),
-              Tab(text: "Thông tin dự án"),
-              Tab(text: "Mô tả chi tiết"),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            Obx(
-              () =>
-                  controller.countRender.value > 0
-                      ? buildPropertyInfoTab()
-                      : SizedBox(),
-            ),
-            buildProjectInformation(),
-            buildDescriptionTab(),
-          ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(""),
+        centerTitle: true,
+        actions: [IconButton(icon: const Icon(Icons.menu), onPressed: () {})],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Get.back(),
         ),
       ),
-    );
-  }
+      body: Obx(() {
+        if (controller.countRender.value == 0) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-  Widget buildPropertyInfoTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image with dots indicator
-          // Image với PageView và indicator
-          Container(
-            height: 300,
-            clipBehavior: Clip.hardEdge,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
-            child: PageView.builder(
-              controller: PageController(viewportFraction: 0.9),
-              itemCount: controller.listingDetail!.imageUrls.length,
-              onPageChanged: (index) {
-                controller.changePage(index);
-              },
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: CachedNetworkImage(
-                      imageUrl: controller.apiClient.getFullUrl(
-                        controller.listingDetail!.imageUrls.isNotEmpty
-                            ? controller.listingDetail!.imageUrls[index]
-                            : 'https://via.placeholder.com/150',
-                      ),
-                      placeholder:
-                          (context, url) =>
-                              const Center(child: CircularProgressIndicator()),
-                      errorWidget:
-                          (context, url, error) => const Center(
-                            child: Icon(Icons.broken_image, size: 48),
+        final images = controller.listingDetail?.imageUrls ?? [];
+
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image slider with navigation
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    height: 220,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: images.isNotEmpty ? images.length : 3,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[(index + 1) * 200],
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: 210,
+                          child: const Center(
+                            child: Icon(
+                              Icons.image,
+                              size: 60,
+                              color: Colors.white,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 8),
-          Obx(
-            () => Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                controller.listingDetail!.imageUrls.length,
-                (i) {
-                  final isActive = i == controller.currentPage.value;
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: isActive ? 8 : 6,
-                    height: isActive ? 8 : 6,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isActive ? Colors.black : Colors.grey.shade300,
-                    ),
-                  );
-                },
+                  // Left arrow
+                  Positioned(
+                    left: 8,
+                    child: _imageNavButton(Icons.arrow_back, () {
+                      if (_pageController.hasClients) {
+                        final page = _pageController.page?.toInt() ?? 0;
+                        _pageController.animateToPage(
+                          page > 0 ? page - 1 : 0,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      }
+                    }),
+                  ),
+                  // Right arrow
+                  Positioned(
+                    right: 8,
+                    child: _imageNavButton(Icons.arrow_forward, () {
+                      if (_pageController.hasClients) {
+                        final page = _pageController.page?.toInt() ?? 0;
+                        final maxPage =
+                            (images.isNotEmpty ? images.length : 3) - 1;
+                        _pageController.animateToPage(
+                          page < maxPage ? page + 1 : maxPage,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      }
+                    }),
+                  ),
+                ],
               ),
-            ),
-          ),
 
-          const SizedBox(height: 16),
-          const Text(
-            "Dự án TK-98E3FA",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Chip(
-                label: const Text("Chuẩn"),
-                backgroundColor: Colors.blue.shade50,
-                labelStyle: const TextStyle(color: Colors.blue),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                "Mã hàng: ",
-                style: TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-              const Text(
-                "TK-98E3FA",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Colors.blue,
+              const SizedBox(height: 16),
+
+              // Title
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  controller.listingDetail!.title ?? "",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+
+              const SizedBox(height: 16),
+
+              // Info: Giá - Diện tích - Số tầng - Trạng thái
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _infoItem(
+                      "Mức giá",
+                      _formatCurrency(
+                        controller.listingDetail!.listingPriceVnd ?? "",
+                      ),
+                    ),
+                    _infoItem(
+                      "Diện tích",
+                      "${controller.listingDetail!.actualAreaSqm ?? 'N/A'} m²",
+                    ),
+                    _infoItem(
+                      "Số tầng",
+                      "${controller.listingDetail!.numberOfFloors ?? 'N/A'}",
+                    ),
+                    _statusTag(controller.listingDetail!.status ?? ""),
+                  ],
+                ),
+              ),
+
+              const Divider(height: 32),
+
+              // Thông tin mô tả
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Thông tin mô tả",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  controller.listingDetail!.description?.isNotEmpty == true
+                      ? controller.listingDetail!.description!
+                      : "Chưa có mô tả",
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Buttons
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    _actionButton(Icons.share, "Chia sẻ"),
+                    const SizedBox(width: 12),
+                    _actionButton(Icons.report, "Báo xấu"),
+                    const SizedBox(width: 12),
+                    _actionButton(Icons.favorite_border, ""),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Thông số kỹ thuật
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Thông số kỹ thuật",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  children: [
+                    _techInfoRow(
+                      "Diện tích sổ",
+                      "${controller.listingDetail!.legalAreaSqm ?? '-'} m²",
+                    ),
+                    _techInfoRow(
+                      "Thực tế",
+                      "${controller.listingDetail!.actualAreaSqm ?? '-'} m²",
+                    ),
+                    _techInfoRow(
+                      "Chiều dài",
+                      "${controller.listingDetail!.frontageMeters ?? '-'} m",
+                    ),
+                    _techInfoRow(
+                      "Chiều rộng",
+                      "${controller.listingDetail!.widthMeters ?? '-'} m",
+                    ),
+                    _techInfoRow("Mặt tiền", "-"),
+                    _techInfoRow(
+                      "Đường trước nhà",
+                      "${controller.listingDetail!.roadWidthMeters ?? '-'} m",
+                    ),
+                    _techInfoRow(
+                      "Số tầng",
+                      "${controller.listingDetail!.numberOfFloors} tầng",
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Tiêu chí
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Tiêu chí",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  children: [
+                    _criterionChip("Lãi vốn (Rẻ)"),
+                    const SizedBox(width: 8),
+                    _criterionChip("Thang máy"),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Thông tin giá tiền
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Thông tin giá tiền",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  children: [
+                    _techInfoRow(
+                      "Giá chào",
+                      _formatCurrency(
+                        controller.listingDetail!.listingPriceVnd!,
+                      ),
+                    ),
+                    _techInfoRow(
+                      "Trích thưởng",
+                      "${controller.listingDetail!.commissionRatePercent}% hoặc ${_formatCurrency(controller.listingDetail!.commissionAmountVnd!)}",
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Thông tin người đăng
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Thông tin người đăng",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        const CircleAvatar(
+                          backgroundColor: Colors.red,
+                          child: Text(
+                            "L",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text("Người đăng", style: TextStyle(fontSize: 13)),
+                            Text(
+                              "La Hung",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: const [
+                        Icon(Icons.phone, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          "0981 189 856",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Thông tin chủ nhà
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Thông tin chủ nhà",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        const CircleAvatar(
+                          backgroundColor: Colors.pink,
+                          child: Text(
+                            "V",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text("Chủ nhà", style: TextStyle(fontSize: 13)),
+                            Text(
+                              "Văn Việt",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Khu vực
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Khu vực",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _locationItem("Tỉnh/Thành phố", "Hà Nội"),
+                    _locationItem("Quận/Huyện", "Phú Xuyên"),
+                    _locationItem("Phường/Xã", "Phú Xuyên"),
+                    _locationItem("Địa chỉ", "Chưa có địa chỉ"),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
             ],
           ),
-          const SizedBox(height: 20),
-          const Text(
-            "Thông số kỹ thuật",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 12),
-          buildInfoRow(Icons.square_foot, "Diện tích sổ", "171.3 m2"),
-          buildInfoRow(Icons.straighten, "Thực tế", "171.3 m2"),
-          buildInfoRow(Icons.height, "Chiều dài", "14.3 m"),
-          buildInfoRow(Icons.swap_horiz, "Chiều rộng", "12 m"),
-          buildInfoRow(Icons.landscape, "Mặt tiền", "12 m"),
-          buildInfoRow(Icons.roundabout_left, "Đường trước nhà", "12 m"),
-          buildInfoRow(Icons.home_work, "Số tầng", "4 tầng"),
-          const SizedBox(height: 12),
-          buildPriceInfo(),
-          const SizedBox(height: 16),
-          buildTagsCriteria(),
-          buildLocationInfo(),
-          CommentSection(),
+        );
+      }),
+    );
+  }
+
+  Widget _infoItem(String label, String value) {
+    return Column(
+      children: [
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        const SizedBox(height: 2),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+  Widget _statusTag(String status) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: status == "approved" ? Colors.blue : Colors.grey,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        status == "approved" ? "Đã duyệt" : "Chờ duyệt",
+        style: const TextStyle(color: Colors.white, fontSize: 12),
+      ),
+    );
+  }
+
+  Widget _actionButton(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.black, size: 18),
+          if (label.isNotEmpty) ...[
+            const SizedBox(width: 6),
+            Text(label, style: const TextStyle(fontSize: 13)),
+          ],
         ],
       ),
     );
   }
-}
 
-class SectionTitle extends StatelessWidget {
-  final String title;
-  const SectionTitle({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+  Widget _imageNavButton(IconData icon, VoidCallback onPressed) {
+    return CircleAvatar(
+      // ignore: deprecated_member_use
+      backgroundColor: Colors.white.withOpacity(0.9),
+      child: IconButton(
+        icon: Icon(icon, color: Colors.black),
+        onPressed: onPressed,
+      ),
     );
   }
-}
 
-class InfoRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color? valueColor;
+  String _formatCurrency(String vnd) {
+    final value = double.tryParse(vnd);
+    if (value == null) return "N/A";
+    if (value >= 1000000000) {
+      return "${(value / 1000000000).toStringAsFixed(0)} tỷ";
+    } else if (value >= 1000000) {
+      return "${(value / 1000000).toStringAsFixed(0)} triệu";
+    }
+    return "$value đ";
+  }
 
-  const InfoRow({
-    super.key,
-    required this.icon,
-    required this.label,
-    required this.value,
-    this.valueColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _techInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(icon, size: 18, color: Colors.grey[700]),
-          const SizedBox(width: 10),
           Text(label, style: const TextStyle(fontSize: 14)),
-          const Spacer(),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: valueColor ?? Colors.black,
-            ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _criterionChip(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.check_box, size: 16, color: Colors.black54),
+          const SizedBox(width: 4),
+          Text(label, style: const TextStyle(fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  Widget _locationItem(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 13, color: Colors.black54),
+        ),
+        const SizedBox(height: 4),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: const BoxDecoration(
+            border: Border(bottom: BorderSide(color: Colors.grey)),
+          ),
+          child: Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.w500),
+          ),
+        ),
+        const SizedBox(height: 12),
+      ],
     );
   }
 }
