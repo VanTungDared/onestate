@@ -2,10 +2,11 @@ import 'package:app_real_estate/dblocal/shared_preferences.dart';
 import 'package:dio/dio.dart';
 
 class ApiClient {
-  static const String _baseUrl = "https://novelof.me/media";
+  static const String _baseUrl = "https://file.dalianperfume.com/re-storage";
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: "http://103.249.200.249:3001/api/v1/", // 🔹 Đổi URL API tại đây
+      baseUrl:
+          "https://bds-api.dalianperfume.com/api/v1/", // 🔹 Đổi URL API tại đây
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       contentType: "application/json",

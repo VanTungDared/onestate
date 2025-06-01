@@ -46,74 +46,68 @@ class SearchScreen extends StatelessWidget {
           ),
         ),
       ),
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _keywordRow(),
-
-            const SizedBox(height: 8),
-            _sectionLabel('Khu vực'),
-            _dropdownField(
-              'Tỉnh/Thành phố',
-              controller.province,
-              provinces,
-              isRequired: true,
-            ),
-            const SizedBox(height: 8),
-
-            _dropdownField(
-              'Quận/Huyện',
-              controller.district,
-              districts,
-              isRequired: true,
-            ),
-            const SizedBox(height: 8),
-
-            _dropdownField('Phường/Xã', controller.ward, wards),
-            const SizedBox(height: 8),
-
-            _textField(hint: 'Ví dụ: Trần Phú', label: 'Tên đường'),
-            const SizedBox(height: 8),
-
-            _textField(hint: 'Ví dụ: 12.3', label: 'Địa chỉ'),
-
-            const SizedBox(height: 8),
-            _sectionLabel('Khoảng giá'),
-            Row(
-              children: [
-                Expanded(child: _textField(hint: 'tỷ', label: 'Từ giá')),
-                const SizedBox(width: 16),
-                Expanded(child: _textField(hint: 'tỷ', label: 'Đến giá')),
-              ],
-            ),
-
-            const SizedBox(height: 8),
-            _sectionLabel('Tiêu chí'),
-            Obx(
-              () => Wrap(
-                spacing: 12,
-                runSpacing: 8,
-                children:
-                    criteriaList.map((label) {
-                      final isSelected = _selectedCriteria.contains(label);
-                      return FilterChip(
-                        label: Text(label),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          if (selected) {
-                            _selectedCriteria.add(label);
-                          } else {
-                            _selectedCriteria.remove(label);
-                          }
-                        },
-                      );
-                    }).toList(),
+      body: Container(
+        color: Colors.white,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _keywordRow(),
+              const SizedBox(height: 8),
+              _sectionLabel('Khu vực'),
+              _dropdownField(
+                'Tỉnh/Thành phố',
+                controller.province,
+                provinces,
+                isRequired: true,
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              _dropdownField(
+                'Quận/Huyện',
+                controller.district,
+                districts,
+                isRequired: true,
+              ),
+              const SizedBox(height: 8),
+              _dropdownField('Phường/Xã', controller.ward, wards),
+              const SizedBox(height: 8),
+              _textField(hint: 'Ví dụ: Trần Phú', label: 'Tên đường'),
+              const SizedBox(height: 8),
+              _textField(hint: 'Ví dụ: 12.3', label: 'Địa chỉ'),
+              const SizedBox(height: 8),
+              _sectionLabel('Khoảng giá'),
+              Row(
+                children: [
+                  Expanded(child: _textField(hint: 'tỷ', label: 'Từ giá')),
+                  const SizedBox(width: 16),
+                  Expanded(child: _textField(hint: 'tỷ', label: 'Đến giá')),
+                ],
+              ),
+              const SizedBox(height: 8),
+              _sectionLabel('Tiêu chí'),
+              Obx(
+                () => Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: criteriaList.map((label) {
+                    final isSelected = _selectedCriteria.contains(label);
+                    return FilterChip(
+                      label: Text(label),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        if (selected) {
+                          _selectedCriteria.add(label);
+                        } else {
+                          _selectedCriteria.remove(label);
+                        }
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -227,18 +221,16 @@ class SearchScreen extends StatelessWidget {
             ),
           ),
           DropdownButtonFormField<String>(
-            value:
-                items.contains(selectedValue.value)
-                    ? selectedValue.value
-                    : null,
+            value: items.contains(selectedValue.value)
+                ? selectedValue.value
+                : null,
             hint: const Text('Chọn'),
-            items:
-                items.map((item) {
-                  return DropdownMenuItem<String>(
-                    value: item,
-                    child: Text(item),
-                  );
-                }).toList(),
+            items: items.map((item) {
+              return DropdownMenuItem<String>(
+                value: item,
+                child: Text(item),
+              );
+            }).toList(),
             onChanged: (val) {
               if (val != null) selectedValue.value = val;
             },

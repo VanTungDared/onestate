@@ -1,6 +1,7 @@
 import 'package:app_real_estate/controllers/detail_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class DetailScreen extends StatelessWidget {
   final controller = Get.put(DetailController());
@@ -11,6 +12,7 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LatLng location = LatLng(20.792132, 105.875961);
     return Scaffold(
       appBar: AppBar(
         title: const Text(""),
@@ -271,7 +273,7 @@ class DetailScreen extends StatelessWidget {
                     ),
                     _techInfoRow(
                       "Trích thưởng",
-                      "${controller.listingDetail!.commissionRatePercent}% hoặc ${_formatCurrency(controller.listingDetail!.commissionAmountVnd!)}",
+                      "${controller.listingDetail!.commissionRatePercent}% hoặc ${_formatCurrency(controller.listingDetail!.commissionAmountVnd)}",
                     ),
                   ],
                 ),
@@ -397,6 +399,23 @@ class DetailScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 24),
+
+              SizedBox(
+                height: 300,
+                child: GoogleMap(
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(20.792132, 105.875961),
+                    zoom: 14.0,
+                  ),
+                  markers: {
+                    Marker(
+                      markerId: MarkerId('vị trí'),
+                      position: LatLng(20.792132, 105.875961),
+                      infoWindow: InfoWindow(title: 'Địa điểm bạn chọn'),
+                    )
+                  },
+                ),
+              )
             ],
           ),
         );
@@ -459,7 +478,8 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  String _formatCurrency(String vnd) {
+  String _formatCurrency(String? vnd) {
+    if (vnd == null) return "";
     final value = double.tryParse(vnd);
     if (value == null) return "N/A";
     if (value >= 1000000000) {

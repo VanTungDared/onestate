@@ -15,7 +15,104 @@ class CategoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(CategoryController());
+    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
+      key: scaffoldKey,
+      endDrawer: Drawer(
+        elevation: 0, // Tùy chọn, loại bỏ đổ bóng
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero), // Không bo góc
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 12.0),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundColor: Colors.red,
+                      child: Text(
+                        'L', // hoặc tên viết tắt
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Lã Đức Hào',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                          Text('0985495876',
+                              style: TextStyle(color: Colors.grey[700])),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.logout_outlined, color: Colors.red),
+                      onPressed: () {
+                        Get.offAllNamed(
+                          RouterName.login,
+                        ); // ví dụ chuyển về màn login
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              // Đăng tin Button
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // TODO: Navigate to post screen
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: Text('Đăng tin',
+                        style: TextStyle(fontSize: 16, color: Colors.white)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Divider(height: 1),
+              ),
+
+              // Danh sách tin
+              ListTile(
+                leading: Icon(Icons.article_outlined),
+                title: Text('Danh sách tin'),
+                onTap: () {
+                  // TODO: Navigate to listing screen
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Divider(height: 1),
+              ),
+
+              // Yêu thích
+              ListTile(
+                leading: Icon(Icons.favorite_border),
+                title: Text('Yêu thích'),
+                onTap: () {
+                  // TODO: Navigate to favorites
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
@@ -70,7 +167,7 @@ class CategoryScreen extends StatelessWidget {
                               IconButton(
                                 icon: Icon(Icons.menu),
                                 onPressed: () {
-                                  // Xử lý mở menu
+                                  scaffoldKey.currentState?.openEndDrawer();
                                 },
                               ),
                             ],
@@ -135,6 +232,7 @@ class CategoryScreen extends StatelessWidget {
                                 icon: Icon(Icons.menu),
                                 onPressed: () {
                                   // Xử lý mở menu
+                                  scaffoldKey.currentState?.openEndDrawer();
                                 },
                               ),
                             ),
@@ -155,11 +253,10 @@ class CategoryScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final listing = dataListings![index]; // lấy ListingModel
                     return GestureDetector(
-                      onTap:
-                          () => Get.toNamed(
-                            RouterName.detail,
-                            arguments: listing.id,
-                          ),
+                      onTap: () => Get.toNamed(
+                        RouterName.detail,
+                        arguments: listing.id,
+                      ),
                       child: Container(
                         margin: EdgeInsets.only(bottom: 16),
                         decoration: BoxDecoration(
@@ -192,14 +289,11 @@ class CategoryScreen extends StatelessWidget {
                                           ? listing.imageUrls.first
                                           : 'https://via.placeholder.com/150',
                                     ),
-                                    placeholder:
-                                        (context, url) => Center(
-                                          child:
-                                              const CircularProgressIndicator(),
-                                        ),
-                                    errorWidget:
-                                        (context, url, error) =>
-                                            const Icon(Icons.error),
+                                    placeholder: (context, url) => Center(
+                                      child: const CircularProgressIndicator(),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
                                     fit: BoxFit.cover,
                                     width: double.infinity,
                                     height: 210,

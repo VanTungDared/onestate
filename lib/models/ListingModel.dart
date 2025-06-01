@@ -30,7 +30,7 @@ class ListingModel {
   final double? latitude;
   final double? longitude;
   final String commissionRatePercent;
-  final String commissionAmountVnd;
+  final String? commissionAmountVnd;
   final String legalAreaSqm;
   final String actualAreaSqm;
   final String frontageMeters;
@@ -74,7 +74,7 @@ class ListingModel {
     this.latitude,
     this.longitude,
     required this.commissionRatePercent,
-    required this.commissionAmountVnd,
+    this.commissionAmountVnd,
     required this.legalAreaSqm,
     required this.actualAreaSqm,
     required this.frontageMeters,
@@ -115,14 +115,8 @@ class ListingModel {
       wardCode: json['wardCode'],
       streetName: json['streetName'],
       fullAddress: json['fullAddress'],
-      latitude:
-          json['latitude'] != null
-              ? (json['latitude'] as num).toDouble()
-              : null,
-      longitude:
-          json['longitude'] != null
-              ? (json['longitude'] as num).toDouble()
-              : null,
+      latitude: _parseToDouble(json['latitude']),
+      longitude: _parseToDouble(json['longitude']),
       commissionRatePercent: json['commissionRatePercent'],
       commissionAmountVnd: json['commissionAmountVnd'],
       legalAreaSqm: json['legalAreaSqm'],
@@ -150,10 +144,9 @@ class ListingModel {
       numberOfBathrooms: json['numberOfBathrooms'],
       numberOfBalconies: json['numberOfBalconies'],
       facing: json['facing'],
-      landCertificate:
-          json['landCertificate'] != null
-              ? LandCertificate.fromJson(json['landCertificate'])
-              : null,
+      landCertificate: json['landCertificate'] != null
+          ? LandCertificate.fromJson(json['landCertificate'])
+          : null,
     );
   }
 
@@ -200,5 +193,13 @@ class ListingModel {
       'facing': facing,
       'landCertificate': landCertificate?.toJson(),
     };
+  }
+
+  static double? _parseToDouble(dynamic value) {
+    if (value == null) return null;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value);
+    return null;
   }
 }
