@@ -17,7 +17,7 @@ class DetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text(""),
         centerTitle: true,
-        actions: [IconButton(icon: const Icon(Icons.menu), onPressed: () {})],
+        // actions: [IconButton(icon: const Icon(Icons.menu), onPressed: () {})],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
@@ -195,7 +195,15 @@ class DetailScreen extends StatelessWidget {
                     const SizedBox(width: 12),
                     _actionButton(Icons.report, "Báo xấu"),
                     const SizedBox(width: 12),
-                    _actionButton(Icons.favorite_border, ""),
+                    Obx(
+                      () => _actionButton(
+                          controller.isLiked.value
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          "",
+                          callBack: () => controller.handleLikeListing(),
+                          color: controller.isLiked.value ? Colors.red : null),
+                    )
                   ],
                 ),
               ),
@@ -433,15 +441,25 @@ class DetailScreen extends StatelessWidget {
                 height: 300,
                 child: GoogleMap(
                   initialCameraPosition: CameraPosition(
-                    target: LatLng(controller.listingDetail!.latitude ?? 0,
-                        controller.listingDetail!.longitude ?? 0),
+                    target: LatLng(
+                        double.tryParse(
+                                controller.listingDetail!.latitude ?? "0") ??
+                            0,
+                        double.tryParse(
+                                controller.listingDetail!.longitude ?? "0") ??
+                            0),
                     zoom: 14.0,
                   ),
                   markers: {
                     Marker(
                       markerId: MarkerId('vị trí'),
-                      position: LatLng(controller.listingDetail!.latitude ?? 0,
-                          controller.listingDetail!.longitude ?? 0),
+                      position: LatLng(
+                          double.tryParse(
+                                  controller.listingDetail!.latitude ?? "0") ??
+                              0,
+                          double.tryParse(
+                                  controller.listingDetail!.longitude ?? "0") ??
+                              0),
                       infoWindow: InfoWindow(title: 'Địa điểm bạn chọn'),
                     )
                   },
@@ -478,22 +496,26 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _actionButton(IconData icon, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.black, size: 18),
-          if (label.isNotEmpty) ...[
-            const SizedBox(width: 6),
-            Text(label, style: const TextStyle(fontSize: 13)),
+  Widget _actionButton(IconData icon, String label,
+      {VoidCallback? callBack, Color? color}) {
+    return GestureDetector(
+      onTap: callBack ?? () {}, // nếu null thì dùng hàm rỗng
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color ?? Colors.black, size: 18),
+            if (label.isNotEmpty) ...[
+              const SizedBox(width: 6),
+              Text(label, style: const TextStyle(fontSize: 13)),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

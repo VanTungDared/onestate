@@ -1,3 +1,5 @@
+import 'package:app_real_estate/models/UserModel.dart';
+import 'package:app_real_estate/utils/notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:app_real_estate/api/api_client.dart';
@@ -39,14 +41,7 @@ class LoginController extends GetxController {
     );
 
     if (result.containsKey("error")) {
-      Get.snackbar(
-        "Lỗi",
-        result["error"],
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
-        duration: Duration(seconds: 3),
-      );
+      LoadingNotifier.showTopMessage(result["error"], false);
       isLoading.value = false;
       return;
     }
@@ -55,12 +50,14 @@ class LoginController extends GetxController {
       'accessToken',
       result["accessToken"],
     );
-    // await SharedPreferenceApp.handleSetString(
-    //   'refreshToken',
-    //   result["refreshToken"],
-    // );
+    final result2 = await apiClient.getCurrentUser();
+    if (result2.containsKey("error")) {
+      LoadingNotifier.showTopMessage(result2["error"], false);
+      isLoading.value = false;
+      return;
+    }
     isLoading.value = false;
-    Get.offAllNamed(RouterName.main);
+    Get.offAllNamed(RouterName.main, arguments: UserModel.fromJson(result2));
   }
 
   @override

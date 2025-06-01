@@ -2,6 +2,7 @@ import 'package:app_real_estate/routers/routerName.dart';
 import 'package:app_real_estate/views/screens/DetailScreen.dart';
 import 'package:app_real_estate/views/screens/LoginScreen.dart';
 import 'package:app_real_estate/views/screens/MainScreen.dart';
+import 'package:app_real_estate/views/screens/MyArticleScreen.dart';
 import 'package:app_real_estate/views/screens/NotFoundScreen.dart';
 import 'package:app_real_estate/views/screens/SearchScreen.dart';
 import 'package:get/get.dart';
@@ -18,4 +19,5 @@ var pages = [
     fullscreenDialog: true,
     opaque: false,
   ),
+  GetPage(name: RouterName.myArticle, page: () => MyArticleScreen()),
 ];

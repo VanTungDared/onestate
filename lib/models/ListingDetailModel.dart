@@ -9,8 +9,8 @@ class ListingDetailModel {
   final String? wardCode;
   final String? streetName;
   final String? fullAddress;
-  final double? latitude;
-  final double? longitude;
+  final String? latitude; // Changed to String?
+  final String? longitude; // Changed to String?
   final String? commissionRatePercent;
   final String? commissionAmountVnd;
   final String? legalAreaSqm;
@@ -33,6 +33,7 @@ class ListingDetailModel {
   final LocationUnit? district;
   final LocationUnit? ward;
   final int? likes;
+  final LikedModel? isLiked;
   final String? ownerPhoneNumber;
   final String? ownerCitizenId;
   final int? numberOfRooms;
@@ -76,6 +77,7 @@ class ListingDetailModel {
     this.district,
     this.ward,
     this.likes,
+    this.isLiked,
     this.ownerPhoneNumber,
     this.ownerCitizenId,
     this.numberOfRooms,
@@ -97,8 +99,8 @@ class ListingDetailModel {
       wardCode: json['wardCode'],
       streetName: json['streetName'],
       fullAddress: json['fullAddress'],
-      latitude: json['latitude'],
-      longitude: json['longitude'],
+      latitude: json['latitude']?.toString(), // Cast to String
+      longitude: json['longitude']?.toString(), // Cast to String
       commissionRatePercent: json['commissionRatePercent'],
       commissionAmountVnd: json['commissionAmountVnd'],
       legalAreaSqm: json['legalAreaSqm'],
@@ -128,6 +130,8 @@ class ListingDetailModel {
           : null,
       ward: json['ward'] != null ? LocationUnit.fromJson(json['ward']) : null,
       likes: json['likes'],
+      isLiked:
+          json['isLiked'] != null ? LikedModel.fromJson(json['isLiked']) : null,
       ownerPhoneNumber: json['ownerPhoneNumber'],
       ownerCitizenId: json['ownerCitizenId'],
       numberOfRooms: json['numberOfRooms'],
@@ -173,6 +177,7 @@ class ListingDetailModel {
         'district': district?.toJson(),
         'ward': ward?.toJson(),
         'likes': likes,
+        'isLiked': isLiked?.toJson(),
         'ownerPhoneNumber': ownerPhoneNumber,
         'ownerCitizenId': ownerCitizenId,
         'numberOfRooms': numberOfRooms,
@@ -190,8 +195,45 @@ class LocationUnit {
   LocationUnit({required this.code, required this.name});
 
   factory LocationUnit.fromJson(Map<String, dynamic> json) {
-    return LocationUnit(code: json['code'] ?? '', name: json['name'] ?? '');
+    return LocationUnit(
+      code: json['code'] ?? '',
+      name: json['name'] ?? '',
+    );
   }
 
-  Map<String, dynamic> toJson() => {'code': code, 'name': name};
+  Map<String, dynamic> toJson() => {
+        'code': code,
+        'name': name,
+      };
+}
+
+class LikedModel {
+  final String id;
+  final String userId;
+  final String listingId;
+  final DateTime? createdAt;
+
+  LikedModel({
+    required this.id,
+    required this.userId,
+    required this.listingId,
+    this.createdAt,
+  });
+
+  factory LikedModel.fromJson(Map<String, dynamic> json) {
+    return LikedModel(
+      id: json['id'] ?? '',
+      userId: json['userId'] ?? '',
+      listingId: json['listingId'] ?? '',
+      createdAt:
+          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'userId': userId,
+        'listingId': listingId,
+        'createdAt': createdAt?.toIso8601String(),
+      };
 }

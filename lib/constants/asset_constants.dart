@@ -5,4 +5,5 @@ class AssetConstant {
   static const String shopIconActive = "assets/images/shop_active.svg";
   static const String profileIcon = "assets/images/profile.svg";
   static const String profileIconActive = "assets/images/profile_active.svg";
+  static const String logo = "assets/images/logo.svg";
 }

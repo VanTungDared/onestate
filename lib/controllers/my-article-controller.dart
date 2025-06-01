@@ -1,13 +1,14 @@
 import 'package:app_real_estate/api/api_client.dart';
 import 'package:app_real_estate/models/ListingModel.dart';
 import 'package:app_real_estate/models/UserModel.dart';
-import 'package:app_real_estate/routers/routerName.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-class CategoryController extends GetxController {
+class MyArticleController extends GetxController {
   final apiClient = ApiClient();
   final scrollController = ScrollController();
+  late List<ListingModel>? dataListings; // thêm dòng này
+  late UserModel? userModel; // thêm dòng này
   final double minHeight = 0.0;
   final double maxHeight = 46.0;
   final double maxWidthIcon = 46.0;
@@ -21,7 +22,8 @@ class CategoryController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
+    dataListings = Get.arguments[0];
+    userModel = Get.arguments[1];
     scrollController.addListener(() {
       double offset = scrollController.position.pixels;
       if (offset < 0) offset = 0;
@@ -55,6 +57,7 @@ class CategoryController extends GetxController {
         }
       }
     });
+    countRender.value = countRender.value + 1;
   }
 
   @override
@@ -66,13 +69,5 @@ class CategoryController extends GetxController {
   String maskPhone(String? phone) {
     if (phone == null || phone.length < 7) return phone ?? '';
     return phone.replaceRange(7, phone.length, '*' * (phone.length - 7));
-  }
-
-  Future<void> navigatorMyArticle(UserModel? userModel) async {
-    Map<String, dynamic> result = await apiClient.getListingsMe();
-    List<ListingModel> dataListings = List<ListingModel>.from(
-      (result["data"] as List).map((e) => ListingModel.fromJson(e)),
-    );
-    Get.toNamed(RouterName.myArticle, arguments: [dataListings, userModel]);
   }
 }

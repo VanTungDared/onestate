@@ -1,6 +1,7 @@
 import 'package:app_real_estate/api/api_client.dart';
 import 'package:app_real_estate/constants/asset_constants.dart';
 import 'package:app_real_estate/models/ListingModel.dart';
+import 'package:app_real_estate/models/UserModel.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
@@ -8,6 +9,7 @@ class MainController extends GetxController {
   final apiClient = ApiClient();
   List<ListingModel> dataListings = [];
   RxInt countRender = 0.obs;
+  late UserModel userModel;
 
   PageController pageController = PageController(initialPage: 0);
   RxInt indexPage = 0.obs;
@@ -32,6 +34,7 @@ class MainController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
+    userModel = Get.arguments;
     Map<String, dynamic> result = await apiClient.getListings();
     dataListings = List<ListingModel>.from(
       (result["data"] as List).map((e) => ListingModel.fromJson(e)),

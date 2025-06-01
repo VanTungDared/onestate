@@ -4,4 +4,5 @@ class RouterName {
   static const String main = '/main_screen';
   static const String detail = '/detail_screen';
   static const String search = '/search_screen';
+  static const String myArticle = '/myArticle_screen';
 }
