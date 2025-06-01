@@ -1,4 +1,5 @@
 import 'package:app_real_estate/controllers/detail_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -12,7 +13,6 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LatLng location = LatLng(20.792132, 105.875961);
     return Scaffold(
       appBar: AppBar(
         title: const Text(""),
@@ -44,23 +44,50 @@ class DetailScreen extends StatelessWidget {
                       controller: _pageController,
                       itemCount: images.isNotEmpty ? images.length : 3,
                       itemBuilder: (context, index) {
-                        return Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[(index + 1) * 200],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.image,
-                              size: 60,
-                              color: Colors.white,
+                        if (images.isNotEmpty) {
+                          final imageUrl =
+                              controller.apiClient.getFullUrl(images[index]);
+
+                          return Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                          ),
-                        );
+                            clipBehavior: Clip.antiAlias,
+                            child: CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const Center(
+                                child: Icon(Icons.broken_image,
+                                    color: Colors.grey, size: 40),
+                              ),
+                            ),
+                          );
+                        } else {
+                          // Placeholder khi không có ảnh
+                          return Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[(index + 1) * 200],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.image,
+                                size: 60,
+                                color: Colors.white,
+                              ),
+                            ),
+                          );
+                        }
                       },
                     ),
                   ),
+
                   // Left arrow
                   Positioned(
                     left: 8,
@@ -152,9 +179,7 @@ class DetailScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
-                  controller.listingDetail!.description?.isNotEmpty == true
-                      ? controller.listingDetail!.description!
-                      : "Chưa có mô tả",
+                  controller.listingDetail!.description ?? "Chưa có mô tả",
                 ),
               ),
 
@@ -268,7 +293,7 @@ class DetailScreen extends StatelessWidget {
                     _techInfoRow(
                       "Giá chào",
                       _formatCurrency(
-                        controller.listingDetail!.listingPriceVnd!,
+                        controller.listingDetail!.listingPriceVnd ?? "",
                       ),
                     ),
                     _techInfoRow(
@@ -307,10 +332,10 @@ class DetailScreen extends StatelessWidget {
                         const SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text("Người đăng", style: TextStyle(fontSize: 13)),
                             Text(
-                              "La Hung",
+                              controller.listingDetail!.authorName ?? "",
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -319,11 +344,11 @@ class DetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Row(
-                      children: const [
+                      children: [
                         Icon(Icons.phone, size: 20),
                         SizedBox(width: 8),
                         Text(
-                          "0981 189 856",
+                          controller.listingDetail!.phoneNumber ?? "",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -360,10 +385,10 @@ class DetailScreen extends StatelessWidget {
                         const SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text("Chủ nhà", style: TextStyle(fontSize: 13)),
                             Text(
-                              "Văn Việt",
+                              controller.listingDetail!.ownerName ?? "",
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -390,10 +415,14 @@ class DetailScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    _locationItem("Tỉnh/Thành phố", "Hà Nội"),
-                    _locationItem("Quận/Huyện", "Phú Xuyên"),
-                    _locationItem("Phường/Xã", "Phú Xuyên"),
-                    _locationItem("Địa chỉ", "Chưa có địa chỉ"),
+                    _locationItem("Tỉnh/Thành phố",
+                        controller.listingDetail!.province!.name),
+                    _locationItem(
+                        "Quận/Huyện", controller.listingDetail!.district!.name),
+                    _locationItem(
+                        "Phường/Xã", controller.listingDetail!.ward!.name),
+                    _locationItem(
+                        "Địa chỉ", controller.listingDetail!.fullAddress ?? ""),
                   ],
                 ),
               ),
@@ -404,13 +433,15 @@ class DetailScreen extends StatelessWidget {
                 height: 300,
                 child: GoogleMap(
                   initialCameraPosition: CameraPosition(
-                    target: LatLng(20.792132, 105.875961),
+                    target: LatLng(controller.listingDetail!.latitude ?? 0,
+                        controller.listingDetail!.longitude ?? 0),
                     zoom: 14.0,
                   ),
                   markers: {
                     Marker(
                       markerId: MarkerId('vị trí'),
-                      position: LatLng(20.792132, 105.875961),
+                      position: LatLng(controller.listingDetail!.latitude ?? 0,
+                          controller.listingDetail!.longitude ?? 0),
                       infoWindow: InfoWindow(title: 'Địa điểm bạn chọn'),
                     )
                   },
