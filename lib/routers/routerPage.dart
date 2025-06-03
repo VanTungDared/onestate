@@ -3,7 +3,9 @@ import 'package:app_real_estate/views/screens/DetailScreen.dart';
 import 'package:app_real_estate/views/screens/LoginScreen.dart';
 import 'package:app_real_estate/views/screens/MainScreen.dart';
 import 'package:app_real_estate/views/screens/MyArticleScreen.dart';
+import 'package:app_real_estate/views/screens/MyLikedScreen.dart';
 import 'package:app_real_estate/views/screens/NotFoundScreen.dart';
+import 'package:app_real_estate/views/screens/RealEstatePostScreen.dart';
 import 'package:app_real_estate/views/screens/SearchScreen.dart';
 import 'package:get/get.dart';
 
@@ -20,4 +22,6 @@ var pages = [
     opaque: false,
   ),
   GetPage(name: RouterName.myArticle, page: () => MyArticleScreen()),
+  GetPage(name: RouterName.myLike, page: () => MyLikedScreen()),
+  GetPage(name: RouterName.post, page: () => RealEstateFormScreen()),
 ];

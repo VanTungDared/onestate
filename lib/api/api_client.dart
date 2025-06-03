@@ -159,7 +159,7 @@ class ApiClient {
         // Giả sử API trả về { "message": "Listing liked successfully" }
         return {
           "success": true,
-          "message": response.data['message'] ?? "Đã thích thành công"
+          "message": response.data['message'] ?? "Đã thích thành công",
         };
       } else {
         return {"error": "Có lỗi xảy ra: ${response.statusMessage}"};
@@ -227,6 +227,54 @@ class ApiClient {
       // Gọi API
       Response response = await _dio.get(
         "listings/me",
+        queryParameters: queryParams,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      Map<String, dynamic> data = response.data;
+      if (response.statusCode == 200) {
+        Map<String, dynamic> result = data["data"];
+        return result;
+      } else {
+        return {"error": "Có lỗi xảy ra: ${response.statusMessage}"};
+      }
+    } catch (e) {
+      print("Lỗi khi gọi API listings: $e");
+      return {"error": "Lỗi khi gọi API"};
+    }
+  }
+
+  Future<Map<String, dynamic>> getListingsLiked({
+    int page = 1,
+    int limit = 10,
+    String? title,
+    String? status, // DRAFT hoặc PUBLISHED
+  }) async {
+    try {
+      // Lấy token từ SharedPreferences
+      String? token = SharedPreferenceApp.handleGetString('accessToken');
+      if (token == null) {
+        return {"error": "Token không tồn tại. Vui lòng đăng nhập lại."};
+      }
+
+      // Chuẩn bị query parameters
+      Map<String, dynamic> queryParams = {'page': page, 'limit': limit};
+
+      if (title != null && title.isNotEmpty) {
+        queryParams['title'] = title;
+      }
+      if (status != null && status.isNotEmpty) {
+        queryParams['status'] = status;
+      }
+
+      // Gọi API
+      Response response = await _dio.get(
+        "listings/liked",
         queryParameters: queryParams,
         options: Options(
           headers: {

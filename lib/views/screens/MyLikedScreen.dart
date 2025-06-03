@@ -1,7 +1,5 @@
 import 'package:app_real_estate/constants/asset_constants.dart';
-import 'package:app_real_estate/controllers/category_controller.dart';
-import 'package:app_real_estate/models/ListingModel.dart';
-import 'package:app_real_estate/models/UserModel.dart';
+import 'package:app_real_estate/controllers/my-liked-controller.dart';
 import 'package:app_real_estate/routers/routerName.dart';
 import 'package:app_real_estate/views/widgets/SubImagesRow.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -9,18 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
-class CategoryScreen extends StatelessWidget {
-  final List<ListingModel>? dataListings; // thêm dòng này
-  final UserModel? userModel; // thêm dòng này
-  const CategoryScreen({
-    super.key,
-    required this.dataListings,
-    required this.userModel,
-  }); // sửa lại constructor
+class MyLikedScreen extends StatelessWidget {
+  const MyLikedScreen({super.key}); // sửa lại constructor
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(CategoryController());
+    final controller = Get.put(MyLikedController());
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+    if (controller.countRender.value == 0) return SizedBox();
     return Scaffold(
       key: scaffoldKey,
       endDrawer: Drawer(
@@ -54,14 +47,14 @@ class CategoryScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            userModel!.fullName,
+                            controller.userModel!.fullName,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            userModel!.phoneNumber,
+                            controller.userModel!.phoneNumber,
                             style: TextStyle(color: Colors.grey[700]),
                           ),
                         ],
@@ -84,9 +77,7 @@ class CategoryScreen extends StatelessWidget {
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Get.toNamed(RouterName.post);
-                    },
+                    onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -108,17 +99,21 @@ class CategoryScreen extends StatelessWidget {
               ListTile(
                 leading: Icon(Icons.article_outlined),
                 title: Text('Danh sách tin của tôi'),
-                onTap: () => controller.navigatorMyArticle(userModel),
+                tileColor: Colors.red,
+                onTap: () {},
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Divider(height: 1),
               ),
+
               // Yêu thích
               ListTile(
                 leading: Icon(Icons.favorite_border),
                 title: Text('Danh sách tin tôi yêu thích'),
-                onTap: () => controller.navigatorMyLiked(userModel),
+                onTap: () {
+                  // TODO: Navigate to favorites
+                },
               ),
             ],
           ),
@@ -145,6 +140,12 @@ class CategoryScreen extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
+                              IconButton(
+                                icon: Icon(Icons.arrow_back_sharp),
+                                onPressed: () {
+                                  Get.back();
+                                },
+                              ),
                               SvgPicture.asset(AssetConstant.logo, width: 40),
                               IconButton(
                                 icon: Icon(Icons.menu),
@@ -231,9 +232,10 @@ class CategoryScreen extends StatelessWidget {
               Expanded(
                 child: ListView.builder(
                   controller: controller.scrollController,
-                  itemCount: dataListings?.length ?? 0,
+                  itemCount: controller.dataListings?.length ?? 0,
                   itemBuilder: (context, index) {
-                    final listing = dataListings![index]; // lấy ListingModel
+                    final listing =
+                        controller.dataListings![index]; // lấy ListingModel
                     return GestureDetector(
                       onTap:
                           () => Get.toNamed(

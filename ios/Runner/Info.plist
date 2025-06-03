@@ -47,5 +47,14 @@
 	<true/>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+	<string>sms</string>
+	<string>tel</string>
+	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>App cần truy cập thư viện ảnh để chọn ảnh.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>App cần dùng camera để chụp ảnh.</string>
 </dict>
 </plist>
