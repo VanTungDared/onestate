@@ -1,0 +1,13 @@
+{
+  "greeting": "Xin chào bạn",
+  "login_prompt": "Đăng nhập để tiếp tục",
+  "phone_hint": "SDT chính hoặc email",
+  "password_hint": "Mật khẩu",
+  "remember_me": "Nhớ tài khoản",
+  "forgot_password": "Quên mật khẩu?",
+  "login_button": "Đăng nhập",
+  "policy_text": "Bằng việc tiếp tục, bạn đồng ý với ",
+  "policy_link": "Điều khoản sử dụng, Chính sách bảo mật, Quy chế, Chính sách",
+  "register_prompt": "Chưa là thành viên? ",
+  "register_link": "Đăng ký tại đây"
+}
