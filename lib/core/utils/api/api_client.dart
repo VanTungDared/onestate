@@ -5,7 +5,7 @@ import 'interceptor.dart';
 
 class DioClient {
   late final Dio _dio;
-
+  late final AuthorizationInterceptor _authorizationInterceptor;
   DioClient() {
     _dio = Dio(
       BaseOptions(
@@ -16,8 +16,9 @@ class DioClient {
         receiveTimeout: const Duration(seconds: 10),
       ),
     );
+    _authorizationInterceptor = AuthorizationInterceptor(_dio);
 
-    _dio.interceptors.addAll([LoggerInterceptor()]);
+    _dio.interceptors.addAll([_authorizationInterceptor, LoggerInterceptor()]);
   }
 
   // GET METHOD
@@ -114,28 +115,6 @@ class DioClient {
   }
 }
 
-// Future<Map<String, dynamic>> login({
-//   required String phoneNumber,
-//   required String password,
-// }) async {
-//   try {
-//     final response = await _dio.post(
-//       "auth/login",
-//       data: {"phoneNumber": phoneNumber, "password": password},
-//       options: Options(headers: {'Content-Type': 'application/json'}),
-//     );
-//
-//     final data = response.data;
-//
-//     if (data['statusCode'] == 200) {
-//       return data['data'];
-//     } else {
-//       return {"error": data["message"] ?? "Login failed"};
-//     }
-//   } catch (e) {
-//     return {"error": "Lỗi khi gọi API: $e"};
-//   }
-// }
 
 // Future<Map<String, dynamic>> getListings({
 //   int page = 1,

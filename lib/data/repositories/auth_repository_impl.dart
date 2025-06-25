@@ -12,18 +12,18 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either> login(String phoneNumber, String password) async {
     final result = await remoteDataSource.login(phoneNumber, password);
-    result.fold(
-      (error) {
-        return Left(error);
-      },
-      (response) async {
-        SharedPreferenceApp.handleSetString(
-          'access_token',
-          response['data']['accessToken'],
+    return await result.fold((error) async => Left(error), (response) async {
+      final data = response.data;
+
+      if (data != null && data['data'] != null) {
+        await SharedPreferenceApp.handleSetString(
+          'accessToken',
+          data['data']['accessToken'],
         );
         return Right(response);
-      },
-    );
-    return result;
+      } else {
+        return const Left('Invalid response format');
+      }
+    });
   }
 }

@@ -5,6 +5,8 @@ class ApiUrl {
 
   static const signup = "${apiV}auth/login";
 
+  static const getUser = "${apiV}auth/me";
+
   static const baseUrlProd = "https://api.onestate-dev.ontik.vn";
 
   static const baseUrlImage = "https://file.dev.ontik.vn/re-storage/images/";

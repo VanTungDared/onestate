@@ -14,7 +14,6 @@ class MainScreen extends GetView<MainController> {
     return Scaffold(
       body: Column(
         children: [
-          // 🔹 Dành toàn bộ phần còn lại cho PageView
           Expanded(
             child: PageView(
               onPageChanged: (index) {

@@ -1,21 +1,14 @@
-import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // String isSaved = "isSaved";
 
-class SharedPreferenceApp extends GetxController {
+class SharedPreferenceApp {
   static SharedPreferences? prefs;
-  @override
-  void onInit() async {
-    super.onInit();
-    handleSetPrefs();
+
+  static Future<void> init() async {
+    prefs = await SharedPreferences.getInstance();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    prefs = null;
-  }
 
   static Future<void> handleSetPrefs() async {
     if (prefs != null) return;
