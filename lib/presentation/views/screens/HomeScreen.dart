@@ -116,11 +116,12 @@ class HomeScreen extends StatelessWidget {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 16),
                             child: InfoCard(
-                              imageUrl: controller.apiClient.getFullUrl(
-                                (listing.imageUrls.isNotEmpty)
-                                    ? listing.imageUrls.first
-                                    : 'https://via.placeholder.com/150',
-                              ),
+                              // imageUrl: controller.apiClient.getFullUrl(
+                              //   (listing.imageUrls.isNotEmpty)
+                              //       ? listing.imageUrls.first
+                              //       : 'https://via.placeholder.com/150',
+                              // ),
+                              imageUrl: 'https://via.placeholder.com/150',
                               title: listing.title,
                               description: listing.description,
                             ),

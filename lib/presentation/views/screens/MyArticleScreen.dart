@@ -1,4 +1,3 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -10,9 +9,7 @@ import '../../routers/routerName.dart';
 import '../../widgets/SubImagesRow.dart';
 
 class MyArticleScreen extends StatelessWidget {
-  const MyArticleScreen({
-    super.key,
-  }); // sửa lại constructor
+  const MyArticleScreen({super.key}); // sửa lại constructor
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(MyArticleController());
@@ -23,7 +20,8 @@ class MyArticleScreen extends StatelessWidget {
       endDrawer: Drawer(
         elevation: 0, // Tùy chọn, loại bỏ đổ bóng
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.zero), // Không bo góc
+          borderRadius: BorderRadius.zero,
+        ), // Không bo góc
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,7 +29,9 @@ class MyArticleScreen extends StatelessWidget {
               // Header
               Padding(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 12.0),
+                  horizontal: 16.0,
+                  vertical: 12.0,
+                ),
                 child: Row(
                   children: [
                     CircleAvatar(
@@ -47,11 +47,17 @@ class MyArticleScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(controller.userModel!.fullName,
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                          Text(controller.userModel!.phoneNumber,
-                              style: TextStyle(color: Colors.grey[700])),
+                          Text(
+                            controller.userModel!.fullName,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            controller.userModel!.phoneNumber,
+                            style: TextStyle(color: Colors.grey[700]),
+                          ),
                         ],
                       ),
                     ),
@@ -77,8 +83,10 @@ class MyArticleScreen extends StatelessWidget {
                       backgroundColor: Colors.red,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: Text('Đăng tin',
-                        style: TextStyle(fontSize: 16, color: Colors.white)),
+                    child: Text(
+                      'Đăng tin',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
                   ),
                 ),
               ),
@@ -139,10 +147,7 @@ class MyArticleScreen extends StatelessWidget {
                                   Get.back();
                                 },
                               ),
-                              SvgPicture.asset(
-                                AssetConstant.logo,
-                                width: 40,
-                              ),
+                              SvgPicture.asset(AssetConstant.logo, width: 40),
                               IconButton(
                                 icon: Icon(Icons.menu),
                                 onPressed: () {
@@ -233,10 +238,11 @@ class MyArticleScreen extends StatelessWidget {
                     final listing =
                         controller.dataListings![index]; // lấy ListingModel
                     return GestureDetector(
-                      onTap: () => Get.toNamed(
-                        RouterName.detail,
-                        arguments: listing.id,
-                      ),
+                      onTap:
+                          () => Get.toNamed(
+                            RouterName.detail,
+                            arguments: listing.id,
+                          ),
                       child: Container(
                         margin: EdgeInsets.only(bottom: 16),
                         decoration: BoxDecoration(
@@ -264,16 +270,20 @@ class MyArticleScreen extends StatelessWidget {
                                     topRight: Radius.circular(16),
                                   ),
                                   child: CachedNetworkImage(
-                                    imageUrl: controller.apiClient.getFullUrl(
-                                      (listing.imageUrls.isNotEmpty)
-                                          ? listing.imageUrls.first
-                                          : 'https://via.placeholder.com/150',
-                                    ),
-                                    placeholder: (context, url) => Center(
-                                      child: const CircularProgressIndicator(),
-                                    ),
-                                    errorWidget: (context, url, error) =>
-                                        const Icon(Icons.error),
+                                    // imageUrl: controller.apiClient.getFullUrl(
+                                    //   (listing.imageUrls.isNotEmpty)
+                                    //       ? listing.imageUrls.first
+                                    //       : 'https://via.placeholder.com/150',
+                                    // ),
+                                    imageUrl: 'https://via.placeholder.com/150',
+                                    placeholder:
+                                        (context, url) => Center(
+                                          child:
+                                              const CircularProgressIndicator(),
+                                        ),
+                                    errorWidget:
+                                        (context, url, error) =>
+                                            const Icon(Icons.error),
                                     fit: BoxFit.cover,
                                     width: double.infinity,
                                     height: 210,

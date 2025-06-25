@@ -2,12 +2,10 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import '../../core/utils/api/api_client.dart';
-import '../../data/models/ListingModel.dart';
 import '../../data/models/UserModel.dart';
-import '../routers/routerName.dart';
 
 class CategoryController extends GetxController {
-  final apiClient = ApiClient();
+  final apiClient = DioClient();
   final scrollController = ScrollController();
   final double minHeight = 0.0;
   final double maxHeight = 46.0;
@@ -70,18 +68,18 @@ class CategoryController extends GetxController {
   }
 
   Future<void> navigatorMyArticle(UserModel? userModel) async {
-    Map<String, dynamic> result = await apiClient.getListingsMe();
-    List<ListingModel> dataListings = List<ListingModel>.from(
-      (result["data"] as List).map((e) => ListingModel.fromJson(e)),
-    );
-    Get.toNamed(RouterName.myArticle, arguments: [dataListings, userModel]);
+    // Map<String, dynamic> result = await apiClient.getListingsMe();
+    // List<ListingModel> dataListings = List<ListingModel>.from(
+    //   (result["data"] as List).map((e) => ListingModel.fromJson(e)),
+    // );
+    // Get.toNamed(RouterName.myArticle, arguments: [dataListings, userModel]);
   }
 
   Future<void> navigatorMyLiked(UserModel? userModel) async {
-    Map<String, dynamic> result = await apiClient.getListingsLiked();
-    List<ListingModel> dataListings = List<ListingModel>.from(
-      (result["data"] as List).map((e) => ListingModel.fromJson(e)),
-    );
-    Get.toNamed(RouterName.myLike, arguments: [dataListings, userModel]);
+    // Map<String, dynamic> result = await apiClient.getListingsLiked();
+    // List<ListingModel> dataListings = List<ListingModel>.from(
+    //   (result["data"] as List).map((e) => ListingModel.fromJson(e)),
+    // );
+    // Get.toNamed(RouterName.myLike, arguments: [dataListings, userModel]);
   }
 }

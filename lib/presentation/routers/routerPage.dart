@@ -1,8 +1,9 @@
 import 'package:app_real_estate/presentation/routers/routerName.dart';
+import 'package:app_real_estate/presentation/views/screens/main/main_binding.dart';
 import 'package:get/get.dart';
 
 import '../views/screens/DetailScreen.dart';
-import '../views/screens/MainScreen.dart';
+import '../views/screens/main/MainScreen.dart';
 import '../views/screens/MyArticleScreen.dart';
 import '../views/screens/MyLikedScreen.dart';
 import '../views/screens/NotFoundScreen.dart';
@@ -18,7 +19,11 @@ var pages = [
     page: () => LoginScreen(),
     binding: LoginBinding(),
   ),
-  GetPage(name: RouterName.main, page: () => MainScreen()),
+  GetPage(
+    name: RouterName.main,
+    page: () => MainScreen(),
+    binding: MainBinding(),
+  ),
   GetPage(name: RouterName.detail, page: () => DetailScreen()),
   GetPage(
     name: RouterName.search,

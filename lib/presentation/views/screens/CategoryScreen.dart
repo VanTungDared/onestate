@@ -1,4 +1,3 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -10,7 +9,6 @@ import '../../../data/models/UserModel.dart';
 import '../../controllers/category_controller.dart';
 import '../../routers/routerName.dart';
 import '../../widgets/SubImagesRow.dart';
-
 
 class CategoryScreen extends StatelessWidget {
   final List<ListingModel>? dataListings; // thêm dòng này
@@ -270,11 +268,12 @@ class CategoryScreen extends StatelessWidget {
                                     topRight: Radius.circular(16),
                                   ),
                                   child: CachedNetworkImage(
-                                    imageUrl: controller.apiClient.getFullUrl(
-                                      (listing.imageUrls.isNotEmpty)
-                                          ? listing.imageUrls.first
-                                          : 'https://via.placeholder.com/150',
-                                    ),
+                                    // imageUrl: controller.apiClient.getFullUrl(
+                                    //   (listing.imageUrls.isNotEmpty)
+                                    //       ? listing.imageUrls.first
+                                    //       : 'https://via.placeholder.com/150',
+                                    // ),
+                                    imageUrl: 'https://via.placeholder.com/150',
                                     placeholder:
                                         (context, url) => Center(
                                           child:

@@ -54,9 +54,11 @@ class DetailScreen extends StatelessWidget {
                           itemCount: images.isNotEmpty ? images.length : 3,
                           itemBuilder: (context, index) {
                             if (images.isNotEmpty) {
-                              final imageUrl = controller.apiClient.getFullUrl(
-                                images[index],
-                              );
+                              // final imageUrl = controller.apiClient.getFullUrl(
+                              //   images[index],
+                              // );
+
+                              final imageUrl = 'https://via.placeholder.com/150';
 
                               return Container(
                                 margin: const EdgeInsets.symmetric(

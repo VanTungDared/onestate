@@ -1,13 +1,13 @@
+import 'package:app_real_estate/presentation/views/screens/main/main_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/main_controller.dart';
-import 'CategoryScreen.dart';
+import '../CategoryScreen.dart';
 
-class MainScreen extends StatelessWidget {
-  final controller = Get.put(MainController());
+class MainScreen extends GetView<MainController> {
 
-  MainScreen({super.key});
+
+  const MainScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,6 @@ class MainScreen extends StatelessWidget {
           Expanded(
             child: PageView(
               onPageChanged: (index) {
-                print("Đã chuyển sang trang: $index");
                 controller.indexPage.value = index;
               },
               controller: controller.pageController,

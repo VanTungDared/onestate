@@ -271,11 +271,12 @@ class MyLikedScreen extends StatelessWidget {
                                     topRight: Radius.circular(16),
                                   ),
                                   child: CachedNetworkImage(
-                                    imageUrl: controller.apiClient.getFullUrl(
-                                      (listing.imageUrls.isNotEmpty)
-                                          ? listing.imageUrls.first
-                                          : 'https://via.placeholder.com/150',
-                                    ),
+                                    // imageUrl: controller.apiClient.getFullUrl(
+                                    //   (listing.imageUrls.isNotEmpty)
+                                    //       ? listing.imageUrls.first
+                                    //       : 'https://via.placeholder.com/150',
+                                    // ),
+                                    imageUrl: 'https://via.placeholder.com/150',
                                     placeholder:
                                         (context, url) => Center(
                                           child:

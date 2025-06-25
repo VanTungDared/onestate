@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
 import '../../../../core/utils/api/api_client.dart';
 import '../../../../core/utils/notifier.dart';
-import '../../../../data/datasources/dblocal/shared_preferences.dart';
-import '../../../../data/models/UserModel.dart';
+import '../../../../data/models/User.dart';
+import '../../../../domain/usecases/login_usecase.dart';
 import '../../../routers/routerName.dart';
 
+class LoginController extends GetxController {
+  final LoginUseCase loginUseCase;
 
-  class LoginController extends GetxController {
+  LoginController(this.loginUseCase);
+
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
   final isPasswordVisible = false.obs;
@@ -17,15 +19,13 @@ import '../../../routers/routerName.dart';
   final isFormValid = false.obs;
   final rememberMe = false.obs;
 
-  final apiClient = ApiClient();
+  final apiClient = DioClient();
 
   @override
   void onInit() {
     super.onInit();
     phoneController.addListener(validateForm);
     passwordController.addListener(validateForm);
-    phoneController.text = "0985495876";
-    passwordController.text = "123";
   }
 
   void validateForm() {
@@ -38,29 +38,32 @@ import '../../../routers/routerName.dart';
     if (!isFormValid.value) return;
 
     isLoading.value = true;
-    final result = await apiClient.login(
-      phoneNumber: phoneController.text.trim(),
-      password: passwordController.text.trim(),
+
+    final result = await loginUseCase.call(
+      phoneController.text.trim(),
+      passwordController.text.trim(),
     );
 
-    if (result.containsKey("error")) {
-      LoadingNotifier.showTopMessage(result["error"], false);
-      isLoading.value = false;
-      return;
-    }
+    result.fold(
+      (errorMessage) {
+        LoadingNotifier.showTopMessage(errorMessage, false);
+        isLoading.value = false;
+      },
+      (data) async {
+        // final userInfo = await apiClient.getCurrentUser();
+        // if (userInfo.containsKey("error")) {
+        //   LoadingNotifier.showTopMessage(userInfo["error"], false);
+        //   isLoading.value = false;
+        //   return;
+        // }
 
-    await SharedPreferenceApp.handleSetString(
-      'accessToken',
-      result["accessToken"],
+        isLoading.value = false;
+        Get.offAllNamed(
+          RouterName.main,
+         // arguments: UserModel.fromJson(userInfo),
+        );
+      },
     );
-    final result2 = await apiClient.getCurrentUser();
-    if (result2.containsKey("error")) {
-      LoadingNotifier.showTopMessage(result2["error"], false);
-      isLoading.value = false;
-      return;
-    }
-    isLoading.value = false;
-    Get.offAllNamed(RouterName.main, arguments: UserModel.fromJson(result2));
   }
 
   @override
@@ -70,3 +73,10 @@ import '../../../routers/routerName.dart';
     super.onClose();
   }
 }
+
+// final result2 = await apiClient.getCurrentUser();
+// if (result2.containsKey("error")) {
+//   LoadingNotifier.showTopMessage(result2["error"], false);
+//   isLoading.value = false;
+//   return;
+// }

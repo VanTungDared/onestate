@@ -6,7 +6,7 @@ import '../../data/models/ListingModel.dart';
 import '../../data/models/UserModel.dart';
 
 class MyLikedController extends GetxController {
-  final apiClient = ApiClient();
+  final apiClient = DioClient();
   final scrollController = ScrollController();
   late List<ListingModel>? dataListings; // thêm dòng này
   late UserModel? userModel; // thêm dòng này

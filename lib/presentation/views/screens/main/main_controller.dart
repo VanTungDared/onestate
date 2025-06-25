@@ -1,13 +1,13 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-import '../../core/utils/api/api_client.dart';
-import '../../core/utils/constants/asset_constants.dart';
-import '../../data/models/ListingModel.dart';
-import '../../data/models/UserModel.dart';
+import '../../../../core/utils/api/api_client.dart';
+import '../../../../core/utils/constants/asset_constants.dart';
+import '../../../../data/models/ListingModel.dart';
+import '../../../../data/models/UserModel.dart';
 
 class MainController extends GetxController {
-  final apiClient = ApiClient();
+  final apiClient = DioClient();
   List<ListingModel> dataListings = [];
   RxInt countRender = 0.obs;
   late UserModel userModel;
@@ -36,11 +36,11 @@ class MainController extends GetxController {
   void onInit() async {
     super.onInit();
     userModel = Get.arguments;
-    Map<String, dynamic> result = await apiClient.getListings();
-    dataListings = List<ListingModel>.from(
-      (result["data"] as List).map((e) => ListingModel.fromJson(e)),
-    );
-    countRender.value = countRender.value + 1;
-    print(result);
+    // Map<String, dynamic> result = await apiClient.getListings();
+    // dataListings = List<ListingModel>.from(
+    //   (result["data"] as List).map((e) => ListingModel.fromJson(e)),
+    // );
+    // countRender.value = countRender.value + 1;
+    // print(result);
   }
 }
