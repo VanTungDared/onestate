@@ -10,7 +10,7 @@ class MainController extends GetxController {
   final apiClient = DioClient();
   List<ListingModel> dataListings = [];
   RxInt countRender = 0.obs;
-  late UserModel userModel;
+  //late UserModel userModel;
 
   PageController pageController = PageController(initialPage: 0);
   RxInt indexPage = 0.obs;
@@ -35,7 +35,7 @@ class MainController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    userModel = Get.arguments;
+    //userModel = Get.arguments;
     // Map<String, dynamic> result = await apiClient.getListings();
     // dataListings = List<ListingModel>.from(
     //   (result["data"] as List).map((e) => ListingModel.fromJson(e)),

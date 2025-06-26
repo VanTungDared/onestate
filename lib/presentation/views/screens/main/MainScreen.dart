@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../CategoryScreen.dart';
+import 'HomeScreen.dart';
 
 class MainScreen extends GetView<MainController> {
 
@@ -21,19 +22,20 @@ class MainScreen extends GetView<MainController> {
               },
               controller: controller.pageController,
               children: [
-                Obx(() {
-                  if (controller.countRender.value > 0) {
-                    return CategoryScreen(
-                      dataListings: controller.dataListings,
-                      userModel: controller.userModel,
-                    );
-                  } else {
-                    return CategoryScreen(
-                      dataListings: controller.dataListings,
-                      userModel: controller.userModel,
-                    );
-                  }
-                }),
+                // Obx(() {
+                //   if (controller.countRender.value > 0) {
+                //     return CategoryScreen(
+                //       dataListings: controller.dataListings,
+                //       userModel: controller.userModel,
+                //     );
+                //   } else {
+                //     return CategoryScreen(
+                //       dataListings: controller.dataListings,
+                //       userModel: controller.userModel,
+                //     );
+                //   }
+                // }),
+                HomeScreen(dataListings: [],)
               ], // bạn thêm các page ở đây
             ),
           ),

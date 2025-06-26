@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/utils/api/api_client.dart';
-import '../../../../core/utils/notifier.dart';
-import '../../../../data/models/UserModel.dart';
 import '../../../../domain/usecases/login_usecase.dart';
 import '../../../routers/routerName.dart';
 
@@ -39,35 +37,39 @@ class LoginController extends GetxController {
   void login() async {
     if (!isFormValid.value) return;
 
-    isLoading.value = true;
-
-    final result = await loginUseCase.call(
-      phoneController.text.trim(),
-      passwordController.text.trim(),
-    );
-
-    result.fold(
-      (errorMessage) {
-        LoadingNotifier.showTopMessage(errorMessage, false);
-        isLoading.value = false;
-      },
-      (data) async {
-        await Future.delayed(Duration(milliseconds: 100));
-        final userInfo = await getUserUseCase.call();
-        userInfo.fold(
-          (errorMessage) {
-            LoadingNotifier.showTopMessage(errorMessage, false);
-            isLoading.value = false;
-          },
-          (data) {
-            isLoading.value = false;
-            Get.offAllNamed(
-              RouterName.main,
-              arguments: UserModel.fromJson(data),
-            );
-          },
-        );
-      },
+    // isLoading.value = true;
+    //
+    // final result = await loginUseCase.call(
+    //   phoneController.text.trim(),
+    //   passwordController.text.trim(),
+    // );
+    //
+    // result.fold(
+    //   (errorMessage) {
+    //     LoadingNotifier.showTopMessage(errorMessage, false);
+    //     isLoading.value = false;
+    //   },
+    //   (data) async {
+    //     await Future.delayed(Duration(milliseconds: 100));
+    //     final userInfo = await getUserUseCase.call();
+    //     userInfo.fold(
+    //       (errorMessage) {
+    //         LoadingNotifier.showTopMessage(errorMessage, false);
+    //         isLoading.value = false;
+    //       },
+    //       (data) {
+    //         isLoading.value = false;
+    //         Get.offAllNamed(
+    //           RouterName.main,
+    //           arguments: UserModel.fromJson(data),
+    //         );
+    //       },
+    //     );
+    //   },
+    // );
+    Get.offAllNamed(
+      RouterName.main,
+      //arguments: UserModel.fromJson(data),
     );
   }
 

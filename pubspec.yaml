@@ -48,7 +48,8 @@ dependencies:
   url_launcher: ^6.3.1
   image_picker: ^1.1.2
   flutter_screenutil: ^5.9.3
-
+  logger: ^2.6.0
+  dartz: ^0.10.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
