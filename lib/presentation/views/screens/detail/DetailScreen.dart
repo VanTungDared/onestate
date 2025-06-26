@@ -6,13 +6,12 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/utils/constants/asset_constants.dart';
-import '../../controllers/detail_controller.dart';
-import '../../widgets/ButtonPrimary.dart';
+import '../../../../core/utils/constants/asset_constants.dart';
+import 'detail_controller.dart';
+import '../../../widgets/ButtonPrimary.dart';
 
 
-class DetailScreen extends StatelessWidget {
-  final controller = Get.put(DetailController());
+class DetailScreen extends GetView<DetailController> {
 
   DetailScreen({super.key});
 
@@ -24,7 +23,6 @@ class DetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text(""),
         centerTitle: true,
-        // actions: [IconButton(icon: const Icon(Icons.menu), onPressed: () {})],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
@@ -34,9 +32,7 @@ class DetailScreen extends StatelessWidget {
         if (controller.countRender.value == 0) {
           return const Center(child: CircularProgressIndicator());
         }
-
         final images = controller.listingDetail?.imageUrls ?? [];
-
         return Stack(
           children: [
             SingleChildScrollView(
@@ -54,9 +50,6 @@ class DetailScreen extends StatelessWidget {
                           itemCount: images.isNotEmpty ? images.length : 3,
                           itemBuilder: (context, index) {
                             if (images.isNotEmpty) {
-                              // final imageUrl = controller.apiClient.getFullUrl(
-                              //   images[index],
-                              // );
 
                               final imageUrl = 'https://via.placeholder.com/150';
 
@@ -86,7 +79,6 @@ class DetailScreen extends StatelessWidget {
                                 ),
                               );
                             } else {
-                              // Placeholder khi không có ảnh
                               return Container(
                                 margin: const EdgeInsets.symmetric(
                                   horizontal: 8,

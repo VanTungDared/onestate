@@ -1,8 +1,7 @@
 import 'package:get/get.dart';
 
-import '../../core/utils/api/api_client.dart';
-import '../../core/utils/notifier.dart';
-import '../../data/models/ListingDetailModel.dart';
+import '../../../../core/utils/api/api_client.dart';
+import '../../../../data/models/ListingDetailModel.dart';
 
 class DetailController extends GetxController {
   final apiClient = DioClient();

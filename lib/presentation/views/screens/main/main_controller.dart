@@ -5,12 +5,14 @@ import '../../../../core/utils/api/api_client.dart';
 import '../../../../core/utils/constants/asset_constants.dart';
 import '../../../../data/models/ListingModel.dart';
 import '../../../../data/models/UserModel.dart';
+import '../../../routers/routerName.dart';
 
 class MainController extends GetxController {
   final apiClient = DioClient();
   List<ListingModel> dataListings = [];
   RxInt countRender = 0.obs;
-  //late UserModel userModel;
+
+  late UserModel userModel;
 
   PageController pageController = PageController(initialPage: 0);
   RxInt indexPage = 0.obs;
@@ -35,12 +37,16 @@ class MainController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    //userModel = Get.arguments;
+    userModel = Get.arguments;
     // Map<String, dynamic> result = await apiClient.getListings();
     // dataListings = List<ListingModel>.from(
     //   (result["data"] as List).map((e) => ListingModel.fromJson(e)),
     // );
     // countRender.value = countRender.value + 1;
     // print(result);
+  }
+
+  void onPressCard() {
+    Get.toNamed(RouterName.detail);
   }
 }

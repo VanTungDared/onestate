@@ -1,106 +1,55 @@
-class LandCertificate {
-  final String code;
-  final List<String> imageUrls;
+import '../../domain/entities/landcertificate.dart';
+import '../../domain/entities/listing.dart';
+import 'landcertificate.dart';
 
-  LandCertificate({required this.code, required this.imageUrls});
-
-  factory LandCertificate.fromJson(Map<String, dynamic> json) {
-    return LandCertificate(
-      code: json['code'] ?? '',
-      imageUrls: List<String>.from(json['imageUrls'] ?? []),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'code': code, 'imageUrls': imageUrls};
-  }
-}
-
-class ListingModel {
-  final String id;
-  final String title;
-  final String status;
-  final String description;
-  final String ownerName;
-  final String provinceCode;
-  final String districtCode;
-  final String wardCode;
-  final String? streetName;
-  final String? fullAddress;
-  final double? latitude;
-  final double? longitude;
-  final String commissionRatePercent;
-  final String? commissionAmountVnd;
-  final String legalAreaSqm;
-  final String actualAreaSqm;
-  final String frontageMeters;
-  final String? widthMeters;
-  final String? roadWidthMeters;
-  final int? numberOfFloors;
-  final String listingPriceVnd;
-  final String realEstateType;
-  final String createdBy;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String authorName;
-  final List<String> imageUrls;
-  final List<String> tags;
-  final String? province;
-  final String? district;
-  final String? ward;
-
-  // New fields
-  final int? likes;
-  final String? phoneNumber;
-  final String? ownerPhoneNumber;
-  final String? ownerCitizenId;
-  final int? numberOfRooms;
-  final int? numberOfBathrooms;
-  final int? numberOfBalconies;
-  final String? facing;
-  final LandCertificate? landCertificate;
-
+class ListingModel extends Listing {
   ListingModel({
-    required this.id,
-    required this.title,
-    required this.status,
-    required this.description,
-    required this.ownerName,
-    required this.provinceCode,
-    required this.districtCode,
-    required this.wardCode,
-    this.streetName,
-    this.fullAddress,
-    this.latitude,
-    this.longitude,
-    required this.commissionRatePercent,
-    this.commissionAmountVnd,
-    required this.legalAreaSqm,
-    required this.actualAreaSqm,
-    required this.frontageMeters,
-    this.widthMeters,
-    this.roadWidthMeters,
-    this.numberOfFloors,
-    required this.listingPriceVnd,
-    required this.realEstateType,
-    required this.createdBy,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.authorName,
-    required this.imageUrls,
-    required this.tags,
-    this.province,
-    this.district,
-    this.ward,
-    this.likes,
-    this.phoneNumber,
-    this.ownerPhoneNumber,
-    this.ownerCitizenId,
-    this.numberOfRooms,
-    this.numberOfBathrooms,
-    this.numberOfBalconies,
-    this.facing,
-    this.landCertificate,
+    required super.id,
+    required super.title,
+    required super.status,
+    required super.description,
+    required super.ownerName,
+    required super.provinceCode,
+    required super.districtCode,
+    required super.wardCode,
+    super.streetName,
+    super.fullAddress,
+    super.latitude,
+    super.longitude,
+    required super.commissionRatePercent,
+    super.commissionAmountVnd,
+    required super.legalAreaSqm,
+    required super.actualAreaSqm,
+    required super.frontageMeters,
+    super.widthMeters,
+    super.roadWidthMeters,
+    super.numberOfFloors,
+    required super.listingPriceVnd,
+    required super.realEstateType,
+    required super.createdBy,
+    required super.createdAt,
+    required super.updatedAt,
+    required super.authorName,
+    required super.imageUrls,
+    required super.tags,
+    super.province,
+    super.district,
+    super.ward,
+    super.likes,
+    super.phoneNumber,
+    super.ownerPhoneNumber,
+    super.ownerCitizenId,
+    super.numberOfRooms,
+    super.numberOfBathrooms,
+    super.numberOfBalconies,
+    super.facing,
+    super.landCertificate,
+    required super.updatedBy,
+    required super.listingPriceVndSell,
+    required super.listingPriceVndRent,
+    required super.listingCode,
+    required super.listingType,
+    required super.isLiked,
   });
 
   factory ListingModel.fromJson(Map<String, dynamic> json) {
@@ -144,9 +93,21 @@ class ListingModel {
       numberOfBathrooms: json['numberOfBathrooms'],
       numberOfBalconies: json['numberOfBalconies'],
       facing: json['facing'],
-      landCertificate: json['landCertificate'] != null
-          ? LandCertificate.fromJson(json['landCertificate'])
-          : null,
+      landCertificate:
+          json['landCertificate'] != null
+              ? LandCertificate(
+                code: json['landCertificate']['code'] ?? '',
+                imageUrls: List<String>.from(
+                  json['landCertificate']['imageUrls'] ?? [],
+                ),
+              )
+              : null,
+      updatedBy: json['updatedBy'],
+      listingPriceVndSell: json['listingPriceVndSell'],
+      listingPriceVndRent: json['listingPriceVndRent'],
+      listingCode: json['listingCode'],
+      listingType: json['listingType'],
+      isLiked: json['isLiked'],
     );
   }
 
@@ -191,7 +152,16 @@ class ListingModel {
       'numberOfBathrooms': numberOfBathrooms,
       'numberOfBalconies': numberOfBalconies,
       'facing': facing,
-      'landCertificate': landCertificate?.toJson(),
+      'landCertificate':
+          landCertificate is LandCertificateModel
+              ? (landCertificate as LandCertificateModel).toJson()
+              : null,
+      'updatedBy': updatedBy,
+      'listingPriceVndSell': listingPriceVndSell,
+      'listingPriceVndRent': listingPriceVndRent,
+      'listingCode': listingCode,
+      'listingType': listingType,
+      'isLiked': isLiked,
     };
   }
 

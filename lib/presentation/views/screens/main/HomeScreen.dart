@@ -128,6 +128,7 @@ class HomeScreen extends GetView<MainController> {
                   imageUrl: 'https://via.placeholder.com/150',
                   title: "ok",
                   description: "ok",
+                  onPress: controller.onPressCard,
                 ),
 
                 const SizedBox(height: 12),

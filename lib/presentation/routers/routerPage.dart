@@ -2,7 +2,8 @@ import 'package:app_real_estate/presentation/routers/routerName.dart';
 import 'package:app_real_estate/presentation/views/screens/main/main_binding.dart';
 import 'package:get/get.dart';
 
-import '../views/screens/DetailScreen.dart';
+import '../views/screens/detail/DetailScreen.dart';
+import '../views/screens/detail/detail_binding.dart';
 import '../views/screens/main/MainScreen.dart';
 import '../views/screens/MyArticleScreen.dart';
 import '../views/screens/MyLikedScreen.dart';
@@ -24,7 +25,11 @@ var pages = [
     page: () => MainScreen(),
     binding: MainBinding(),
   ),
-  GetPage(name: RouterName.detail, page: () => DetailScreen()),
+  GetPage(
+    name: RouterName.detail,
+    page: () => DetailScreen(),
+    binding: DetailBinding(),
+  ),
   GetPage(
     name: RouterName.search,
     page: () => SearchScreen(),
