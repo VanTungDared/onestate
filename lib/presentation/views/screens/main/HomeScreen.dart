@@ -2,17 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../../../../data/models/ListingModel.dart';
 import '../../../routers/routerName.dart';
 import '../../../widgets/InfoCard.dart';
 import 'main_controller.dart';
 
 class HomeScreen extends GetView<MainController> {
-  final List<ListingModel>? dataListings; // thêm dòng này
-  const HomeScreen({
-    super.key,
-    required this.dataListings,
-  }); // sửa lại constructor
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,44 +20,6 @@ class HomeScreen extends GetView<MainController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // AppBar
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //   children: [
-                //     Row(
-                //       children: [
-                //         CircleAvatar(
-                //           radius: 24,
-                //           backgroundImage: NetworkImage(
-                //             'https://i.pravatar.cc/150?img=3',
-                //           ),
-                //         ),
-                //         const SizedBox(width: 12),
-                //         Column(
-                //           crossAxisAlignment: CrossAxisAlignment.start,
-                //           children: const [
-                //             Text(
-                //               'Good Morning',
-                //               style: TextStyle(
-                //                 fontSize: 12,
-                //                 color: Colors.grey,
-                //               ),
-                //             ),
-                //             Text(
-                //               'Adrian Hajdin',
-                //               style: TextStyle(
-                //                 fontSize: 16,
-                //                 fontWeight: FontWeight.bold,
-                //               ),
-                //             ),
-                //           ],
-                //         ),
-                //       ],
-                //     ),
-                //     Icon(Icons.notifications_none),
-                //   ],
-                // ),
-                // const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
                     Get.toNamed(RouterName.search);
@@ -96,7 +53,7 @@ class HomeScreen extends GetView<MainController> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      'Có 3 bất động sản',
+                      'Có ${controller.dataListings.length} bất động sản',
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.normal,
@@ -106,29 +63,35 @@ class HomeScreen extends GetView<MainController> {
                   ],
                 ),
                 SizedBox(height: 16.h),
-                // // List of Info Cards
-                // Padding(
-                //   padding: const EdgeInsets.all(8),
-                //   child: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children:
-                //         dataListings!.map((listing) {
-                //           return Padding(
-                //             padding: const EdgeInsets.only(bottom: 16),
-                //             child: InfoCard(
-                //               imageUrl: 'https://via.placeholder.com/150',
-                //               title: "Ok",
-                //               description: listing.description,
-                //             ),
-                //           );
-                //         }).toList(),
-                //   ),
-                // ),
-                InfoCard(
-                  imageUrl: 'https://via.placeholder.com/150',
-                  title: "ok",
-                  description: "ok",
-                  onPress: controller.onPressCard,
+
+                Obx(
+                  () => ListView.builder(
+                    itemCount: controller.dataListings.length,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      final item = controller.dataListings[index];
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: 12.h),
+                        child: InfoCard(
+                          imageUrl:
+                              item.imageUrls.isNotEmpty
+                                  ? item.imageUrls.first
+                                  : 'https://via.placeholder.com/150',
+                          title: item.title,
+                          description: item.description,
+                          onPress: controller.onPressCard,
+                          listingPriceVndRent:
+                              _formatPrice(item.listingPriceVndRent),
+                          legalAreaSqm: item.legalAreaSqm,
+                          province: item.province.name,
+                          district: item.district.name,
+                          own: item.ownerName,
+                          updatedAt: formatUpdatedAtDaysAgo(item.updatedAt),
+                        ),
+                      );
+                    },
+                  ),
                 ),
 
                 const SizedBox(height: 12),
@@ -163,5 +126,36 @@ class HomeScreen extends GetView<MainController> {
         ],
       ),
     );
+  }
+
+  String _formatPrice(String? priceVnd) {
+    if (priceVnd == null) return 'Đang cập nhật';
+    try {
+      double price = double.parse(priceVnd);
+      if (price >= 1000000000) {
+        return '${(price / 1000000000).toStringAsFixed(1)} tỷ';
+      } else if (price >= 1000000) {
+        return '${(price / 1000000).toStringAsFixed(1)} triệu';
+      } else {
+        return '${price.toStringAsFixed(0)} đ';
+      }
+    } catch (e) {
+      return 'Đang cập nhật';
+    }
+  }
+
+  String formatUpdatedAtDaysAgo(DateTime? updatedAt) {
+    if (updatedAt == null) return 'Đang cập nhật';
+
+    final now = DateTime.now();
+    final difference = now.difference(updatedAt).inDays;
+
+    if (difference == 0) {
+      return 'Cập nhật hôm nay';
+    } else if (difference == 1) {
+      return 'Cập nhật hôm qua';
+    } else {
+      return 'Cập nhật $difference ngày trước';
+    }
   }
 }

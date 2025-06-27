@@ -9,7 +9,7 @@ class DioClient {
   DioClient() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: ApiUrl.baseUrl,
+        baseUrl: ApiUrl.baseUrlProd,
         headers: {'Content-Type': 'application/json; charset=UTF-8'},
         responseType: ResponseType.json,
         sendTimeout: const Duration(seconds: 10),

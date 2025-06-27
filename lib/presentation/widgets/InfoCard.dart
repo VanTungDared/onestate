@@ -2,10 +2,18 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../core/utils/constants/api_url.dart';
+
 class InfoCard extends StatelessWidget {
   final String imageUrl;
   final String title;
   final String description;
+  final String listingPriceVndRent;
+  final String legalAreaSqm;
+  final String province;
+  final String district;
+  final String own;
+  final String updatedAt;
   final VoidCallback onPress;
 
   const InfoCard({
@@ -14,6 +22,11 @@ class InfoCard extends StatelessWidget {
     required this.title,
     required this.description,
     required this.onPress,
+    required this.listingPriceVndRent,
+    required this.legalAreaSqm,
+    required this.province,
+    required this.district,
+    required this.own, required this.updatedAt,
   });
 
   @override
@@ -25,13 +38,31 @@ class InfoCard extends StatelessWidget {
         width: 400.w,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: Colors.blue,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              spreadRadius: 2,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            Container(width: 128.w, height: 140.h, color: Colors.grey),
+            Container(
+              width: 128.w,
+              height: 140.h,
+              color: Colors.grey,
+              child: CachedNetworkImage(
+                imageUrl: "${ApiUrl.baseUrlImage}/$imageUrl",
+                placeholder:
+                    (context, url) => const CircularProgressIndicator(),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+                fit: BoxFit.cover,
+              ),
+            ),
             SizedBox(width: 16.w),
             Expanded(
               child: Column(
@@ -39,7 +70,7 @@ class InfoCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
-                    "Quỹ căn stu, 1 - 3PN Vin OCP chính chủ view đẹp giá rẻ, pháp lý rõ ràng miễn phí MG, HT vay 80%",
+                    title,
                     style: TextStyle(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.bold,
@@ -52,7 +83,7 @@ class InfoCard extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        "10 triệu",
+                        listingPriceVndRent,
                         style: TextStyle(
                           fontSize: 16.sp,
                           color: Color(0xFFEF4444),
@@ -63,7 +94,7 @@ class InfoCard extends StatelessWidget {
                       dot(),
                       SizedBox(width: 12.w),
                       Text(
-                        "70m2",
+                        "${legalAreaSqm}m2",
                         style: TextStyle(
                           fontSize: 16.sp,
                           color: Color(0xFFEF4444),
@@ -82,7 +113,7 @@ class InfoCard extends StatelessWidget {
                       ),
                       SizedBox(width: 8.w),
                       Text(
-                        "Cầu giấy, Hà Nội",
+                        "$district, $province",
                         style: TextStyle(
                           fontSize: 14.sp,
                           color: Color(0xFF505050),
@@ -97,7 +128,7 @@ class InfoCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Hà Nội",
+                            own,
                             style: TextStyle(
                               fontSize: 14.sp,
                               color: Colors.black,
@@ -105,7 +136,7 @@ class InfoCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            "7 ngày trước",
+                            updatedAt,
                             style: TextStyle(
                               fontSize: 14.sp,
                               color: Color(0xFF505050),
@@ -135,11 +166,6 @@ class InfoCard extends StatelessWidget {
       decoration: BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
     );
   }
-}
 
-// CachedNetworkImage(
-//   imageUrl: imageUrl,
-//   placeholder: (context, url) => const CircularProgressIndicator(),
-//   errorWidget: (context, url, error) => const Icon(Icons.error),
-//   fit: BoxFit.cover,
-// ),
+
+}

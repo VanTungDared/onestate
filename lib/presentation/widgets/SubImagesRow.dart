@@ -20,7 +20,7 @@ class SubImagesRow extends StatelessWidget {
 
     return Row(
       children: List.generate(displayCount, (index) {
-        final imageUrl = controller.apiClient.getFullUrl(imageUrls[index]);
+        final imageUrl = "controller.apiClient.getFullUrl(imageUrls[index])";
         final isFirst = index == 0;
         final isLast = index == displayCount - 1;
 

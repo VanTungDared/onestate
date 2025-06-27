@@ -18,7 +18,7 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
       return Right(response);
     } catch (e) {
       if (e is DioException) {
-        final errorMessage = e.response?.data['message'] ?? 'Signup failed';
+        final errorMessage = e.response?.data['message'] ?? 'Get user failure';
         return Left(errorMessage);
       }
       return const Left('An unexpected error occurred');

@@ -7,8 +7,17 @@ class ApiUrl {
 
   static const getUser = "${apiV}auth/me";
 
-  static const baseUrlProd = "https://api.onestate-dev.ontik.vn";
+  static String getListing({
+    required int page,
+    required int limit,
+    required String listingType,
+    String sort = "default",
+  }) {
+    return "${apiV}listings?page=$page&limit=$limit&listingType=$listingType&sort=$sort";
+  }
 
-  static const baseUrlImage = "https://file.dev.ontik.vn/re-storage/images/";
+  static const baseUrlProd = "https://api.onestate-dev.ontik.vn/";
+
+  static const baseUrlImage = "https://file.dev.ontik.vn/re-storage";
 }
 

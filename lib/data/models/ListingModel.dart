@@ -1,5 +1,8 @@
+import 'package:app_real_estate/domain/entities/district.dart';
+
 import '../../domain/entities/landcertificate.dart';
 import '../../domain/entities/listing.dart';
+import 'district_model.dart';
 import 'landcertificate.dart';
 
 class ListingModel extends Listing {
@@ -12,8 +15,8 @@ class ListingModel extends Listing {
     required super.provinceCode,
     required super.districtCode,
     required super.wardCode,
-    super.streetName,
-    super.fullAddress,
+    required super.streetName,
+    required super.fullAddress,
     super.latitude,
     super.longitude,
     required super.commissionRatePercent,
@@ -21,10 +24,9 @@ class ListingModel extends Listing {
     required super.legalAreaSqm,
     required super.actualAreaSqm,
     required super.frontageMeters,
-    super.widthMeters,
+    required super.widthMeters,
     super.roadWidthMeters,
-    super.numberOfFloors,
-    required super.listingPriceVnd,
+    required super.numberOfFloors,
     required super.realEstateType,
     required super.createdBy,
     required super.createdAt,
@@ -32,17 +34,17 @@ class ListingModel extends Listing {
     required super.authorName,
     required super.imageUrls,
     required super.tags,
-    super.province,
-    super.district,
+    required super.province,
+    required super.district,
     super.ward,
-    super.likes,
-    super.phoneNumber,
-    super.ownerPhoneNumber,
-    super.ownerCitizenId,
-    super.numberOfRooms,
-    super.numberOfBathrooms,
-    super.numberOfBalconies,
-    super.facing,
+    required super.likes,
+    required super.phoneNumber,
+    required super.ownerPhoneNumber,
+    required super.ownerCitizenId,
+    required super.numberOfRooms,
+    required super.numberOfBathrooms,
+    required super.numberOfBalconies,
+    required super.facing,
     super.landCertificate,
     required super.updatedBy,
     required super.listingPriceVndSell,
@@ -50,6 +52,7 @@ class ListingModel extends Listing {
     required super.listingCode,
     required super.listingType,
     required super.isLiked,
+    required super.propertyType,
   });
 
   factory ListingModel.fromJson(Map<String, dynamic> json) {
@@ -67,39 +70,54 @@ class ListingModel extends Listing {
       latitude: _parseToDouble(json['latitude']),
       longitude: _parseToDouble(json['longitude']),
       commissionRatePercent: json['commissionRatePercent'],
-      commissionAmountVnd: json['commissionAmountVnd'],
+      commissionAmountVnd: json['commissionAmountVnd'] as int?,
       legalAreaSqm: json['legalAreaSqm'],
       actualAreaSqm: json['actualAreaSqm'],
       frontageMeters: json['frontageMeters'],
       widthMeters: json['widthMeters'],
-      roadWidthMeters: json['roadWidthMeters'],
-      numberOfFloors: json['numberOfFloors'],
-      listingPriceVnd: json['listingPriceVnd'],
+      roadWidthMeters: json['roadWidthMeters'] as int?,
+      numberOfFloors: json['numberOfFloors'] as int? ?? 0,
+
       realEstateType: json['realEstateType'],
       createdBy: json['createdBy'],
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      createdAt:
+          json['createdAt'] != null
+              ? DateTime.parse(json['createdAt'])
+              : DateTime.now(),
+      updatedAt:
+          json['createdAt'] != null
+              ? DateTime.parse(json['createdAt'])
+              : DateTime.now(),
       authorName: json['authorName'],
-      imageUrls: List<String>.from(json['imageUrls'] ?? []),
-      tags: List<String>.from(json['tags'] ?? []),
-      province: json['province']?['name'],
-      district: json['district']?['name'],
+      imageUrls:
+          (json['imageUrls'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      tags: (json['tags'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      province:
+          json['province'] != null
+              ? DistrictModel.fromJson(json['province'])
+              : District(code: "", name: ""),
+      district:
+          json['district'] != null
+              ? DistrictModel.fromJson(json['district'])
+              : District(code: "", name: ""),
       ward: json['ward']?['name'],
-      likes: json['likes'],
+      likes: json['likes'] as int? ?? 0,
       phoneNumber: json['phoneNumber'],
       ownerPhoneNumber: json['ownerPhoneNumber'],
       ownerCitizenId: json['ownerCitizenId'],
-      numberOfRooms: json['numberOfRooms'],
-      numberOfBathrooms: json['numberOfBathrooms'],
-      numberOfBalconies: json['numberOfBalconies'],
+      numberOfRooms: json['numberOfRooms'] as int? ?? 0,
+      numberOfBathrooms: json['numberOfBathrooms'] as int? ?? 0,
+      numberOfBalconies: json['numberOfBalconies'] as int?,
       facing: json['facing'],
       landCertificate:
           json['landCertificate'] != null
               ? LandCertificate(
                 code: json['landCertificate']['code'] ?? '',
-                imageUrls: List<String>.from(
-                  json['landCertificate']['imageUrls'] ?? [],
-                ),
+                imageUrls:
+                    (json['landCertificate']['imageUrls'] as List?)
+                        ?.map((e) => e.toString())
+                        .toList() ??
+                    [],
               )
               : null,
       updatedBy: json['updatedBy'],
@@ -107,7 +125,8 @@ class ListingModel extends Listing {
       listingPriceVndRent: json['listingPriceVndRent'],
       listingCode: json['listingCode'],
       listingType: json['listingType'],
-      isLiked: json['isLiked'],
+      isLiked: json['isLiked'] as bool? ?? false,
+      propertyType: json['propertyType'],
     );
   }
 
@@ -133,7 +152,7 @@ class ListingModel extends Listing {
       'widthMeters': widthMeters,
       'roadWidthMeters': roadWidthMeters,
       'numberOfFloors': numberOfFloors,
-      'listingPriceVnd': listingPriceVnd,
+
       'realEstateType': realEstateType,
       'createdBy': createdBy,
       'createdAt': createdAt.toIso8601String(),

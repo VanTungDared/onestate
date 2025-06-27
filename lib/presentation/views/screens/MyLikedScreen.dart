@@ -1,4 +1,3 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -323,7 +322,9 @@ class MyLikedScreen extends StatelessWidget {
                                   Row(
                                     children: [
                                       Text(
-                                        _formatPrice(listing.listingPriceVnd),
+                                        _formatPrice(
+                                          listing.listingPriceVndRent,
+                                        ),
                                         style: TextStyle(
                                           color: Colors.red,
                                           fontWeight: FontWeight.bold,

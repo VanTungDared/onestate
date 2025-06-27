@@ -14,7 +14,7 @@ import 'login_controller.dart';
 class LoginBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<DioClient>(() => DioClient());
+    Get.lazyPut<DioClient>(() => DioClient(), fenix: true);
     Get.lazyPut<AuthRemoteDataSource>(() => AuthRemoteDataSourceImpl());
     Get.lazyPut<AuthRepository>(() => AuthRepositoryImpl(Get.find()));
     Get.lazyPut(() => LoginUseCase(Get.find()));
