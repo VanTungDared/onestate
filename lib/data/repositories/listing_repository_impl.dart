@@ -3,6 +3,7 @@ import 'package:dartz/dartz.dart';
 import '../../domain/repositories/listing_repository.dart';
 import '../datasources/remote/listing_remote_data_source.dart';
 import '../models/ListingModel.dart';
+import '../models/listing_detail_model.dart';
 
 class ListingRepositoryImpl implements ListingRepository {
   final ListingRemoteDataSource remoteDataSource;
@@ -23,9 +24,15 @@ class ListingRepositoryImpl implements ListingRepository {
       sort: sort,
     );
 
-    return result.fold(
-      (error) => Left(error),
-      (listings) => Right(listings),
-    );
+    return result.fold((error) => Left(error), (listings) => Right(listings));
+  }
+
+  @override
+  Future<Either<String, ListingDetailModel>> getListingById({
+    required String id,
+  }) async {
+    final result = await remoteDataSource.getListingById(id: id);
+
+    return result.fold((error) => Left(error), (listings) => Right(listings));
   }
 }

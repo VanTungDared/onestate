@@ -1,23 +1,24 @@
+import 'package:app_real_estate/domain/usecases/get_listing_by_id_use_case.dart';
 import 'package:get/get.dart';
 
-import '../../../../core/utils/api/api_client.dart';
-import '../../../../data/models/ListingDetailModel.dart';
+import '../../../../core/utils/notifier.dart';
+import '../../../../data/models/listing_detail_model.dart';
 
 class DetailController extends GetxController {
-  final apiClient = DioClient();
   RxBool isLiked = false.obs;
+  final GetListingByIdUseCase getListingByIdUseCase;
+  final Rxn<ListingDetailModel> listingDetail = Rxn<ListingDetailModel>();
 
-  ListingDetailModel? listingDetail;
-  RxInt countRender = 0.obs;
+  DetailController(this.getListingByIdUseCase);
 
+  final isLoading = false.obs;
   String id = "";
 
   @override
   void onInit() async {
     super.onInit();
     id = Get.arguments;
-    await fetchListingDetail();
-    countRender.value = countRender.value + 1;
+    await fetchListingDetail(id: id);
   }
 
   var currentPage = 0.obs;
@@ -26,21 +27,21 @@ class DetailController extends GetxController {
     currentPage.value = index;
   }
 
-  Future<void> fetchListingDetail() async {
-    // try {
-    //   final result = await apiClient.getListingDetail(id);
-    //
-    //   if (result.containsKey('error')) {
-    //     Get.snackbar('Lỗi', result['error']);
-    //   } else {
-    //     listingDetail = ListingDetailModel.fromJson(result);
-    //     isLiked.value = listingDetail?.isLiked != null;
-    //     update(); // Cập nhật lại UI
-    //   }
-    // } catch (e) {
-    //   Get.snackbar('Lỗi', 'Không thể tải dữ liệu');
-    //   print('fetchListingDetail error: $e');
-    // }
+  Future<void> fetchListingDetail({required String id}) async {
+    isLoading.value = true;
+
+    final result = await getListingByIdUseCase.call(id: id);
+
+    result.fold(
+      (errorMessage) {
+        LoadingNotifier.showTopMessage(errorMessage, false);
+        isLoading.value = false;
+      },
+      (data) async {
+        listingDetail.value = data;
+        isLoading.value = false;
+      },
+    );
   }
 
   Future<void> handleLikeListing() async {

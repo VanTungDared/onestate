@@ -16,6 +16,10 @@ class ApiUrl {
     return "${apiV}listings?page=$page&limit=$limit&listingType=$listingType&sort=$sort";
   }
 
+  static String getListingById({required String id}) {
+    return "${apiV}listings/$id";
+  }
+
   static const baseUrlProd = "https://api.onestate-dev.ontik.vn/";
 
   static const baseUrlImage = "https://file.dev.ontik.vn/re-storage";

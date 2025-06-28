@@ -1,21 +1,19 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/utils/constants/api_url.dart';
 import '../../../../core/utils/constants/asset_constants.dart';
 import 'detail_controller.dart';
 import '../../../widgets/ButtonPrimary.dart';
 
-
 class DetailScreen extends GetView<DetailController> {
-
-  DetailScreen({super.key});
-
-  final PageController _pageController = PageController();
+  const DetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,187 +27,111 @@ class DetailScreen extends GetView<DetailController> {
         ),
       ),
       body: Obx(() {
-        if (controller.countRender.value == 0) {
+        if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
-        final images = controller.listingDetail?.imageUrls ?? [];
+        final item = controller.listingDetail.value;
+        if (item == null) {
+          return const SizedBox.shrink();
+        }
         return Stack(
           children: [
             SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Image slider with navigation
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SizedBox(
-                        height: 220,
-                        child: PageView.builder(
-                          controller: _pageController,
-                          itemCount: images.isNotEmpty ? images.length : 3,
-                          itemBuilder: (context, index) {
-                            if (images.isNotEmpty) {
-
-                              final imageUrl = 'https://via.placeholder.com/150';
-
-                              return Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                clipBehavior: Clip.antiAlias,
+                  CarouselSlider(
+                    options: CarouselOptions(
+                      height: 256.h,
+                      autoPlay: true,
+                      enlargeCenterPage: true,
+                      viewportFraction: 1.0,
+                      aspectRatio: 16 / 9,
+                      autoPlayInterval: Duration(seconds: 3),
+                      autoPlayAnimationDuration: Duration(milliseconds: 800),
+                    ),
+                    items:
+                        item.imageUrls.map((url) {
+                          return Builder(
+                            builder: (BuildContext context) {
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
                                 child: CachedNetworkImage(
-                                  imageUrl: imageUrl,
-                                  fit: BoxFit.cover,
+                                  imageUrl: "${ApiUrl.baseUrlImage}/$url",
                                   placeholder:
-                                      (context, url) => const Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
+                                      (context, url) =>
+                                          const CircularProgressIndicator(),
                                   errorWidget:
-                                      (context, url, error) => const Center(
-                                        child: Icon(
-                                          Icons.broken_image,
-                                          color: Colors.grey,
-                                          size: 40,
-                                        ),
-                                      ),
+                                      (context, url, error) =>
+                                          const Icon(Icons.error),
+                                  fit: BoxFit.cover,
                                 ),
                               );
-                            } else {
-                              return Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[(index + 1) * 200],
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.image,
-                                    size: 60,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                      ),
-
-                      // Left arrow
-                      Positioned(
-                        left: 8,
-                        child: _imageNavButton(Icons.arrow_back, () {
-                          if (_pageController.hasClients) {
-                            final page = _pageController.page?.toInt() ?? 0;
-                            _pageController.animateToPage(
-                              page > 0 ? page - 1 : 0,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          }
-                        }),
-                      ),
-                      // Right arrow
-                      Positioned(
-                        right: 8,
-                        child: _imageNavButton(Icons.arrow_forward, () {
-                          if (_pageController.hasClients) {
-                            final page = _pageController.page?.toInt() ?? 0;
-                            final maxPage =
-                                (images.isNotEmpty ? images.length : 3) - 1;
-                            _pageController.animateToPage(
-                              page < maxPage ? page + 1 : maxPage,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          }
-                        }),
-                      ),
-                    ],
+                            },
+                          );
+                        }).toList(),
                   ),
-
-                  const SizedBox(height: 16),
-
-                  // Title
+                  SizedBox(height: 16.h),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: EdgeInsets.symmetric(horizontal: 16.0.w),
                     child: Text(
-                      controller.listingDetail!.title ?? "",
-                      style: const TextStyle(
-                        fontSize: 18,
+                      item.title,
+                      style: TextStyle(
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 16),
-
+                  Divider(height: 32.h, color: Colors.grey.shade300),
                   // Info: Giá - Diện tích - Số tầng - Trạng thái
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: EdgeInsets.symmetric(horizontal: 16.0.w),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _infoItem(
                           "Mức giá",
-                          _formatCurrency(
-                            controller.listingDetail!.listingPriceVnd ?? "",
-                          ),
+                          _formatCurrency(item.listingPriceVndSell),
                         ),
-                        _infoItem(
-                          "Diện tích",
-                          "${controller.listingDetail!.actualAreaSqm ?? 'N/A'} m²",
-                        ),
-                        _infoItem(
-                          "Số tầng",
-                          "${controller.listingDetail!.numberOfFloors ?? 'N/A'}",
-                        ),
-                        _statusTag(controller.listingDetail!.status ?? ""),
+                        _infoItem("Diện tích", "${item.actualAreaSqm} m²"),
+                        _infoItem("Số tầng", "${item.numberOfFloors}"),
+                        _statusTag(item.status, "Trạng thái"),
                       ],
                     ),
                   ),
-
-                  const Divider(height: 32),
-
+                  Divider(height: 32.h, color: Colors.grey.shade300),
                   // Thông tin mô tả
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0.w),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         "Thông tin mô tả",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      controller.listingDetail!.description ?? "Chưa có mô tả",
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+                    child: Text(item.description),
                   ),
 
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
 
                   // Buttons
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: EdgeInsets.symmetric(horizontal: 16.0.w),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         _actionButton(Icons.share, "Chia sẻ"),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12.w),
                         _actionButton(Icons.report, "Báo xấu"),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12.w),
                         Obx(
                           () => _actionButton(
                             controller.isLiked.value
@@ -223,81 +145,61 @@ class DetailScreen extends GetView<DetailController> {
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: 24),
-
+                  SizedBox(height: 12.h),
                   // Thông số kỹ thuật
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0.w),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         "Thông số kỹ thuật",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  Divider(height: 12.h, color: Colors.grey.shade300),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Column(
                       children: [
                         _techInfoRow(
                           "Diện tích sổ",
-                          "${controller.listingDetail!.legalAreaSqm ?? '-'} m²",
+                          "${item.legalAreaSqm} m²",
+                          "assets/images/icon_dientich_so.png",
                         ),
+                        Divider(height: 12.h, color: Colors.grey.shade300),
                         _techInfoRow(
                           "Thực tế",
-                          "${controller.listingDetail!.actualAreaSqm ?? '-'} m²",
+                          "${item.actualAreaSqm} m²",
+                          "assets/images/icon_dientich_so.png",
                         ),
+                        Divider(height: 12.h, color: Colors.grey.shade300),
                         _techInfoRow(
-                          "Chiều dài",
-                          "${controller.listingDetail!.frontageMeters ?? '-'} m",
+                          "Mặt tiền",
+                          "${item.frontageMeters} m",
+                          Icons.home_outlined,
                         ),
+                        Divider(height: 12.h, color: Colors.grey.shade300),
                         _techInfoRow(
-                          "Chiều rộng",
-                          "${controller.listingDetail!.widthMeters ?? '-'} m",
+                          "Chiều sâu",
+                          "${item.widthMeters} m",
+                          CupertinoIcons.square_on_square,
                         ),
-                        _techInfoRow("Mặt tiền", "-"),
+                        Divider(height: 12.h, color: Colors.grey.shade300),
                         _techInfoRow(
                           "Đường trước nhà",
-                          "${controller.listingDetail!.roadWidthMeters ?? '-'} m",
+                          "-",
+                          "assets/images/icon_road.png",
                         ),
+                        Divider(height: 12.h, color: Colors.grey.shade300),
                         _techInfoRow(
                           "Số tầng",
-                          "${controller.listingDetail!.numberOfFloors} tầng",
+                          "${item.numberOfFloors} tầng",
+                          "assets/images/icon_thang.png",
                         ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Tiêu chí
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Tiêu chí",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      children: [
-                        _criterionChip("Lãi vốn (Rẻ)"),
-                        const SizedBox(width: 8),
-                        _criterionChip("Thang máy"),
                       ],
                     ),
                   ),
@@ -318,26 +220,27 @@ class DetailScreen extends GetView<DetailController> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  Divider(height: 12.h, color: Colors.grey.shade300),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Column(
                       children: [
                         _techInfoRow(
                           "Giá chào",
-                          _formatCurrency(
-                            controller.listingDetail!.listingPriceVnd ?? "",
-                          ),
+                          _formatCurrency(item.listingPriceVndSell),
+                          Icons.money,
                         ),
+                        Divider(height: 12.h, color: Colors.grey.shade300),
                         _techInfoRow(
                           "Trích thưởng",
-                          "${controller.listingDetail!.commissionRatePercent}% hoặc ${_formatCurrency(controller.listingDetail!.commissionAmountVnd)}",
+                          "${item.commissionRatePercent}% - ${_formatCurrency(item.commissionAmountVnd)}",
+                          Icons.monetization_on,
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
                   // Thông tin người đăng
                   Padding(
@@ -345,47 +248,71 @@ class DetailScreen extends GetView<DetailController> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "Thông tin người đăng",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 18.sp,
                           ),
                         ),
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            const CircleAvatar(
+                            CircleAvatar(
+                              radius: 16.r,
                               backgroundColor: Colors.red,
                               child: Text(
-                                "L",
+                                (item.authorName.isNotEmpty)
+                                    ? item.authorName[0].toUpperCase()
+                                    : '',
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: 12.w),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Text(
                                   "Người đăng",
-                                  style: TextStyle(fontSize: 13),
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                                 Text(
-                                  controller.listingDetail!.authorName ?? "",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  item.authorName,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.sp,
+                                  ),
                                 ),
                               ],
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+                        SizedBox(height: 12.h),
                         Row(
                           children: [
-                            Icon(Icons.phone, size: 20),
-                            SizedBox(width: 8),
-                            Text(
-                              controller.listingDetail!.phoneNumber ?? "",
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            Icon(Icons.phone, size: 32.w),
+                            SizedBox(width: 12.w),
+                            Column(
+                              children: [
+                                Text(
+                                  "Số điện thoại",
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                Text(
+                                  item.phoneNumber,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.sp,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -393,39 +320,50 @@ class DetailScreen extends GetView<DetailController> {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  SizedBox(height: 16.h),
 
                   // Thông tin chủ nhà
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: EdgeInsets.symmetric(horizontal: 16.0.w),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "Thông tin chủ nhà",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 18.sp,
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        SizedBox(height: 12.h),
                         Row(
                           children: [
-                            const CircleAvatar(
+                            CircleAvatar(
                               backgroundColor: Colors.pink,
                               child: Text(
-                                "V",
+                                (item.ownerName.isNotEmpty)
+                                    ? item.ownerName[0].toUpperCase()
+                                    : '',
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: 12.w),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Chủ nhà", style: TextStyle(fontSize: 13)),
                                 Text(
-                                  controller.listingDetail!.ownerName ?? "",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  "Chủ nhà",
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                Text(
+                                  item.ownerName,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.sp,
+                                  ),
                                 ),
                               ],
                             ),
@@ -434,121 +372,70 @@ class DetailScreen extends GetView<DetailController> {
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: 24),
-
+                  SizedBox(height: 16.h),
                   // Khu vực
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: EdgeInsets.symmetric(horizontal: 16.0.w),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "Khu vực",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 18.sp,
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        _locationItem(
-                          "Tỉnh/Thành phố",
-                          controller.listingDetail!.province!.name,
-                        ),
-                        _locationItem(
-                          "Quận/Huyện",
-                          controller.listingDetail!.district!.name,
-                        ),
-                        _locationItem(
-                          "Phường/Xã",
-                          controller.listingDetail!.ward!.name,
-                        ),
-                        _locationItem(
-                          "Địa chỉ",
-                          controller.listingDetail!.fullAddress ?? "",
-                        ),
+                        SizedBox(height: 12.h),
+                        _locationItem("Tỉnh/Thành phố", item.province.name),
+                        _locationItem("Quận/Huyện", item.district.name),
+                        _locationItem("Phường/Xã", item.ward.name),
+                        _locationItem("Địa chỉ", item.fullAddress),
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: 24),
-
-                  SizedBox(
-                    height: 300,
-                    child: GoogleMap(
-                      initialCameraPosition: CameraPosition(
-                        target: LatLng(
-                          double.tryParse(
-                                controller.listingDetail!.latitude ?? "0",
-                              ) ??
-                              0,
-                          double.tryParse(
-                                controller.listingDetail!.longitude ?? "0",
-                              ) ??
-                              0,
-                        ),
-                        zoom: 14.0,
-                      ),
-                      markers: {
-                        Marker(
-                          markerId: MarkerId('vị trí'),
-                          position: LatLng(
-                            double.tryParse(
-                                  controller.listingDetail!.latitude ?? "0",
-                                ) ??
-                                0,
-                            double.tryParse(
-                                  controller.listingDetail!.longitude ?? "0",
-                                ) ??
-                                0,
-                          ),
-                          infoWindow: InfoWindow(title: 'Địa điểm bạn chọn'),
-                        ),
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 70),
+                  SizedBox(height: 68.h),
                 ],
               ),
             ),
             Positioned(
               left: 0,
               right: 0,
-              bottom: 0,
+              bottom: 0.h,
               child: Container(
-                padding: EdgeInsets.all(12),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
                 decoration: BoxDecoration(
-                  border: Border(top: BorderSide(width: 1, color: Colors.grey)),
+                  border: Border(
+                    top: BorderSide(width: 1.w, color: Colors.grey),
+                  ),
                   color: Colors.white,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     CircleAvatar(
-                      radius: 20,
+                      radius: 20.r,
                       backgroundColor: Colors.red,
                       child: Text(
-                        controller.listingDetail!.authorName == null
-                            ? "U"
-                            : controller.listingDetail!.authorName![0]
-                                .toUpperCase(),
-                        style: TextStyle(color: Colors.white, fontSize: 14),
+                        item.authorName[0].toUpperCase(),
+                        style: TextStyle(color: Colors.white, fontSize: 14.sp),
                       ),
                     ),
                     ButtonPrimary(
                       content: "Zalo",
                       icon: Padding(
-                        padding: const EdgeInsets.only(right: 8),
+                        padding: EdgeInsets.only(right: 8.w),
                         child: SvgPicture.asset(
                           AssetConstant.logoZalo,
-                          height: 24,
+                          height: 24.h,
                         ),
                       ),
-                      horizontalPadding: 16,
-                      verticalPadding: 12,
+                      horizontalPadding: 16.w,
+                      verticalPadding: 4.h,
                       callBack: () async {
                         final url = Uri.parse(
-                          'https://zalo.me/${controller.listingDetail?.phoneNumber ?? "0"}',
+                          'https://zalo.me/${item.phoneNumber}',
                         );
                         if (await canLaunchUrl(url)) {
                           await launchUrl(
@@ -559,26 +446,24 @@ class DetailScreen extends GetView<DetailController> {
                           throw 'Không thể mở đường dẫn: $url';
                         }
                       },
-                      boxBorder: Border.all(width: 1, color: Colors.grey),
+                      boxBorder: Border.all(width: 1.w, color: Colors.grey),
                     ),
                     ButtonPrimary(
-                      content: controller.listingDetail?.phoneNumber ?? "0",
+                      content: item.phoneNumber,
                       icon: Padding(
-                        padding: const EdgeInsets.only(right: 8),
+                        padding: EdgeInsets.only(right: 8.w),
                         child: Icon(Icons.phone, color: Colors.white),
                       ),
-                      horizontalPadding: 16,
-                      verticalPadding: 12,
+                      horizontalPadding: 16.w,
+                      verticalPadding: 8.h,
                       color: Color(0xff00A5AB),
                       textStyle: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 16.sp,
                       ),
                       callBack: () async {
-                        final url = Uri.parse(
-                          'tel:${controller.listingDetail?.phoneNumber ?? "0"}',
-                        );
+                        final url = Uri.parse('tel:${item.phoneNumber}');
                         if (await canLaunchUrl(url)) {
                           await launchUrl(
                             url,
@@ -602,24 +487,30 @@ class DetailScreen extends GetView<DetailController> {
   Widget _infoItem(String label, String value) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-        const SizedBox(height: 2),
+        Text(label, style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
+        SizedBox(height: 2.h),
         Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
       ],
     );
   }
 
-  Widget _statusTag(String status) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: status == "approved" ? Colors.blue : Colors.grey,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        status == "approved" ? "Đã duyệt" : "Chờ duyệt",
-        style: const TextStyle(color: Colors.white, fontSize: 12),
-      ),
+  Widget _statusTag(String status, String label) {
+    return Column(
+      children: [
+        Text(label, style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
+        SizedBox(height: 2.h),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+          decoration: BoxDecoration(
+            color: status == "approved" ? Colors.blue : Colors.grey,
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          child: Text(
+            status == "approved" ? "Đã duyệt" : "Chờ duyệt",
+            style: TextStyle(color: Colors.white, fontSize: 12.sp),
+          ),
+        ),
+      ],
     );
   }
 
@@ -630,34 +521,23 @@ class DetailScreen extends GetView<DetailController> {
     Color? color,
   }) {
     return GestureDetector(
-      onTap: callBack ?? () {}, // nếu null thì dùng hàm rỗng
+      onTap: callBack ?? () {},
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.r),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: color ?? Colors.black, size: 18),
+            Icon(icon, color: color ?? Colors.black, size: 18.sp),
             if (label.isNotEmpty) ...[
-              const SizedBox(width: 6),
-              Text(label, style: const TextStyle(fontSize: 13)),
+              SizedBox(width: 6.w),
+              Text(label, style: TextStyle(fontSize: 13.sp)),
             ],
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _imageNavButton(IconData icon, VoidCallback onPressed) {
-    return CircleAvatar(
-      // ignore: deprecated_member_use
-      backgroundColor: Colors.white.withOpacity(0.9),
-      child: IconButton(
-        icon: Icon(icon, color: Colors.black),
-        onPressed: onPressed,
       ),
     );
   }
@@ -674,16 +554,48 @@ class DetailScreen extends GetView<DetailController> {
     return "$value đ";
   }
 
-  Widget _techInfoRow(String label, String value) {
+  Widget _techInfoRow(String label, String value, dynamic iconOrImage) {
+    Widget iconWidget;
+
+    if (iconOrImage is IconData) {
+      iconWidget = Icon(iconOrImage, size: 24.w, color: Colors.black54);
+    } else if (iconOrImage is String) {
+      iconWidget = Image.asset(
+        iconOrImage,
+        width: 24.w,
+        height: 24.w,
+        errorBuilder:
+            (context, error, stackTrace) =>
+                Icon(Icons.image_not_supported, size: 24.w),
+        color: Colors.black54,
+      );
+    } else {
+      iconWidget = SizedBox(width: 24.w);
+    }
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: EdgeInsets.symmetric(vertical: 4.h),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 14)),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          iconWidget,
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                value,
+                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
+              ),
+            ),
           ),
         ],
       ),
@@ -712,23 +624,20 @@ class DetailScreen extends GetView<DetailController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 13, color: Colors.black54),
-        ),
-        const SizedBox(height: 4),
+        Text(label, style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
+        SizedBox(height: 4.h),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: EdgeInsets.symmetric(vertical: 10.h),
           decoration: const BoxDecoration(
             border: Border(bottom: BorderSide(color: Colors.grey)),
           ),
           child: Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.w500),
+            value.isEmpty ? "Chưa có địa chỉ" : value,
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14.sp),
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
       ],
     );
   }

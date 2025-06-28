@@ -55,7 +55,7 @@ class MainController extends GetxController {
     );
   }
 
-  void onPressCard() {
-    Get.toNamed(RouterName.detail);
+  void onPressCard({required String id}) {
+    Get.toNamed(RouterName.detail, arguments: id);
   }
 }

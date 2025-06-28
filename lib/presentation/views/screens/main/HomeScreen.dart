@@ -52,11 +52,13 @@ class HomeScreen extends GetView<MainController> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      'Có ${controller.dataListings.length} bất động sản',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.normal,
+                    Obx(
+                      () => Text(
+                        'Có ${controller.dataListings.length} bất động sản',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.normal,
+                        ),
                       ),
                     ),
                     _sortWidget(),
@@ -80,13 +82,16 @@ class HomeScreen extends GetView<MainController> {
                                   : 'https://via.placeholder.com/150',
                           title: item.title,
                           description: item.description,
-                          onPress: controller.onPressCard,
-                          listingPriceVndRent:
-                              _formatPrice(item.listingPriceVndRent),
+                          onPress: () {
+                            controller.onPressCard(id: item.id);
+                          },
+                          listingPriceVndRent: _formatPrice(
+                            item.listingPriceVndRent,
+                          ),
                           legalAreaSqm: item.legalAreaSqm,
                           province: item.province.name,
                           district: item.district.name,
-                          own: item.ownerName,
+                          own: item.authorName,
                           updatedAt: formatUpdatedAtDaysAgo(item.updatedAt),
                         ),
                       );

@@ -69,10 +69,6 @@ class LoginController extends GetxController {
         );
       },
     );
-    // Get.offAllNamed(
-    //   RouterName.main,
-    //   //arguments: UserModel.fromJson(data),
-    // );
   }
 
   @override
