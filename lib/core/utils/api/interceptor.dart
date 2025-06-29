@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:get/get.dart' as dio;
 import 'package:logger/logger.dart';
 
 import '../../../data/datasources/dblocal/shared_preferences.dart';
+import '../../../presentation/routers/routerName.dart';
 
 class LoggerInterceptor extends Interceptor {
   Logger logger = Logger(
@@ -66,5 +68,21 @@ class AuthorizationInterceptor extends Interceptor {
     }
 
     handler.next(options);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    if (err.response?.statusCode == 401 &&
+        err.response?.data['message'] == 'Token expired') {
+      SharedPreferenceApp.handleClear();
+
+      if (dio.Get.currentRoute != RouterName.login) {
+        dio.Get.offAllNamed(RouterName.login);
+      }
+
+      logger.w("Token expired. Redirecting to login.");
+    }
+
+    handler.next(err);
   }
 }

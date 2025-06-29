@@ -12,9 +12,14 @@ import '../views/screens/RealEstatePostScreen.dart';
 import '../views/screens/SearchScreen.dart';
 import '../views/screens/login/LoginScreen.dart';
 import '../views/screens/login/binding.dart';
+import '../views/screens/splash/splash_screen.dart';
 
 var pages = [
   GetPage(name: RouterName.notfound, page: () => NotFoundScreen()),
+  GetPage(
+    name: RouterName.splash,
+    page: () => const SplashScreen(),
+  ),
   GetPage(
     name: RouterName.login,
     page: () => LoginScreen(),

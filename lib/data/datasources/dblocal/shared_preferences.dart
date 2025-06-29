@@ -73,4 +73,8 @@ class SharedPreferenceApp {
     await handleSetPrefs();
     await prefs!.remove(key);
   }
+
+  static Future<void> handleClear() async {
+    await prefs!.clear();
+  }
 }

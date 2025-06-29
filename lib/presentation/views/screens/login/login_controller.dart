@@ -1,18 +1,15 @@
-import 'package:app_real_estate/domain/usecases/get_user_usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/utils/api/api_client.dart';
 import '../../../../core/utils/notifier.dart';
-import '../../../../data/models/UserModel.dart';
 import '../../../../domain/usecases/login_usecase.dart';
 import '../../../routers/routerName.dart';
 
 class LoginController extends GetxController {
   final LoginUseCase loginUseCase;
-  final GetUserUseCase getUserUseCase;
 
-  LoginController(this.loginUseCase, this.getUserUseCase);
+  LoginController(this.loginUseCase);
 
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
@@ -53,20 +50,8 @@ class LoginController extends GetxController {
       },
       (data) async {
         await Future.delayed(Duration(milliseconds: 100));
-        final userInfo = await getUserUseCase.call();
-        userInfo.fold(
-          (errorMessage) {
-            LoadingNotifier.showTopMessage(errorMessage, false);
-            isLoading.value = false;
-          },
-          (data) {
-            isLoading.value = false;
-            Get.offAllNamed(
-              RouterName.main,
-              arguments: UserModel.fromJson(data),
-            );
-          },
-        );
+        isLoading.value = false;
+        Get.offAllNamed(RouterName.main);
       },
     );
   }

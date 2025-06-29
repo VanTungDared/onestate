@@ -66,8 +66,11 @@ class HomeScreen extends GetView<MainController> {
                 ),
                 SizedBox(height: 16.h),
 
-                Obx(
-                  () => ListView.builder(
+                Obx(() {
+                  if (controller.isLoadingListing.value) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  return ListView.builder(
                     itemCount: controller.dataListings.length,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -96,8 +99,8 @@ class HomeScreen extends GetView<MainController> {
                         ),
                       );
                     },
-                  ),
-                ),
+                  );
+                }),
 
                 const SizedBox(height: 12),
               ],

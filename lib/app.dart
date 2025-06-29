@@ -1,6 +1,4 @@
 import 'package:app_real_estate/presentation/routers/routerPage.dart';
-import 'package:app_real_estate/presentation/views/screens/login/LoginScreen.dart';
-import 'package:app_real_estate/presentation/views/screens/login/binding.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -9,6 +7,9 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'core/utils/app_translation.dart';
+import 'presentation/routers/routerName.dart';
+import 'presentation/views/app/app_bindings.dart';
+import 'presentation/views/screens/splash/splash_screen.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -28,8 +29,8 @@ class MyApp extends StatelessWidget {
           ),
           darkTheme: ThemeData.dark(),
           themeMode: ThemeMode.light,
-          home: LoginScreen(),
-          initialBinding: LoginBinding(),
+          initialRoute: RouterName.splash,
+          initialBinding: AppBinding(),
           getPages: pages,
           unknownRoute: pages[0],
           translations: AppTranslations(),

@@ -4,21 +4,21 @@ import '../constants/api_url.dart';
 import 'interceptor.dart';
 
 class DioClient {
-  late final Dio _dio;
-  late final AuthorizationInterceptor _authorizationInterceptor;
-  DioClient() {
-    _dio = Dio(
-      BaseOptions(
-        baseUrl: ApiUrl.baseUrlProd,
-        headers: {'Content-Type': 'application/json; charset=UTF-8'},
-        responseType: ResponseType.json,
-        sendTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 10),
-      ),
-    );
-    _authorizationInterceptor = AuthorizationInterceptor(_dio);
+  final Dio dio;
 
-    _dio.interceptors.addAll([_authorizationInterceptor, LoggerInterceptor()]);
+  DioClient()
+    : dio = Dio(
+        BaseOptions(
+          baseUrl: ApiUrl.baseUrlProd,
+          headers: {'Content-Type': 'application/json; charset=UTF-8'},
+          responseType: ResponseType.json,
+          sendTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 10),
+        ),
+      ) {
+    final authorizationInterceptor = AuthorizationInterceptor(dio);
+
+    dio.interceptors.addAll([authorizationInterceptor, LoggerInterceptor()]);
   }
 
   // GET METHOD
@@ -30,7 +30,7 @@ class DioClient {
     ProgressCallback? onReceiveProgress,
   }) async {
     try {
-      final Response response = await _dio.get(
+      final Response response = await dio.get(
         url,
         queryParameters: queryParameters,
         options: options,
@@ -53,7 +53,7 @@ class DioClient {
     ProgressCallback? onReceiveProgress,
   }) async {
     try {
-      final Response response = await _dio.post(
+      final Response response = await dio.post(
         url,
         data: data,
         options: options,
@@ -77,7 +77,7 @@ class DioClient {
     ProgressCallback? onReceiveProgress,
   }) async {
     try {
-      final Response response = await _dio.put(
+      final Response response = await dio.put(
         url,
         data: data,
         queryParameters: queryParameters,
@@ -101,7 +101,7 @@ class DioClient {
     CancelToken? cancelToken,
   }) async {
     try {
-      final Response response = await _dio.delete(
+      final Response response = await dio.delete(
         url,
         data: data,
         queryParameters: queryParameters,
@@ -116,54 +116,7 @@ class DioClient {
 }
 
 
-// Future<Map<String, dynamic>> getListings({
-//   int page = 1,
-//   int limit = 10,
-//   String? title,
-//   String? status, // DRAFT hoặc PUBLISHED
-// }) async {
-//   try {
-//     // Lấy token từ SharedPreferences
-//     String? token = SharedPreferenceApp.handleGetString('accessToken');
-//     if (token == null) {
-//       return {"error": "Token không tồn tại. Vui lòng đăng nhập lại."};
-//     }
-//
-//     // Chuẩn bị query parameters
-//     Map<String, dynamic> queryParams = {'page': page, 'limit': limit};
-//
-//     if (title != null && title.isNotEmpty) {
-//       queryParams['title'] = title;
-//     }
-//     if (status != null && status.isNotEmpty) {
-//       queryParams['status'] = status;
-//     }
-//
-//     // Gọi API
-//     Response response = await _dio.get(
-//       "listings",
-//       queryParameters: queryParams,
-//       options: Options(
-//         headers: {
-//           'Authorization': 'Bearer $token',
-//           'Content-Type': 'application/json',
-//         },
-//       ),
-//     );
-//
-//     Map<String, dynamic> data = response.data;
-//     if (response.statusCode == 200) {
-//       Map<String, dynamic> result = data["data"];
-//       return result;
-//     } else {
-//       return {"error": "Có lỗi xảy ra: ${response.statusMessage}"};
-//     }
-//   } catch (e) {
-//     print("Lỗi khi gọi API listings: $e");
-//     return {"error": "Lỗi khi gọi API"};
-//   }
-// }
-//
+
 // String getFullUrl(String? path) {
 //   if (path == null || path.isEmpty) {
 //     return "https://via.placeholder.com/150"; // fallback nếu không có ảnh

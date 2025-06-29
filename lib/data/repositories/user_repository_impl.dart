@@ -15,8 +15,8 @@ class UserRepositoryImpl implements UserRepository {
       (error) {
         return Left(error);
       },
-      (response) async {
-        return Right(response.data);
+      (data) async {
+        return Right(data);
       },
     );
   }
