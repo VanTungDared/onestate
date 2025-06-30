@@ -5,23 +5,25 @@ import 'package:get/get.dart';
 
 import '../../../core/utils/api/api_client.dart';
 import '../../../core/utils/constants/api_url.dart';
-import '../../models/ListingModel.dart';
 import '../../models/listing_detail_model.dart';
+import '../../models/listing_reponse_model.dart';
 
 abstract class ListingRemoteDataSource {
-  Future<Either<String, List<ListingModel>>> getListing({
+  Future<Either<String, ListingResponse>> getListing({
     required int page,
     required int limit,
     required String listingType,
     String sort,
   });
 
-  Future<Either<String, ListingDetailModel>> getListingById({required String id});
+  Future<Either<String, ListingDetailModel>> getListingById({
+    required String id,
+  });
 }
 
 class ListingRemoteDataSourceImpl implements ListingRemoteDataSource {
   @override
-  Future<Either<String, List<ListingModel>>> getListing({
+  Future<Either<String, ListingResponse>> getListing({
     required int page,
     required int limit,
     required String listingType,
@@ -36,10 +38,9 @@ class ListingRemoteDataSourceImpl implements ListingRemoteDataSource {
       );
 
       final response = await Get.find<DioClient>().get(url);
-      final data = response.data['data']['data'] as List;
-
-      final listings = data.map((json) => ListingModel.fromJson(json)).toList();
-      return Right(listings);
+      final jsonData = response.data['data'];
+      final result = ListingResponse.fromJson(jsonData);
+      return Right(result);
     } catch (e) {
       if (e is DioException) {
         final errorMessage =

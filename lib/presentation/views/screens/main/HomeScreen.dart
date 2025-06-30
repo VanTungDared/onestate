@@ -14,67 +14,72 @@ class HomeScreen extends GetView<MainController> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16, top: 12),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Get.toNamed(RouterName.search);
-                  },
-                  child: Container(
-                    height: 46.h,
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.search, color: Colors.grey),
-                        SizedBox(width: 10.w),
-                        Expanded(
-                          child: Text(
-                            'Tìm kiếm bằng từ khóa',
-                            style: TextStyle(color: Colors.grey),
-                            overflow: TextOverflow.ellipsis,
+        child: Obx(() {
+          final isLoading = controller.isLoadingListing.value;
+          final hasMore =
+              controller.currentPage.value < controller.lastPage.value;
+          final totalItems = controller.dataListings.length;
+
+          return CustomScrollView(
+            controller: controller.scrollController,
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 12.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () => Get.toNamed(RouterName.search),
+                        child: Container(
+                          height: 46.h,
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.search, color: Colors.grey),
+                              SizedBox(width: 10.w),
+                              Expanded(
+                                child: Text(
+                                  'Tìm kiếm bằng từ khóa',
+                                  style: TextStyle(color: Colors.grey),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Icon(Icons.tune, color: Colors.grey),
+                            ],
                           ),
                         ),
-                        Icon(Icons.tune, color: Colors.grey),
-                      ],
-                    ),
+                      ),
+                      SizedBox(height: 20.h),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Có $totalItems bất động sản',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          _sortWidget(),
+                        ],
+                      ),
+                      SizedBox(height: 16.h),
+                    ],
                   ),
                 ),
-                SizedBox(height: 20.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Obx(
-                      () => Text(
-                        'Có ${controller.dataListings.length} bất động sản',
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                    ),
-                    _sortWidget(),
-                  ],
-                ),
-                SizedBox(height: 16.h),
+              ),
 
-                Obx(() {
-                  if (controller.isLoadingListing.value) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                  return ListView.builder(
-                    itemCount: controller.dataListings.length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
+              // Danh sách bất động sản
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    if (index < totalItems) {
                       final item = controller.dataListings[index];
                       return Padding(
                         padding: EdgeInsets.only(bottom: 12.h),
@@ -85,9 +90,7 @@ class HomeScreen extends GetView<MainController> {
                                   : 'https://via.placeholder.com/150',
                           title: item.title,
                           description: item.description,
-                          onPress: () {
-                            controller.onPressCard(id: item.id);
-                          },
+                          onPress: () => controller.onPressCard(id: item.id),
                           listingPriceVndRent: _formatPrice(
                             item.listingPriceVndRent,
                           ),
@@ -98,15 +101,34 @@ class HomeScreen extends GetView<MainController> {
                           updatedAt: formatUpdatedAtDaysAgo(item.updatedAt),
                         ),
                       );
-                    },
-                  );
-                }),
+                    } else {
+                      if (isLoading) {
+                        return const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      } else if (!hasMore) {
+                        return const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Center(
+                            child: Text(
+                              "Đã tải hết dữ liệu",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        );
+                      } else {
+                        return const SizedBox();
+                      }
+                    }
+                  }, childCount: totalItems + 1),
+                ),
+              ),
 
-                const SizedBox(height: 12),
-              ],
-            ),
-          ),
-        ),
+              const SliverToBoxAdapter(child: SizedBox(height: 12)),
+            ],
+          );
+        }),
       ),
     );
   }

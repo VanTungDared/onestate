@@ -4,6 +4,7 @@ import '../../domain/repositories/listing_repository.dart';
 import '../datasources/remote/listing_remote_data_source.dart';
 import '../models/ListingModel.dart';
 import '../models/listing_detail_model.dart';
+import '../models/listing_reponse_model.dart';
 
 class ListingRepositoryImpl implements ListingRepository {
   final ListingRemoteDataSource remoteDataSource;
@@ -11,7 +12,7 @@ class ListingRepositoryImpl implements ListingRepository {
   ListingRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<Either<String, List<ListingModel>>> getListing(
+  Future<Either<String, ListingResponse>> getListing(
     int page,
     int limit,
     String listingType, {

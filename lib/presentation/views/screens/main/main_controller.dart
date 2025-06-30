@@ -22,6 +22,10 @@ class MainController extends GetxController {
   RxInt indexPage = 0.obs;
   final isLoadingMe = false.obs;
   final isLoadingListing = false.obs;
+  final RxInt currentPage = 1.obs;
+  final RxInt lastPage = 1.obs;
+  final int pageSize = 10;
+  final ScrollController scrollController = ScrollController();
 
   List<Map<String, dynamic>> bottomItems = [
     // {
@@ -47,19 +51,56 @@ class MainController extends GetxController {
 
     fetchMe();
     fetchListings();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+              scrollController.position.maxScrollExtent - 200 &&
+          !isLoadingListing.value &&
+          currentPage.value < lastPage.value) {
+        fetchMoreListings();
+      }
+    });
+  }
+
+  @override
+  void onClose() {
+    scrollController.dispose();
+    super.onClose();
   }
 
   void fetchListings() async {
     isLoadingListing.value = true;
-    final result = await getListingUseCase.call(1, 10, "sell");
+
+    final result = await getListingUseCase.call(1, pageSize, "sell");
 
     result.fold(
       (error) {
         print("Get listing failed: $error");
         isLoadingListing.value = false;
       },
-      (listings) {
-        dataListings.assignAll(listings);
+      (response) {
+        dataListings.assignAll(response.data);
+        currentPage.value = response.currentPage;
+        lastPage.value = response.lastPage;
+        isLoadingListing.value = false;
+      },
+    );
+  }
+
+  void fetchMoreListings() async {
+    isLoadingListing.value = true;
+    final nextPage = currentPage.value + 1;
+
+    final result = await getListingUseCase.call(nextPage, pageSize, "sell");
+
+    result.fold(
+      (error) {
+        print("Get more listings failed: $error");
+        isLoadingListing.value = false;
+      },
+      (response) {
+        dataListings.addAll(response.data);
+        currentPage.value = response.currentPage;
+        lastPage.value = response.lastPage;
         isLoadingListing.value = false;
       },
     );
