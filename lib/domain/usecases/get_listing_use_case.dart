@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 
-import '../../data/models/ListingModel.dart';
 import '../../data/models/listing_reponse_model.dart';
 import '../repositories/listing_repository.dart';
 

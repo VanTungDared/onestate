@@ -9,6 +9,15 @@ import '../../../../domain/usecases/get_listing_use_case.dart';
 import '../../../../domain/usecases/get_user_usecase.dart';
 import '../../../routers/routerName.dart';
 
+enum SortOption {
+  newest,
+  priceLowToHigh,
+  priceHighToLow,
+  areaSmallToLarge,
+  areaLargeToSmall,
+}
+
+
 class MainController extends GetxController {
   final GetListingUseCase getListingUseCase;
   final GetUserUseCase getUserUseCase;
@@ -26,6 +35,8 @@ class MainController extends GetxController {
   final RxInt lastPage = 1.obs;
   final int pageSize = 10;
   final ScrollController scrollController = ScrollController();
+  final Rx<SortOption> selectedSortOption = SortOption.newest.obs;
+
 
   List<Map<String, dynamic>> bottomItems = [
     // {
@@ -124,4 +135,31 @@ class MainController extends GetxController {
       },
     );
   }
+
+  void sortListings() {
+    final current = selectedSortOption.value;
+
+    final sorted = [...dataListings];
+
+    switch (current) {
+      case SortOption.newest:
+        sorted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        break;
+      case SortOption.priceLowToHigh:
+        sorted.sort((a, b) => a.listingPriceVndSell.compareTo(b.listingPriceVndSell));
+        break;
+      case SortOption.priceHighToLow:
+        sorted.sort((a, b) => b.listingPriceVndSell.compareTo(a.listingPriceVndSell));
+        break;
+      case SortOption.areaSmallToLarge:
+        sorted.sort((a, b) => a.actualAreaSqm.compareTo(b.actualAreaSqm));
+        break;
+      case SortOption.areaLargeToSmall:
+        sorted.sort((a, b) => b.actualAreaSqm.compareTo(a.actualAreaSqm));
+        break;
+    }
+
+    dataListings.assignAll(sorted);
+  }
+
 }

@@ -2,7 +2,6 @@ import 'package:dartz/dartz.dart';
 
 import '../../domain/repositories/listing_repository.dart';
 import '../datasources/remote/listing_remote_data_source.dart';
-import '../models/ListingModel.dart';
 import '../models/listing_detail_model.dart';
 import '../models/listing_reponse_model.dart';
 

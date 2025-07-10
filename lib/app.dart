@@ -9,7 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'core/utils/app_translation.dart';
 import 'presentation/routers/routerName.dart';
 import 'presentation/views/app/app_bindings.dart';
-import 'presentation/views/screens/splash/splash_screen.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

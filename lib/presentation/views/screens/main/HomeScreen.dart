@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 
 import '../../../routers/routerName.dart';
 import '../../../widgets/InfoCard.dart';
+import 'Widget/custom_check_box.dart';
+import 'Widget/option_filter.dart';
 import 'main_controller.dart';
 
 class HomeScreen extends GetView<MainController> {
@@ -54,7 +56,9 @@ class HomeScreen extends GetView<MainController> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 12.h),
+                      OptionFilter(),
+                      SizedBox(height: 12.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -65,7 +69,7 @@ class HomeScreen extends GetView<MainController> {
                               fontWeight: FontWeight.normal,
                             ),
                           ),
-                          _sortWidget(),
+                          _sortWidget(context),
                         ],
                       ),
                       SizedBox(height: 16.h),
@@ -133,27 +137,39 @@ class HomeScreen extends GetView<MainController> {
     );
   }
 
-  Widget _sortWidget() {
-    return Container(
-      height: 32.h,
-      padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(width: 1.w, color: Colors.grey),
-      ),
-      child: Row(
-        children: [
-          Text(
-            "Tin mới nhất (Mặc định) ",
-            style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.normal,
-              color: Color(0xFF6B7280),
+  Widget _sortWidget(BuildContext context) {
+    String title = switch (controller.selectedSortOption.value) {
+      SortOption.newest => 'Tin mới nhất (Mặc định)',
+      SortOption.priceLowToHigh => 'Giá thấp đến cao',
+      SortOption.priceHighToLow => 'Giá cao đến thấp',
+      SortOption.areaSmallToLarge => 'Diện tích nhỏ đến lớn',
+      SortOption.areaLargeToSmall => 'Diện tích lớn đến nhỏ',
+    };
+    return GestureDetector(
+      onTap: () {
+        showBottomDialog(context);
+      },
+      child: Container(
+        height: 32.h,
+        padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 8.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(width: 1.w, color: Colors.grey),
+        ),
+        child: Row(
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.normal,
+                color: Color(0xFF6B7280),
+              ),
             ),
-          ),
-          Icon(Icons.arrow_drop_down, color: Color(0xFF6B7280)),
-        ],
+            Icon(Icons.arrow_drop_down, color: Color(0xFF6B7280)),
+          ],
+        ),
       ),
     );
   }
@@ -187,5 +203,107 @@ class HomeScreen extends GetView<MainController> {
     } else {
       return 'Cập nhật $difference ngày trước';
     }
+  }
+
+  void showBottomDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+      ),
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Sắp xếp",
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    icon: Icon(Icons.close, size: 24.w, color: Colors.grey),
+                  ),
+                ],
+              ),
+              Divider(color: Colors.grey, height: 24.h),
+              CustomCheckboxRow(
+                title: 'Tin mới nhất (Mặc định)',
+                isChecked:
+                    controller.selectedSortOption.value == SortOption.newest,
+                onChanged: (bool value) {
+                  controller.selectedSortOption.value = SortOption.newest;
+                  controller.sortListings();
+                  Get.back();
+                },
+              ),
+              SizedBox(height: 24.h),
+              CustomCheckboxRow(
+                title: 'Giá thấp đến cao',
+                isChecked:
+                    controller.selectedSortOption.value ==
+                    SortOption.priceLowToHigh,
+                onChanged: (bool value) {
+                  controller.selectedSortOption.value =
+                      SortOption.priceLowToHigh;
+                  controller.sortListings();
+                  Get.back();
+                },
+              ),
+              SizedBox(height: 24.h),
+              CustomCheckboxRow(
+                title: 'Giá cao đến thấp',
+                isChecked:
+                    controller.selectedSortOption.value ==
+                    SortOption.priceHighToLow,
+                onChanged: (bool value) {
+                  controller.selectedSortOption.value =
+                      SortOption.priceHighToLow;
+                  controller.sortListings();
+                  Get.back();
+                },
+              ),
+              SizedBox(height: 24.h),
+              CustomCheckboxRow(
+                title: 'Diện tích nhỏ đến lớn',
+                isChecked:
+                    controller.selectedSortOption.value ==
+                    SortOption.areaSmallToLarge,
+                onChanged: (bool value) {
+                  controller.selectedSortOption.value =
+                      SortOption.areaSmallToLarge;
+                  controller.sortListings();
+                  Get.back();
+                },
+              ),
+              SizedBox(height: 24.h),
+              CustomCheckboxRow(
+                title: 'Diện tích lớn đến nhỏ',
+                isChecked:
+                    controller.selectedSortOption.value ==
+                    SortOption.areaLargeToSmall,
+                onChanged: (bool value) {
+                  controller.selectedSortOption.value =
+                      SortOption.areaLargeToSmall;
+                  controller.sortListings();
+                  Get.back();
+                },
+              ),
+              SizedBox(height: 100.h),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
