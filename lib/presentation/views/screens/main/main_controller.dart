@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
@@ -5,6 +6,7 @@ import '../../../../core/utils/constants/asset_constants.dart';
 import '../../../../core/utils/notifier.dart';
 import '../../../../data/models/ListingModel.dart';
 import '../../../../data/models/UserModel.dart';
+import '../../../../domain/entities/type_house.dart';
 import '../../../../domain/usecases/get_listing_use_case.dart';
 import '../../../../domain/usecases/get_user_usecase.dart';
 import '../../../routers/routerName.dart';
@@ -16,7 +18,6 @@ enum SortOption {
   areaSmallToLarge,
   areaLargeToSmall,
 }
-
 
 class MainController extends GetxController {
   final GetListingUseCase getListingUseCase;
@@ -37,7 +38,6 @@ class MainController extends GetxController {
   final ScrollController scrollController = ScrollController();
   final Rx<SortOption> selectedSortOption = SortOption.newest.obs;
 
-
   List<Map<String, dynamic>> bottomItems = [
     // {
     //   'icon': AssetConstant.homeIcon,
@@ -55,6 +55,20 @@ class MainController extends GetxController {
       'label': 'Tài khoản',
     },
   ];
+
+  final List<HouseType> typeHouse = [
+    HouseType(label: 'Chung cư', icon: Icons.apartment),
+    HouseType(label: 'Chung cư mini', icon: Icons.home_work),
+    HouseType(label: 'Lãi vốn (Rẻ)', icon: Icons.attach_money),
+    HouseType(label: 'Nhà phố', icon: Icons.house),
+    HouseType(label: 'Nhà ngõ', icon: Icons.location_city),
+    HouseType(label: 'Biệt thự', icon: Icons.villa),
+    HouseType(label: 'Đất nền', icon: Icons.terrain),
+    HouseType(label: 'Văn phòng', icon: Icons.business),
+    HouseType(label: 'Đóng tiền', icon: Icons.payments),
+  ];
+
+  RxSet<String> selectedTypeHouse = <String>{}.obs;
 
   @override
   void onInit() async {
@@ -146,10 +160,14 @@ class MainController extends GetxController {
         sorted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         break;
       case SortOption.priceLowToHigh:
-        sorted.sort((a, b) => a.listingPriceVndSell.compareTo(b.listingPriceVndSell));
+        sorted.sort(
+          (a, b) => a.listingPriceVndSell.compareTo(b.listingPriceVndSell),
+        );
         break;
       case SortOption.priceHighToLow:
-        sorted.sort((a, b) => b.listingPriceVndSell.compareTo(a.listingPriceVndSell));
+        sorted.sort(
+          (a, b) => b.listingPriceVndSell.compareTo(a.listingPriceVndSell),
+        );
         break;
       case SortOption.areaSmallToLarge:
         sorted.sort((a, b) => a.actualAreaSqm.compareTo(b.actualAreaSqm));
@@ -161,5 +179,4 @@ class MainController extends GetxController {
 
     dataListings.assignAll(sorted);
   }
-
 }

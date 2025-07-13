@@ -89,9 +89,9 @@ class HomeScreen extends GetView<MainController> {
                         padding: EdgeInsets.only(bottom: 12.h),
                         child: InfoCard(
                           imageUrl:
-                              item.imageUrls.isNotEmpty
-                                  ? item.imageUrls.first
-                                  : 'https://via.placeholder.com/150',
+                          item.imageUrls.isNotEmpty
+                              ? item.imageUrls.first
+                              : 'https://via.placeholder.com/150',
                           title: item.title,
                           description: item.description,
                           onPress: () => controller.onPressCard(id: item.id),
@@ -194,7 +194,9 @@ class HomeScreen extends GetView<MainController> {
     if (updatedAt == null) return 'Đang cập nhật';
 
     final now = DateTime.now();
-    final difference = now.difference(updatedAt).inDays;
+    final difference = now
+        .difference(updatedAt)
+        .inDays;
 
     if (difference == 0) {
       return 'Cập nhật hôm nay';
@@ -240,7 +242,7 @@ class HomeScreen extends GetView<MainController> {
               CustomCheckboxRow(
                 title: 'Tin mới nhất (Mặc định)',
                 isChecked:
-                    controller.selectedSortOption.value == SortOption.newest,
+                controller.selectedSortOption.value == SortOption.newest,
                 onChanged: (bool value) {
                   controller.selectedSortOption.value = SortOption.newest;
                   controller.sortListings();
@@ -251,7 +253,7 @@ class HomeScreen extends GetView<MainController> {
               CustomCheckboxRow(
                 title: 'Giá thấp đến cao',
                 isChecked:
-                    controller.selectedSortOption.value ==
+                controller.selectedSortOption.value ==
                     SortOption.priceLowToHigh,
                 onChanged: (bool value) {
                   controller.selectedSortOption.value =
@@ -264,7 +266,7 @@ class HomeScreen extends GetView<MainController> {
               CustomCheckboxRow(
                 title: 'Giá cao đến thấp',
                 isChecked:
-                    controller.selectedSortOption.value ==
+                controller.selectedSortOption.value ==
                     SortOption.priceHighToLow,
                 onChanged: (bool value) {
                   controller.selectedSortOption.value =
@@ -277,7 +279,7 @@ class HomeScreen extends GetView<MainController> {
               CustomCheckboxRow(
                 title: 'Diện tích nhỏ đến lớn',
                 isChecked:
-                    controller.selectedSortOption.value ==
+                controller.selectedSortOption.value ==
                     SortOption.areaSmallToLarge,
                 onChanged: (bool value) {
                   controller.selectedSortOption.value =
@@ -290,7 +292,7 @@ class HomeScreen extends GetView<MainController> {
               CustomCheckboxRow(
                 title: 'Diện tích lớn đến nhỏ',
                 isChecked:
-                    controller.selectedSortOption.value ==
+                controller.selectedSortOption.value ==
                     SortOption.areaLargeToSmall,
                 onChanged: (bool value) {
                   controller.selectedSortOption.value =
