@@ -48,7 +48,6 @@ class ListingRemoteDataSourceImpl implements ListingRemoteDataSource {
         return Left(errorMessage);
       }
       //return const Left('An unexpected error occurred');
-      debugPrint(e.toString());
       return Left(e.toString());
     }
   }

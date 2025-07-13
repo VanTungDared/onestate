@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 
 import '../views/screens/detail/DetailScreen.dart';
 import '../views/screens/detail/detail_binding.dart';
+import '../views/screens/filter/filter_binding.dart';
+import '../views/screens/filter/filter_screen.dart';
 import '../views/screens/main/MainScreen.dart';
 import '../views/screens/MyArticleScreen.dart';
 import '../views/screens/MyLikedScreen.dart';
@@ -16,10 +18,7 @@ import '../views/screens/splash/splash_screen.dart';
 
 var pages = [
   GetPage(name: RouterName.notfound, page: () => NotFoundScreen()),
-  GetPage(
-    name: RouterName.splash,
-    page: () => const SplashScreen(),
-  ),
+  GetPage(name: RouterName.splash, page: () => const SplashScreen()),
   GetPage(
     name: RouterName.login,
     page: () => LoginScreen(),
@@ -41,6 +40,13 @@ var pages = [
     transition: Transition.upToDown,
     fullscreenDialog: true,
     opaque: false,
+  ),
+  GetPage(
+    name: RouterName.filter,
+    page: () => FilterScreen(),
+    transition: Transition.upToDown,
+    fullscreenDialog: true,
+    binding: FilterBinding(),
   ),
   GetPage(name: RouterName.myArticle, page: () => MyArticleScreen()),
   GetPage(name: RouterName.myLike, page: () => MyLikedScreen()),

@@ -23,5 +23,13 @@ class ApiUrl {
   static const baseUrlProd = "https://api.onestate-dev.ontik.vn/";
 
   static const baseUrlImage = "https://file.dev.ontik.vn/re-storage";
+
+  static String getDistricts({required String codeDistrict}){
+    return "${apiV}provinces/$codeDistrict/districts";
+  }
+
+  static String getWards({required String codeDistrict, required String codeWard}){
+    return "${apiV}provinces/$codeDistrict/districts/$codeWard/wards";
+  }
 }
 
