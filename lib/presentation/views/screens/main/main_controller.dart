@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/utils/constants/asset_constants.dart';
@@ -178,5 +177,14 @@ class MainController extends GetxController {
     }
 
     dataListings.assignAll(sorted);
+  }
+
+  void goToFilterScreen() {
+    Get.toNamed(RouterName.filter)?.then((value) {
+      if (value != null) {
+        dataListings.clear();
+        dataListings.addAll(value);
+      }
+    });
   }
 }

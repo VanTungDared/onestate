@@ -11,18 +11,31 @@ class FilterScreen extends GetView<FilterController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.w),
-          child: Column(
-            children: [
-              header(),
-              SizedBox(height: 12.h),
-              Expanded(child: body()),
-              buttonFilter(),
-            ],
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.w),
+              child: Column(
+                children: [
+                  header(),
+                  SizedBox(height: 12.h),
+                  Expanded(child: body()),
+                  buttonFilter(),
+                ],
+              ),
+            ),
           ),
-        ),
+          Obx(() {
+            if (controller.isLoading.value) {
+              return Container(
+                color: Colors.black.withOpacity(0.3),
+                child: const Center(child: CircularProgressIndicator()),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+        ],
       ),
     );
   }
@@ -363,6 +376,7 @@ class FilterScreen extends GetView<FilterController> {
               ),
             ),
             style: TextStyle(fontSize: 14.sp, color: Colors.black),
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
           ),
         ),
         SizedBox(width: 8.w),
@@ -388,6 +402,7 @@ class FilterScreen extends GetView<FilterController> {
               ),
             ),
             style: TextStyle(fontSize: 14.sp, color: Colors.black),
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
           ),
         ),
       ],
@@ -412,7 +427,9 @@ class FilterScreen extends GetView<FilterController> {
               bgColor: Colors.redAccent,
               textColor: Colors.white,
               borderSideColor: Colors.redAccent,
-              onTap: () {},
+              onTap: () {
+                controller.fetchListings();
+              },
             ),
           ),
         ],

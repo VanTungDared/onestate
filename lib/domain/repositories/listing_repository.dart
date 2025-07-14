@@ -12,4 +12,22 @@ abstract class ListingRepository {
   });
 
   Future<Either<String, ListingDetailModel>> getListingById({required String id});
+
+  Future<Either<String, ListingResponse>> filterListing({
+    required int page,
+    required int limit,
+    required String provinceCode,
+    required String districtCode,
+    required String wardCode,
+    required List<String> tags,
+    required String streetName,
+    required double minActualAreaSqm,
+    required double maxActualAreaSqm,
+    required double minNumberOfFloors,
+    required double maxNumberOfFloors,
+    required double minFrontageMeters,
+    required double maxFrontageMeters,
+    required String listingType,
+    required String sort,
+  });
 }

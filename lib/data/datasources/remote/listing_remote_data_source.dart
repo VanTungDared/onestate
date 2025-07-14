@@ -18,6 +18,24 @@ abstract class ListingRemoteDataSource {
   Future<Either<String, ListingDetailModel>> getListingById({
     required String id,
   });
+
+  Future<Either<String, ListingResponse>> filterListing({
+    required int page,
+    required int limit,
+    required String provinceCode,
+    required String districtCode,
+    required String wardCode,
+    required List<String> tags,
+    required String streetName,
+    required double minActualAreaSqm,
+    required double maxActualAreaSqm,
+    required double minNumberOfFloors,
+    required double maxNumberOfFloors,
+    required double minFrontageMeters,
+    required double maxFrontageMeters,
+    required String listingType,
+    required String sort,
+  });
 }
 
 class ListingRemoteDataSourceImpl implements ListingRemoteDataSource {
@@ -63,6 +81,60 @@ class ListingRemoteDataSourceImpl implements ListingRemoteDataSource {
       final listing = ListingDetailModel.fromJson(data);
 
       return Right(listing);
+    } catch (e) {
+      if (e is DioException) {
+        final errorMessage =
+            e.response?.data['message'] ?? 'Get listing failure';
+        return Left(errorMessage);
+      }
+      //return const Left('An unexpected error occurred');
+      return Left(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<String, ListingResponse>> filterListing({
+    required int page,
+    required int limit,
+    required String provinceCode,
+    required String districtCode,
+    required String wardCode,
+    required List<String> tags,
+    required String streetName,
+    required double minActualAreaSqm,
+    required double maxActualAreaSqm,
+    required double minNumberOfFloors,
+    required double maxNumberOfFloors,
+    required double minFrontageMeters,
+    required double maxFrontageMeters,
+    required String listingType,
+    required String sort,
+  }) async {
+    try {
+
+      final url = ApiUrl.filterListingUrl(
+        page: page,
+        limit: limit,
+        provinceCode: provinceCode,
+        districtCode: districtCode,
+        wardCode: wardCode,
+        tags: tags,
+        streetName: streetName,
+        minActualAreaSqm: minActualAreaSqm,
+        maxActualAreaSqm: maxActualAreaSqm,
+        minNumberOfFloors: minNumberOfFloors,
+        maxNumberOfFloors: maxNumberOfFloors,
+        minFrontageMeters: minFrontageMeters,
+        maxFrontageMeters: maxFrontageMeters,
+        listingType: listingType,
+        sort: sort,
+      );
+
+
+      final response = await Get.find<DioClient>().get(url);
+      final jsonData = response.data['data'];
+      final result = ListingResponse.fromJson(jsonData);
+      return Right(result);
     } catch (e) {
       if (e is DioException) {
         final errorMessage =

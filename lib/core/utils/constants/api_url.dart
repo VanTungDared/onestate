@@ -24,12 +24,66 @@ class ApiUrl {
 
   static const baseUrlImage = "https://file.dev.ontik.vn/re-storage";
 
-  static String getDistricts({required String codeDistrict}){
+  static String getDistricts({required String codeDistrict}) {
     return "${apiV}provinces/$codeDistrict/districts";
   }
 
-  static String getWards({required String codeDistrict, required String codeWard}){
+  static String getWards({
+    required String codeDistrict,
+    required String codeWard,
+  }) {
     return "${apiV}provinces/$codeDistrict/districts/$codeWard/wards";
   }
-}
 
+  static String filterListingUrl({
+    required int page,
+    required int limit,
+    required String provinceCode,
+    required String districtCode,
+    required String wardCode,
+    required List<String> tags,
+    required String streetName,
+    required double minActualAreaSqm,
+    required double maxActualAreaSqm,
+    required double minNumberOfFloors,
+    required double maxNumberOfFloors,
+    required double minFrontageMeters,
+    required double maxFrontageMeters,
+    required String listingType,
+    required String sort,
+  }) {
+    try {
+      final queryParams = {
+        'page': page.toString(),
+        'limit': limit.toString(),
+        'provinceCode': provinceCode,
+        'districtCode': districtCode,
+        'wardCode': wardCode,
+        'streetName': streetName,
+        'minActualAreaSqm': minActualAreaSqm.toString(),
+        'maxActualAreaSqm': maxActualAreaSqm.toString(),
+        'minNumberOfFloors': minNumberOfFloors.toString(),
+        'maxNumberOfFloors': maxNumberOfFloors.toString(),
+        'minFrontageMeters': minFrontageMeters.toString(),
+        'maxFrontageMeters': maxFrontageMeters.toString(),
+        'listingType': listingType,
+        'sort': sort,
+      };
+
+      final baseQuery = Uri(queryParameters: queryParams).query;
+
+      final tagQuery = tags
+          .map((tag) => 'tags=${Uri.encodeComponent(tag)}')
+          .join('&');
+
+      final fullQuery = [
+        baseQuery,
+        tagQuery,
+      ].where((q) => q.isNotEmpty).join('&');
+
+      return '${apiV}listings?$fullQuery';
+    } catch (e, stack) {
+      return '';
+    }
+  }
+}
