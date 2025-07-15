@@ -4,7 +4,11 @@ import 'package:get/get.dart';
 
 import 'group_type_house.dart';
 
-void showBottomDialog(BuildContext context) {
+void showBottomDialog({
+  required BuildContext context,
+  required VoidCallback showResult,
+  required VoidCallback reset
+}) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -42,7 +46,7 @@ void showBottomDialog(BuildContext context) {
               Divider(color: Colors.grey, height: 24.h),
               Expanded(child: GroupCheckboxTypeHouse()),
               SizedBox(height: 12.h),
-              buttonFilter(),
+              buttonFilter(showResult: showResult, reset: reset),
               SizedBox(height: 12.h),
             ],
           ),
@@ -52,16 +56,13 @@ void showBottomDialog(BuildContext context) {
   );
 }
 
-Widget buttonFilter() {
+Widget buttonFilter({required VoidCallback showResult,required VoidCallback reset}) {
   return Container(
     width: Get.width,
     padding: EdgeInsets.only(top: 8.h),
     child: Row(
       children: [
-        Flexible(
-          flex: 1,
-          child: _buttonCustom(text: "Đặt lại", onTap: () {}),
-        ),
+        Flexible(flex: 1, child: _buttonCustom(text: "Đặt lại", onTap: reset)),
         SizedBox(width: 12.w),
         Flexible(
           flex: 2,
@@ -70,7 +71,7 @@ Widget buttonFilter() {
             bgColor: Colors.redAccent,
             textColor: Colors.white,
             borderSideColor: Colors.redAccent,
-            onTap: () {},
+            onTap: showResult,
           ),
         ),
       ],

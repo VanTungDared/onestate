@@ -6,6 +6,7 @@ import '../../../../core/utils/notifier.dart';
 import '../../../../data/models/ListingModel.dart';
 import '../../../../data/models/UserModel.dart';
 import '../../../../domain/entities/type_house.dart';
+import '../../../../domain/usecases/filter_apartment_use_case.dart';
 import '../../../../domain/usecases/get_listing_use_case.dart';
 import '../../../../domain/usecases/get_user_usecase.dart';
 import '../../../routers/routerName.dart';
@@ -21,11 +22,16 @@ enum SortOption {
 class MainController extends GetxController {
   final GetListingUseCase getListingUseCase;
   final GetUserUseCase getUserUseCase;
+  final FilterApartmentUseCase filterApartmentUseCase;
   final RxList<ListingModel> dataListings = <ListingModel>[].obs;
 
   final Rxn<UserModel> userModel = Rxn<UserModel>();
 
-  MainController(this.getListingUseCase, this.getUserUseCase);
+  MainController(
+    this.getListingUseCase,
+    this.getUserUseCase,
+    this.filterApartmentUseCase,
+  );
 
   PageController pageController = PageController(initialPage: 0);
   RxInt indexPage = 0.obs;
@@ -36,6 +42,8 @@ class MainController extends GetxController {
   final int pageSize = 10;
   final ScrollController scrollController = ScrollController();
   final Rx<SortOption> selectedSortOption = SortOption.newest.obs;
+  final RxInt minPrice = 0.obs;
+  final RxInt maxPrice = 0.obs;
 
   List<Map<String, dynamic>> bottomItems = [
     // {
@@ -56,15 +64,27 @@ class MainController extends GetxController {
   ];
 
   final List<HouseType> typeHouse = [
-    HouseType(label: 'Chung cư', icon: Icons.apartment),
-    HouseType(label: 'Chung cư mini', icon: Icons.home_work),
-    HouseType(label: 'Lãi vốn (Rẻ)', icon: Icons.attach_money),
-    HouseType(label: 'Nhà phố', icon: Icons.house),
-    HouseType(label: 'Nhà ngõ', icon: Icons.location_city),
-    HouseType(label: 'Biệt thự', icon: Icons.villa),
-    HouseType(label: 'Đất nền', icon: Icons.terrain),
-    HouseType(label: 'Văn phòng', icon: Icons.business),
-    HouseType(label: 'Đóng tiền', icon: Icons.payments),
+    HouseType(label: 'Chung cư', icon: Icons.apartment, value: 'apartment'),
+    HouseType(
+      label: 'Chung cư mini',
+      icon: Icons.home_work,
+      value: 'mini_apartment',
+    ),
+    HouseType(
+      label: 'Lãi vốn (Rẻ)',
+      icon: Icons.attach_money,
+      value: 'cashflow',
+    ),
+    HouseType(label: 'Nhà phố', icon: Icons.house, value: 'house'),
+    HouseType(
+      label: 'Nhà ngõ',
+      icon: Icons.location_city,
+      value: 'alley_house',
+    ),
+    HouseType(label: 'Biệt thự', icon: Icons.villa, value: 'villa'),
+    HouseType(label: 'Đất nền', icon: Icons.terrain, value: 'land'),
+    HouseType(label: 'Văn phòng', icon: Icons.business, value: 'office'),
+    HouseType(label: 'Đóng tiền', icon: Icons.payments, value: 'cashflow'),
   ];
 
   RxSet<String> selectedTypeHouse = <String>{}.obs;
@@ -186,5 +206,71 @@ class MainController extends GetxController {
         dataListings.addAll(value);
       }
     });
+  }
+
+  void filterByTypeHouse() async {
+    isLoadingListing.value = true;
+    final result = await filterApartmentUseCase.call(
+      page: 1,
+      limit: 10,
+      listingType: 'sell',
+      propertyTypes: selectedTypeHouse.toList(),
+      sort: 'default',
+      minPrice: minPrice.value == 0 ? null : minPrice.value,
+      maxPrice: maxPrice.value == 0 ? null : maxPrice.value,
+    );
+
+    result.fold(
+      (error) {
+        print("Get listing failed: $error");
+        isLoadingListing.value = false;
+      },
+      (response) {
+        dataListings.clear();
+        dataListings.assignAll(response.data);
+        isLoadingListing.value = false;
+        Get.back();
+      },
+    );
+  }
+
+  void filterByTypePrice() async {
+    isLoadingListing.value = true;
+    final result = await filterApartmentUseCase.call(
+      page: 1,
+      limit: 10,
+      listingType: 'sell',
+      propertyTypes:
+          selectedTypeHouse.toList().isEmpty
+              ? null
+              : selectedTypeHouse.toList(),
+      sort: 'default',
+      minPrice: minPrice.value,
+      maxPrice: maxPrice.value,
+    );
+
+    result.fold(
+      (error) {
+        print("Get listing failed: $error");
+        isLoadingListing.value = false;
+      },
+      (response) {
+        dataListings.clear();
+        dataListings.assignAll(response.data);
+        isLoadingListing.value = false;
+        Get.back();
+      },
+    );
+  }
+
+  void resetTypeHouse() {
+    selectedTypeHouse.clear();
+    Get.back();
+  }
+
+  void resetTypePrice() {
+    minPrice.value = 0;
+    maxPrice.value = 0;
+    Get.back();
   }
 }

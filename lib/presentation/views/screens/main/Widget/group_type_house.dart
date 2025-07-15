@@ -15,7 +15,7 @@ class GroupCheckboxTypeHouse extends GetView<MainController> {
         return Obx(() {
           final option = controller.typeHouse[index];
           final isSelected = controller.selectedTypeHouse.contains(
-            option.label,
+            option.value,
           );
           return CheckboxListTile(
             controlAffinity: ListTileControlAffinity.trailing,
@@ -31,9 +31,9 @@ class GroupCheckboxTypeHouse extends GetView<MainController> {
             value: isSelected,
             onChanged: (bool? isChecked) {
               if (isChecked == true) {
-                controller.selectedTypeHouse.add(option.label);
+                controller.selectedTypeHouse.add(option.value);
               } else {
-                controller.selectedTypeHouse.remove(option.label);
+                controller.selectedTypeHouse.remove(option.value);
               }
             },
           );

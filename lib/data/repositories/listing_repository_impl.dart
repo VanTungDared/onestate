@@ -73,4 +73,26 @@ class ListingRepositoryImpl implements ListingRepository {
     );
     return result.fold((error) => Left(error), (listings) => Right(listings));
   }
+
+  @override
+  Future<Either<String, ListingResponse>> filterListingByTypeHouse({
+    required int page,
+    required int limit,
+    required String listingType,
+    List<String>? propertyTypes,
+    int? minPrice,
+    int? maxPrice,
+    required String sort,
+  }) async {
+    final result = await remoteDataSource.filterListingByTypeHouse(
+      page: page,
+      limit: limit,
+      listingType: listingType,
+      propertyTypes: propertyTypes,
+        minPrice : minPrice ,
+        maxPrice : maxPrice ,
+        sort : sort
+    );
+    return result.fold((error) => Left(error), (listings) => Right(listings));
+  }
 }

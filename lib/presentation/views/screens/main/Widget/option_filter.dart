@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../../../../routers/routerName.dart';
 import 'type_house_bottom_sheet.dart';
 import 'type_price_bottom_sheet.dart';
 
@@ -43,7 +42,11 @@ class OptionFilter extends GetView<MainController> {
         ),
         GestureDetector(
           onTap: () {
-            showBottomDialog(context);
+            showBottomDialog(
+              context: context,
+              showResult: controller.filterByTypeHouse,
+              reset: controller.resetTypeHouse,
+            );
           },
           child: Container(
             height: 32.h,
@@ -75,7 +78,13 @@ class OptionFilter extends GetView<MainController> {
         ),
         GestureDetector(
           onTap: () {
-            showBottomDialogTypePrice(context);
+            showBottomDialogTypePrice(
+              context,
+              controller.minPrice,
+              controller.maxPrice,
+              showResult: controller.filterByTypePrice,
+              reset: controller.resetTypePrice,
+            );
           },
           child: Container(
             height: 32.h,

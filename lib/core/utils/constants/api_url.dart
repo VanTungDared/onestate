@@ -82,7 +82,51 @@ class ApiUrl {
       ].where((q) => q.isNotEmpty).join('&');
 
       return '${apiV}listings?$fullQuery';
-    } catch (e, stack) {
+    } catch (e) {
+      return '';
+    }
+  }
+
+  static String filterListingByTypeHouseUrl({
+    required int page,
+    required int limit,
+    required String listingType,
+    List<String>? propertyTypes,
+    int? minPrice,
+    int? maxPrice,
+    required String sort,
+  }) {
+    try {
+      final queryParams = {
+        'page': page.toString(),
+        'limit': limit.toString(),
+        'listingType': listingType,
+        'sort': sort,
+      };
+
+      if (minPrice != null) {
+        queryParams['minPrice'] = (minPrice * 1000000000).toString();
+      }
+      if (maxPrice != null) {
+        queryParams['maxPrice'] = (maxPrice * 1000000000).toString();
+      }
+
+      final baseQuery = Uri(queryParameters: queryParams).query;
+
+      final propertyTypesQuery =
+          (propertyTypes != null && propertyTypes.isNotEmpty)
+              ? propertyTypes
+                  .map((type) => 'propertyTypes=${Uri.encodeComponent(type)}')
+                  .join('&')
+              : '';
+
+      final fullQuery = [
+        baseQuery,
+        propertyTypesQuery,
+      ].where((q) => q.isNotEmpty).join('&');
+
+      return '${apiV}listings?$fullQuery';
+    } catch (e) {
       return '';
     }
   }

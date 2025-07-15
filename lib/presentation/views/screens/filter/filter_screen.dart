@@ -417,7 +417,9 @@ class FilterScreen extends GetView<FilterController> {
         children: [
           Flexible(
             flex: 1,
-            child: _buttonCustom(text: "Đặt lại", onTap: () {}),
+            child: _buttonCustom(text: "Đặt lại", onTap: () {
+              controller.resetFilter();
+            }),
           ),
           SizedBox(width: 12.w),
           Flexible(

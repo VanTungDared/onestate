@@ -4,7 +4,13 @@ import 'package:get/get.dart';
 
 import 'slider_widget.dart';
 
-void showBottomDialogTypePrice(BuildContext context) {
+void showBottomDialogTypePrice(
+  BuildContext context,
+  RxInt minPrice,
+  RxInt maxPrice, {
+  required VoidCallback showResult,
+  required VoidCallback reset,
+}) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -41,8 +47,13 @@ void showBottomDialogTypePrice(BuildContext context) {
               ),
               Divider(color: Colors.grey, height: 12.h),
 
-              Expanded(child: DoubleEndedSlider()),
-              buttonFilter(),
+              Expanded(
+                child: DoubleEndedSlider(
+                  minPrice: minPrice,
+                  maxPrice: maxPrice,
+                ),
+              ),
+              buttonFilter(showResult: showResult, reset: reset),
             ],
           ),
         ),
@@ -51,13 +62,16 @@ void showBottomDialogTypePrice(BuildContext context) {
   );
 }
 
-Widget buttonFilter() {
+Widget buttonFilter({
+  required VoidCallback showResult,
+  required VoidCallback reset,
+}) {
   return Container(
     width: Get.width,
     padding: EdgeInsets.only(top: 8.h),
     child: Row(
       children: [
-        Flexible(flex: 1, child: _buttonCustom(text: "Đặt lại", onTap: () {})),
+        Flexible(flex: 1, child: _buttonCustom(text: "Đặt lại", onTap: reset)),
         SizedBox(width: 12.w),
         Flexible(
           flex: 2,
@@ -66,7 +80,7 @@ Widget buttonFilter() {
             bgColor: Colors.redAccent,
             textColor: Colors.white,
             borderSideColor: Colors.redAccent,
-            onTap: () {},
+            onTap: showResult,
           ),
         ),
       ],

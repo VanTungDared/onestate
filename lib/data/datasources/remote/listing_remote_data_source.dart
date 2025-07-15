@@ -36,6 +36,16 @@ abstract class ListingRemoteDataSource {
     required String listingType,
     required String sort,
   });
+
+  Future<Either<String, ListingResponse>> filterListingByTypeHouse({
+    required int page,
+    required int limit,
+    required String listingType,
+    List<String>? propertyTypes,
+    int? minPrice,
+    int? maxPrice,
+    required String sort,
+  });
 }
 
 class ListingRemoteDataSourceImpl implements ListingRemoteDataSource {
@@ -111,7 +121,6 @@ class ListingRemoteDataSourceImpl implements ListingRemoteDataSource {
     required String sort,
   }) async {
     try {
-
       final url = ApiUrl.filterListingUrl(
         page: page,
         limit: limit,
@@ -130,6 +139,41 @@ class ListingRemoteDataSourceImpl implements ListingRemoteDataSource {
         sort: sort,
       );
 
+      final response = await Get.find<DioClient>().get(url);
+      final jsonData = response.data['data'];
+      final result = ListingResponse.fromJson(jsonData);
+      return Right(result);
+    } catch (e) {
+      if (e is DioException) {
+        final errorMessage =
+            e.response?.data['message'] ?? 'Get listing failure';
+        return Left(errorMessage);
+      }
+      //return const Left('An unexpected error occurred');
+      return Left(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<String, ListingResponse>> filterListingByTypeHouse({
+    required int page,
+    required int limit,
+    required String listingType,
+    List<String>? propertyTypes,
+    int? minPrice,
+    int? maxPrice,
+    required String sort,
+  }) async {
+    try {
+      final url = ApiUrl.filterListingByTypeHouseUrl(
+        page: page,
+        limit: limit,
+        listingType: listingType,
+        propertyTypes: propertyTypes,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        sort: sort,
+      );
 
       final response = await Get.find<DioClient>().get(url);
       final jsonData = response.data['data'];

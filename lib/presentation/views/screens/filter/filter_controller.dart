@@ -154,4 +154,9 @@ class FilterController extends GetxController {
       },
     );
   }
+
+  void resetFilter(){
+    Get.delete<FilterController>(force: true);
+    Get.back();
+  }
 }

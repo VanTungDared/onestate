@@ -11,7 +11,9 @@ abstract class ListingRepository {
     String sort,
   });
 
-  Future<Either<String, ListingDetailModel>> getListingById({required String id});
+  Future<Either<String, ListingDetailModel>> getListingById({
+    required String id,
+  });
 
   Future<Either<String, ListingResponse>> filterListing({
     required int page,
@@ -28,6 +30,16 @@ abstract class ListingRepository {
     required double minFrontageMeters,
     required double maxFrontageMeters,
     required String listingType,
+    required String sort,
+  });
+
+  Future<Either<String, ListingResponse>> filterListingByTypeHouse({
+    required int page,
+    required int limit,
+    required String listingType,
+    List<String>? propertyTypes,
+    int? minPrice,
+    int? maxPrice,
     required String sort,
   });
 }

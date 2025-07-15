@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 class DoubleEndedSlider extends StatefulWidget {
-  const DoubleEndedSlider({super.key});
+  final RxInt minPrice;
+  final RxInt maxPrice;
+
+  const DoubleEndedSlider({
+    super.key,
+    required this.minPrice,
+    required this.maxPrice,
+  });
 
   @override
   State<DoubleEndedSlider> createState() => _DoubleEndedSliderState();
@@ -19,6 +27,13 @@ class _DoubleEndedSliderState extends State<DoubleEndedSlider> {
     super.initState();
     _startController.text = _currentRange.start.toInt().toString();
     _endController.text = _currentRange.end.toInt().toString();
+    _currentRange = RangeValues(
+      widget.minPrice.value.toDouble(),
+      widget.maxPrice.value.toDouble(),
+    );
+
+    _startController.text = widget.minPrice.value.toString();
+    _endController.text = widget.maxPrice.value.toString();
   }
 
   void _updateStartFromText(String text) {
@@ -27,6 +42,7 @@ class _DoubleEndedSliderState extends State<DoubleEndedSlider> {
       setState(() {
         _currentRange = RangeValues(parsed.toDouble(), _currentRange.end);
       });
+      widget.minPrice.value = parsed;
     }
   }
 
@@ -36,6 +52,7 @@ class _DoubleEndedSliderState extends State<DoubleEndedSlider> {
       setState(() {
         _currentRange = RangeValues(_currentRange.start, parsed.toDouble());
       });
+      widget.maxPrice.value = parsed;
     }
   }
 
@@ -168,6 +185,8 @@ class _DoubleEndedSliderState extends State<DoubleEndedSlider> {
             onChanged: (RangeValues values) {
               setState(() {
                 _currentRange = values;
+                widget.minPrice.value = _currentRange.start.toInt();
+                widget.maxPrice.value = _currentRange.end.toInt();
               });
             },
           ),
@@ -176,6 +195,8 @@ class _DoubleEndedSliderState extends State<DoubleEndedSlider> {
             onChanged: (newRange) {
               setState(() {
                 _currentRange = newRange;
+                widget.minPrice.value = _currentRange.start.toInt();
+                widget.maxPrice.value = _currentRange.end.toInt();
               });
             },
           ),
