@@ -320,7 +320,10 @@ class CategoryScreen extends StatelessWidget {
                                   Row(
                                     children: [
                                       Text(
-                                        _formatPrice(listing.listingPriceVndRent),
+                                        _formatPrice(
+                                          listing.listingPriceVndRent
+                                              .toString(),
+                                        ),
                                         style: TextStyle(
                                           color: Colors.red,
                                           fontWeight: FontWeight.bold,

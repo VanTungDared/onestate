@@ -1,3 +1,6 @@
+import 'package:app_real_estate/core/utils/constants/asset_constants.dart';
+import 'package:app_real_estate/core/utils/image_utils.dart';
+import 'package:app_real_estate/presentation/widgets/CustomDrawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -9,11 +12,36 @@ import 'Widget/option_filter.dart';
 import 'main_controller.dart';
 
 class HomeScreen extends GetView<MainController> {
-  const HomeScreen({super.key});
-
+  HomeScreen({super.key});
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      endDrawer: Obx(
+        () =>
+            controller.userModel.value != null
+                ? CustomDrawer(userModel: controller.userModel.value!)
+                : SizedBox(),
+      ),
+      appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        actionsPadding: EdgeInsets.symmetric(horizontal: 16.w),
+        actions: [
+          ImageUtils.loadFromAsset(AssetConstant.logoPng),
+          Spacer(),
+          GestureDetector(
+            onTap: () => _scaffoldKey.currentState?.openEndDrawer(),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(20.w, 10, 0, 10),
+              child: Icon(Icons.menu),
+            ),
+          ),
+        ],
+      ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Obx(() {
@@ -22,83 +50,82 @@ class HomeScreen extends GetView<MainController> {
               controller.currentPage.value < controller.lastPage.value;
           final totalItems = controller.dataListings.length;
 
-          return CustomScrollView(
-            controller: controller.scrollController,
-            slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 12.h),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      GestureDetector(
-                        onTap: () => Get.toNamed(RouterName.search),
-                        child: Container(
-                          height: 46.h,
-                          padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.search, color: Colors.grey),
-                              SizedBox(width: 10.w),
-                              Expanded(
-                                child: Text(
-                                  'Tìm kiếm bằng từ khóa',
-                                  style: TextStyle(color: Colors.grey),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+          return Column(
+            children: [
+              // Header cố định
+              Padding(
+                padding: EdgeInsets.only(left: 16.w, right: 16.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () => Get.toNamed(RouterName.search),
+                      child: Container(
+                        height: 40.h,
+                        padding: EdgeInsets.symmetric(horizontal: 16.w),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.search, color: Colors.grey),
+                            SizedBox(width: 10.w),
+                            Expanded(
+                              child: Text(
+                                'Tìm kiếm bằng từ khóa',
+                                style: TextStyle(color: Colors.grey),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              Icon(Icons.tune, color: Colors.grey),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 12.h),
-                      OptionFilter(),
-                      SizedBox(height: 12.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Có $totalItems bất động sản',
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.normal,
-                            ),
+                    ),
+                    SizedBox(height: 6.h),
+                    OptionFilter(),
+                    SizedBox(height: 6.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Có $totalItems bất động sản',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.normal,
                           ),
-                          _sortWidget(context),
-                        ],
-                      ),
-                      SizedBox(height: 16.h),
-                    ],
-                  ),
+                        ),
+                        _sortWidget(context),
+                      ],
+                    ),
+                    SizedBox(height: 6.h),
+                  ],
                 ),
               ),
 
-              // Danh sách bất động sản
-              SliverPadding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
+              // Danh sách cuộn
+              Expanded(
+                child: ListView.builder(
+                  controller: controller.scrollController,
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  itemCount: totalItems + 1,
+                  itemBuilder: (context, index) {
                     if (index < totalItems) {
                       final item = controller.dataListings[index];
                       return Padding(
                         padding: EdgeInsets.only(bottom: 12.h),
                         child: InfoCard(
                           imageUrl:
-                          item.imageUrls.isNotEmpty
-                              ? item.imageUrls.first
-                              : 'https://via.placeholder.com/150',
+                              item.imageUrls.isNotEmpty
+                                  ? item.imageUrls.first
+                                  : 'https://via.placeholder.com/150',
                           title: item.title,
                           description: item.description,
                           onPress: () => controller.onPressCard(id: item.id),
                           listingPriceVndRent: _formatPrice(
-                            item.listingPriceVndRent,
+                            item.listingPriceVndRent.toString(),
                           ),
-                          legalAreaSqm: item.legalAreaSqm,
+                          legalAreaSqm: item.legalAreaSqm.toString(),
                           province: item.province.name,
                           district: item.district.name,
                           own: item.authorName,
@@ -125,11 +152,9 @@ class HomeScreen extends GetView<MainController> {
                         return const SizedBox();
                       }
                     }
-                  }, childCount: totalItems + 1),
+                  },
                 ),
               ),
-
-              const SliverToBoxAdapter(child: SizedBox(height: 12)),
             ],
           );
         }),
@@ -150,13 +175,9 @@ class HomeScreen extends GetView<MainController> {
         showBottomDialog(context);
       },
       child: Container(
-        height: 32.h,
+        height: 28.h,
         padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 8.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(width: 1.w, color: Colors.grey),
-        ),
+        decoration: BoxDecoration(color: Colors.white),
         child: Row(
           children: [
             Text(
@@ -164,10 +185,10 @@ class HomeScreen extends GetView<MainController> {
               style: TextStyle(
                 fontSize: 13.sp,
                 fontWeight: FontWeight.normal,
-                color: Color(0xFF6B7280),
+                color: const Color(0xFF6B7280),
               ),
             ),
-            Icon(Icons.arrow_drop_down, color: Color(0xFF6B7280)),
+            const Icon(Icons.arrow_drop_down, color: Color(0xFF6B7280)),
           ],
         ),
       ),
@@ -194,9 +215,7 @@ class HomeScreen extends GetView<MainController> {
     if (updatedAt == null) return 'Đang cập nhật';
 
     final now = DateTime.now();
-    final difference = now
-        .difference(updatedAt)
-        .inDays;
+    final difference = now.difference(updatedAt).inDays;
 
     if (difference == 0) {
       return 'Cập nhật hôm nay';
@@ -210,7 +229,7 @@ class HomeScreen extends GetView<MainController> {
   void showBottomDialog(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
       ),
       backgroundColor: Colors.white,
@@ -242,7 +261,7 @@ class HomeScreen extends GetView<MainController> {
               CustomCheckboxRow(
                 title: 'Tin mới nhất (Mặc định)',
                 isChecked:
-                controller.selectedSortOption.value == SortOption.newest,
+                    controller.selectedSortOption.value == SortOption.newest,
                 onChanged: (bool value) {
                   controller.selectedSortOption.value = SortOption.newest;
                   controller.sortListings();
@@ -253,7 +272,7 @@ class HomeScreen extends GetView<MainController> {
               CustomCheckboxRow(
                 title: 'Giá thấp đến cao',
                 isChecked:
-                controller.selectedSortOption.value ==
+                    controller.selectedSortOption.value ==
                     SortOption.priceLowToHigh,
                 onChanged: (bool value) {
                   controller.selectedSortOption.value =
@@ -266,7 +285,7 @@ class HomeScreen extends GetView<MainController> {
               CustomCheckboxRow(
                 title: 'Giá cao đến thấp',
                 isChecked:
-                controller.selectedSortOption.value ==
+                    controller.selectedSortOption.value ==
                     SortOption.priceHighToLow,
                 onChanged: (bool value) {
                   controller.selectedSortOption.value =
@@ -279,7 +298,7 @@ class HomeScreen extends GetView<MainController> {
               CustomCheckboxRow(
                 title: 'Diện tích nhỏ đến lớn',
                 isChecked:
-                controller.selectedSortOption.value ==
+                    controller.selectedSortOption.value ==
                     SortOption.areaSmallToLarge,
                 onChanged: (bool value) {
                   controller.selectedSortOption.value =
@@ -292,7 +311,7 @@ class HomeScreen extends GetView<MainController> {
               CustomCheckboxRow(
                 title: 'Diện tích lớn đến nhỏ',
                 isChecked:
-                controller.selectedSortOption.value ==
+                    controller.selectedSortOption.value ==
                     SortOption.areaLargeToSmall,
                 onChanged: (bool value) {
                   controller.selectedSortOption.value =

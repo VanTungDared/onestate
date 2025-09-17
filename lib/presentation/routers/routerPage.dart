@@ -1,5 +1,6 @@
 import 'package:app_real_estate/presentation/routers/routerName.dart';
 import 'package:app_real_estate/presentation/views/screens/main/main_binding.dart';
+import 'package:app_real_estate/presentation/views/screens/my_article/my_article_binding.dart';
 import 'package:get/get.dart';
 
 import '../views/screens/detail/DetailScreen.dart';
@@ -7,7 +8,7 @@ import '../views/screens/detail/detail_binding.dart';
 import '../views/screens/filter/filter_binding.dart';
 import '../views/screens/filter/filter_screen.dart';
 import '../views/screens/main/MainScreen.dart';
-import '../views/screens/MyArticleScreen.dart';
+import '../views/screens/my_article/MyArticleScreen.dart';
 import '../views/screens/MyLikedScreen.dart';
 import '../views/screens/NotFoundScreen.dart';
 import '../views/screens/RealEstatePostScreen.dart';
@@ -48,7 +49,11 @@ var pages = [
     fullscreenDialog: true,
     binding: FilterBinding(),
   ),
-  GetPage(name: RouterName.myArticle, page: () => MyArticleScreen()),
+  GetPage(
+    name: RouterName.myArticle,
+    page: () => MyArticleScreen(),
+    binding: MyArticleBinding(),
+  ),
   GetPage(name: RouterName.myLike, page: () => MyLikedScreen()),
   GetPage(name: RouterName.post, page: () => RealEstateFormScreen()),
 ];

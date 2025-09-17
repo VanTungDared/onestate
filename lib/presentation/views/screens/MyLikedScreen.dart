@@ -323,7 +323,8 @@ class MyLikedScreen extends StatelessWidget {
                                     children: [
                                       Text(
                                         _formatPrice(
-                                          listing.listingPriceVndRent,
+                                          listing.listingPriceVndRent
+                                              .toString(),
                                         ),
                                         style: TextStyle(
                                           color: Colors.red,

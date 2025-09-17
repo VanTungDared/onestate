@@ -1,4 +1,3 @@
-
 import 'district.dart';
 
 class Listing {
@@ -12,31 +11,36 @@ class Listing {
   String wardCode;
   String streetName;
   String fullAddress;
-  dynamic latitude;
-  dynamic longitude;
-  String commissionRatePercent;
-  dynamic commissionAmountVnd;
-  String legalAreaSqm;
-  String actualAreaSqm;
-  String frontageMeters;
-  String widthMeters;
-  dynamic roadWidthMeters;
+  double? latitude;
+  double? longitude;
+
+  double commissionRatePercent; // trước là String
+  int? commissionAmountVnd; // giữ int
+  double legalAreaSqm; // trước là String
+  double actualAreaSqm; // trước là String
+  double frontageMeters; // trước là String
+  double widthMeters; // trước là String
+  double? roadWidthMeters;
+
   int numberOfFloors;
-  String listingPriceVndSell;
-  String? listingPriceVndRent;
-  String realEstateType;
+  double listingPriceVndSell; // trước là String
+  double? listingPriceVndRent; // trước là String?
+
   String createdBy;
   String updatedBy;
   DateTime createdAt;
   DateTime updatedAt;
   String authorName;
   String phoneNumber;
+
   List<String> imageUrls;
   List<String> tags;
   String propertyType;
+
   District province;
   District district;
-  dynamic ward;
+  dynamic ward; // có thể là object hoặc null
+
   int likes;
   String ownerPhoneNumber;
   String ownerCitizenId;
@@ -44,6 +48,7 @@ class Listing {
   int numberOfBathrooms;
   int? numberOfBalconies;
   String? facing;
+
   dynamic landCertificate;
   String listingCode;
   String listingType;
@@ -72,7 +77,6 @@ class Listing {
     required this.numberOfFloors,
     required this.listingPriceVndSell,
     required this.listingPriceVndRent,
-    required this.realEstateType,
     required this.createdBy,
     required this.updatedBy,
     required this.createdAt,
@@ -98,5 +102,3 @@ class Listing {
     required this.isLiked,
   });
 }
-
-

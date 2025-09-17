@@ -23,8 +23,7 @@ class ListingDetail {
   dynamic roadWidthMeters;
   int numberOfFloors;
   String listingPriceVndSell;
-  String listingPriceVndRent;
-  String realEstateType;
+  String? listingPriceVndRent; // có thể null
   String createdBy;
   String updatedBy;
   DateTime createdAt;
@@ -33,7 +32,7 @@ class ListingDetail {
   String phoneNumber;
   List<String> imageUrls;
   List<String> tags;
-  String propertyType;
+  String propertyType; // thay cho realEstateType
   District province;
   District district;
   District ward;
@@ -42,7 +41,7 @@ class ListingDetail {
   String ownerCitizenId;
   int numberOfRooms;
   int numberOfBathrooms;
-  dynamic numberOfBalconies;
+  int numberOfBalconies;
   dynamic facing;
   dynamic landCertificate;
   String listingCode;
@@ -72,7 +71,6 @@ class ListingDetail {
     required this.numberOfFloors,
     required this.listingPriceVndSell,
     required this.listingPriceVndRent,
-    required this.realEstateType,
     required this.createdBy,
     required this.updatedBy,
     required this.createdAt,
@@ -97,5 +95,4 @@ class ListingDetail {
     required this.listingType,
     required this.isLiked,
   });
-
 }

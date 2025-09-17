@@ -29,7 +29,6 @@ class ListingDetailModel extends ListingDetail {
     required super.numberOfFloors,
     required super.listingPriceVndSell,
     required super.listingPriceVndRent,
-    required super.realEstateType,
     required super.createdBy,
     required super.updatedBy,
     required super.createdAt,
@@ -58,38 +57,39 @@ class ListingDetailModel extends ListingDetail {
   factory ListingDetailModel.fromJson(Map<String, dynamic> json) {
     return ListingDetailModel(
       id: json['id'] ?? '',
-      title: json['title'],
-      status: json['status'],
-      description: json['description'],
-      ownerName: json['ownerName'],
-      provinceCode: json['provinceCode'],
-      districtCode: json['districtCode'],
-      wardCode: json['wardCode'],
-      streetName: json['streetName'],
-      fullAddress: json['fullAddress'],
+      title: json['title'] ?? '',
+      status: json['status'] ?? '',
+      description: json['description'] ?? '',
+      ownerName: json['ownerName'] ?? '',
+      provinceCode: json['provinceCode'] ?? '',
+      districtCode: json['districtCode'] ?? '',
+      wardCode: json['wardCode'] ?? '',
+      streetName: json['streetName'] ?? '',
+      fullAddress: json['fullAddress'] ?? '',
       latitude: json['latitude']?.toString(),
       longitude: json['longitude']?.toString(),
-      commissionRatePercent: json['commissionRatePercent'],
-      commissionAmountVnd: json['commissionAmountVnd'],
-      legalAreaSqm: json['legalAreaSqm'],
-      actualAreaSqm: json['actualAreaSqm'],
-      frontageMeters: json['frontageMeters'],
-      widthMeters: json['widthMeters'],
+      commissionRatePercent: json['commissionRatePercent'] ?? '',
+      commissionAmountVnd: json['commissionAmountVnd'] ?? '',
+      legalAreaSqm: json['legalAreaSqm'] ?? '',
+      actualAreaSqm: json['actualAreaSqm'] ?? '',
+      frontageMeters: json['frontageMeters'] ?? '',
+      widthMeters: json['widthMeters'] ?? '',
       roadWidthMeters: (json['roadWidthMeters'] as num?)?.toDouble(),
-      numberOfFloors: json['numberOfFloors'],
-      realEstateType: json['realEstateType'],
-      createdBy: json['createdBy'],
-      updatedBy: json['updatedBy'],
+      numberOfFloors: json['numberOfFloors'] ?? 0,
+      listingPriceVndSell: json['listingPriceVndSell'],
+      listingPriceVndRent: json['listingPriceVndRent'],
+      createdBy: json['createdBy'] ?? '',
+      updatedBy: json['updatedBy'] ?? '',
       createdAt:
           json['createdAt'] != null
               ? DateTime.parse(json['createdAt'])
               : DateTime.now(),
       updatedAt:
-          json['createdAt'] != null
-              ? DateTime.parse(json['createdAt'])
+          json['updatedAt'] != null
+              ? DateTime.parse(json['updatedAt'])
               : DateTime.now(),
-      authorName: json['authorName'],
-      phoneNumber: json['phoneNumber'],
+      authorName: json['authorName'] ?? '',
+      phoneNumber: json['phoneNumber'] ?? '',
       imageUrls:
           (json['imageUrls'] as List?)?.map((e) => e.toString()).toList() ?? [],
       tags: (json['tags'] as List?)?.map((e) => e.toString()).toList() ?? [],
@@ -105,7 +105,7 @@ class ListingDetailModel extends ListingDetail {
           json['ward'] != null
               ? DistrictModel.fromJson(json['ward'])
               : District(code: "", name: ""),
-      likes: json['likes'],
+      likes: json['likes'] ?? 0,
       isLiked:
           json['isLiked'] != null
               ? IsLikeModel.fromJson(json['isLiked'])
@@ -115,18 +115,16 @@ class ListingDetailModel extends ListingDetail {
                 listingId: '',
                 createdAt: DateTime.now(),
               ),
-      ownerPhoneNumber: json['ownerPhoneNumber'],
-      ownerCitizenId: json['ownerCitizenId'],
-      numberOfRooms: json['numberOfRooms'],
-      numberOfBathrooms: json['numberOfBathrooms'],
-      numberOfBalconies: json['numberOfBalconies'],
+      ownerPhoneNumber: json['ownerPhoneNumber'] ?? '',
+      ownerCitizenId: json['ownerCitizenId'] ?? '',
+      numberOfRooms: json['numberOfRooms'] ?? 0,
+      numberOfBathrooms: json['numberOfBathrooms'] ?? 0,
+      numberOfBalconies: json['numberOfBalconies'] ?? 0,
       facing: json['facing'],
       landCertificate: json['landCertificate'],
-      listingPriceVndSell: json['listingPriceVndSell'],
-      listingPriceVndRent: json['listingPriceVndRent'],
-      propertyType: json['propertyType'],
-      listingCode: json['listingCode'],
-      listingType: json['listingType'],
+      propertyType: json['propertyType'] ?? '',
+      listingCode: json['listingCode'] ?? '',
+      listingType: json['listingType'] ?? '',
     );
   }
 
@@ -151,7 +149,8 @@ class ListingDetailModel extends ListingDetail {
     'widthMeters': widthMeters,
     'roadWidthMeters': roadWidthMeters,
     'numberOfFloors': numberOfFloors,
-    'realEstateType': realEstateType,
+    'listingPriceVndSell': listingPriceVndSell,
+    'listingPriceVndRent': listingPriceVndRent,
     'createdBy': createdBy,
     'updatedBy': updatedBy,
     'createdAt': createdAt.toIso8601String(),
@@ -160,11 +159,28 @@ class ListingDetailModel extends ListingDetail {
     'phoneNumber': phoneNumber,
     'imageUrls': imageUrls,
     'tags': tags,
-    'province': province,
-    'district': district,
-    'ward': ward,
+    'province':
+        (province is DistrictModel)
+            ? (province as DistrictModel).toJson()
+            : {'code': province.code, 'name': province.name},
+    'district':
+        (district is DistrictModel)
+            ? (district as DistrictModel).toJson()
+            : {'code': district.code, 'name': district.name},
+    'ward':
+        (ward is DistrictModel)
+            ? (ward as DistrictModel).toJson()
+            : {'code': ward.code, 'name': ward.name},
     'likes': likes,
-    'isLiked': isLiked,
+    'isLiked':
+        (isLiked is IsLikeModel)
+            ? (isLiked as IsLikeModel).toJson()
+            : {
+              'id': isLiked.id,
+              'userId': isLiked.userId,
+              'listingId': isLiked.listingId,
+              'createdAt': isLiked.createdAt.toIso8601String(),
+            },
     'ownerPhoneNumber': ownerPhoneNumber,
     'ownerCitizenId': ownerCitizenId,
     'numberOfRooms': numberOfRooms,
@@ -172,5 +188,8 @@ class ListingDetailModel extends ListingDetail {
     'numberOfBalconies': numberOfBalconies,
     'facing': facing,
     'landCertificate': landCertificate,
+    'propertyType': propertyType,
+    'listingCode': listingCode,
+    'listingType': listingType,
   };
 }

@@ -26,7 +26,8 @@ class InfoCard extends StatelessWidget {
     required this.legalAreaSqm,
     required this.province,
     required this.district,
-    required this.own, required this.updatedAt,
+    required this.own,
+    required this.updatedAt,
   });
 
   @override
@@ -42,10 +43,10 @@ class InfoCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 10,
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 2,
               spreadRadius: 2,
-              offset: Offset(0, 4),
+              offset: Offset(0, 2),
             ),
           ],
         ),
@@ -57,8 +58,6 @@ class InfoCard extends StatelessWidget {
               color: Colors.grey,
               child: CachedNetworkImage(
                 imageUrl: "${ApiUrl.baseUrlImage}/$imageUrl",
-                placeholder:
-                    (context, url) => const CircularProgressIndicator(),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
                 fit: BoxFit.cover,
               ),
@@ -69,15 +68,18 @@ class InfoCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2C2C2C),
+                  Padding(
+                    padding: EdgeInsets.only(right: 8.w),
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2C2C2C),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
 
                   Row(
@@ -166,6 +168,4 @@ class InfoCard extends StatelessWidget {
       decoration: BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
     );
   }
-
-
 }

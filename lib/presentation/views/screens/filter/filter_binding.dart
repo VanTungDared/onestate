@@ -25,7 +25,9 @@ class FilterBinding extends Bindings {
     Get.lazyPut(() => GetDistrictUseCase(Get.find()));
     Get.lazyPut(() => GetWardUseCase(Get.find()));
 
-    Get.put(FilterController(Get.find(), Get.find(), Get.find()), permanent: true);
-
+    Get.put(
+      FilterController(Get.find(), Get.find(), Get.find()),
+      permanent: true,
+    );
   }
 }

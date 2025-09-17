@@ -58,9 +58,6 @@ class DetailScreen extends GetView<DetailController> {
                                 borderRadius: BorderRadius.circular(12),
                                 child: CachedNetworkImage(
                                   imageUrl: "${ApiUrl.baseUrlImage}/$url",
-                                  placeholder:
-                                      (context, url) =>
-                                          const CircularProgressIndicator(),
                                   errorWidget:
                                       (context, url, error) =>
                                           const Icon(Icons.error),

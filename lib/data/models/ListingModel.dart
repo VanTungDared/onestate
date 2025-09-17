@@ -27,7 +27,6 @@ class ListingModel extends Listing {
     required super.widthMeters,
     super.roadWidthMeters,
     required super.numberOfFloors,
-    required super.realEstateType,
     required super.createdBy,
     required super.createdAt,
     required super.updatedAt,
@@ -44,7 +43,7 @@ class ListingModel extends Listing {
     required super.numberOfRooms,
     required super.numberOfBathrooms,
     required super.numberOfBalconies,
-    required super.facing,
+    super.facing,
     super.landCertificate,
     required super.updatedBy,
     required super.listingPriceVndSell,
@@ -65,28 +64,27 @@ class ListingModel extends Listing {
       provinceCode: json['provinceCode'],
       districtCode: json['districtCode'],
       wardCode: json['wardCode'],
-      streetName: json['streetName'],
-      fullAddress: json['fullAddress'],
+      streetName: json['streetName'] ?? "",
+      fullAddress: json['fullAddress'] ?? "",
       latitude: _parseToDouble(json['latitude']),
       longitude: _parseToDouble(json['longitude']),
-      commissionRatePercent: json['commissionRatePercent'],
-      commissionAmountVnd: json['commissionAmountVnd'] as int?,
-      legalAreaSqm: json['legalAreaSqm'],
-      actualAreaSqm: json['actualAreaSqm'],
-      frontageMeters: json['frontageMeters'],
-      widthMeters: json['widthMeters'],
-      roadWidthMeters: json['roadWidthMeters'] as int?,
-      numberOfFloors: json['numberOfFloors'] as int? ?? 0,
+      commissionRatePercent: _parseToDouble(json['commissionRatePercent']) ?? 0,
+      commissionAmountVnd: _parseToInt(json['commissionAmountVnd']),
+      legalAreaSqm: _parseToDouble(json['legalAreaSqm']) ?? 0,
+      actualAreaSqm: _parseToDouble(json['actualAreaSqm']) ?? 0,
+      frontageMeters: _parseToDouble(json['frontageMeters']) ?? 0,
+      widthMeters: _parseToDouble(json['widthMeters']) ?? 0,
+      roadWidthMeters: _parseToDouble(json['roadWidthMeters']),
+      numberOfFloors: _parseToInt(json['numberOfFloors']) ?? 0,
 
-      realEstateType: json['realEstateType'],
       createdBy: json['createdBy'],
       createdAt:
           json['createdAt'] != null
               ? DateTime.parse(json['createdAt'])
               : DateTime.now(),
       updatedAt:
-          json['createdAt'] != null
-              ? DateTime.parse(json['createdAt'])
+          json['updatedAt'] != null
+              ? DateTime.parse(json['updatedAt'])
               : DateTime.now(),
       authorName: json['authorName'],
       imageUrls:
@@ -101,13 +99,13 @@ class ListingModel extends Listing {
               ? DistrictModel.fromJson(json['district'])
               : District(code: "", name: ""),
       ward: json['ward']?['name'],
-      likes: json['likes'] as int? ?? 0,
+      likes: _parseToInt(json['likes']) ?? 0,
       phoneNumber: json['phoneNumber'],
       ownerPhoneNumber: json['ownerPhoneNumber'],
       ownerCitizenId: json['ownerCitizenId'],
-      numberOfRooms: json['numberOfRooms'] as int? ?? 0,
-      numberOfBathrooms: json['numberOfBathrooms'] as int? ?? 0,
-      numberOfBalconies: json['numberOfBalconies'] as int?,
+      numberOfRooms: _parseToInt(json['numberOfRooms']) ?? 0,
+      numberOfBathrooms: _parseToInt(json['numberOfBathrooms']) ?? 0,
+      numberOfBalconies: _parseToInt(json['numberOfBalconies']),
       facing: json['facing'],
       landCertificate:
           json['landCertificate'] != null
@@ -120,9 +118,9 @@ class ListingModel extends Listing {
                     [],
               )
               : null,
-      updatedBy: json['updatedBy'],
-      listingPriceVndSell: json['listingPriceVndSell'],
-      listingPriceVndRent: json['listingPriceVndRent'],
+      updatedBy: json['updatedBy'] ?? "",
+      listingPriceVndSell: _parseToDouble(json['listingPriceVndSell']) ?? 0,
+      listingPriceVndRent: _parseToDouble(json['listingPriceVndRent']),
       listingCode: json['listingCode'],
       listingType: json['listingType'],
       isLiked: json['isLiked'] as bool? ?? false,
@@ -152,8 +150,6 @@ class ListingModel extends Listing {
       'widthMeters': widthMeters,
       'roadWidthMeters': roadWidthMeters,
       'numberOfFloors': numberOfFloors,
-
-      'realEstateType': realEstateType,
       'createdBy': createdBy,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
@@ -181,6 +177,7 @@ class ListingModel extends Listing {
       'listingCode': listingCode,
       'listingType': listingType,
       'isLiked': isLiked,
+      'propertyType': propertyType,
     };
   }
 
@@ -189,6 +186,14 @@ class ListingModel extends Listing {
     if (value is double) return value;
     if (value is int) return value.toDouble();
     if (value is String) return double.tryParse(value);
+    return null;
+  }
+
+  static int? _parseToInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    if (value is String) return int.tryParse(value);
     return null;
   }
 }
