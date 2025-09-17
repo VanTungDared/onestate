@@ -6,10 +6,13 @@ import 'package:get/get.dart';
 
 class CustomDrawer extends StatelessWidget {
   final UserModel userModel;
-
+  final GlobalKey<ScaffoldState> scaffoldKey;
+  final Function callLogout;
   const CustomDrawer({
     super.key,
     required this.userModel, // phải có "this." để gán vào field
+    required this.scaffoldKey,
+    required this.callLogout,
   });
   @override
   Widget build(BuildContext context) {
@@ -60,9 +63,7 @@ class CustomDrawer extends StatelessWidget {
                   ),
                   const Spacer(),
                   IconButton(
-                    onPressed: () {
-                      // TODO: logout
-                    },
+                    onPressed: () => callLogout(),
                     icon: const Icon(Icons.logout, color: Colors.red),
                   ),
                 ],
@@ -81,7 +82,9 @@ class CustomDrawer extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.toNamed(RouterName.post);
+                  },
                   child: Text(
                     "Đăng tin",
                     style: TextStyle(
@@ -93,21 +96,23 @@ class CustomDrawer extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 12.h),
-
+              SizedBox(height: 6.h),
               // Menu items
               _buildMenuItem(
                 icon: Icons.article_outlined,
                 title: "Bài đăng của tôi",
                 onTap: () {
+                  scaffoldKey.currentState?.closeEndDrawer();
                   Get.toNamed(RouterName.myArticle);
                 },
               ),
+              Divider(thickness: 1, height: 1, color: Colors.grey.shade300),
               _buildMenuItem(
                 icon: Icons.favorite_border,
                 title: "Bài đăng đã thích",
                 onTap: () {
-                  // TODO: navigate
+                  scaffoldKey.currentState?.closeEndDrawer();
+                  Get.toNamed(RouterName.myFavourite);
                 },
               ),
             ],

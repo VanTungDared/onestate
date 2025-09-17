@@ -1,3 +1,4 @@
+import 'package:app_real_estate/data/datasources/dblocal/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -103,6 +104,19 @@ class MainController extends GetxController {
         fetchMoreListings();
       }
     });
+  }
+
+  handleCallLogout() async {
+    final dataLogout = await getUserUseCase.logout();
+    dataLogout.fold(
+      (errorMessage) {
+        LoadingNotifier.showTopMessage(errorMessage, false);
+      },
+      (data) async {
+        await SharedPreferenceApp.handleRemove('accessToken');
+        Get.offAllNamed(RouterName.login);
+      },
+    );
   }
 
   @override

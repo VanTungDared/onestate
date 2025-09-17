@@ -23,8 +23,34 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-            textTheme:
-                GoogleFonts.robotoCondensedTextTheme(), // Sử dụng font Poppins
+            textTheme: GoogleFonts.quicksandTextTheme()
+                .apply(bodyColor: Colors.black87, displayColor: Colors.black87)
+                .copyWith(
+                  bodyLarge: GoogleFonts.quicksand(fontWeight: FontWeight.w600),
+                  bodyMedium: GoogleFonts.quicksand(
+                    fontWeight: FontWeight.w500,
+                  ),
+                  bodySmall: GoogleFonts.quicksand(fontWeight: FontWeight.w500),
+                  titleLarge: GoogleFonts.quicksand(
+                    fontWeight: FontWeight.w700,
+                  ),
+                  titleMedium: GoogleFonts.quicksand(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  titleSmall: GoogleFonts.quicksand(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  labelLarge: GoogleFonts.quicksand(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  labelMedium: GoogleFonts.quicksand(
+                    fontWeight: FontWeight.w500,
+                  ),
+                  labelSmall: GoogleFonts.quicksand(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+            scaffoldBackgroundColor: const Color(0xFFF5F5F5),
           ),
           darkTheme: ThemeData.dark(),
           themeMode: ThemeMode.light,

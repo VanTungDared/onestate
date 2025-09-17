@@ -21,7 +21,11 @@ class HomeScreen extends GetView<MainController> {
       endDrawer: Obx(
         () =>
             controller.userModel.value != null
-                ? CustomDrawer(userModel: controller.userModel.value!)
+                ? CustomDrawer(
+                  userModel: controller.userModel.value!,
+                  scaffoldKey: _scaffoldKey,
+                  callLogout: () => controller.handleCallLogout(),
+                )
                 : SizedBox(),
       ),
       appBar: AppBar(
@@ -89,7 +93,7 @@ class HomeScreen extends GetView<MainController> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Có $totalItems bất động sản',
+                          'Số lượng: $totalItems',
                           style: TextStyle(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.normal,

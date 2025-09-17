@@ -10,4 +10,8 @@ class GetUserUseCase {
   Future<Either> call() {
     return repository.getUser();
   }
+
+  Future<Either> logout() {
+    return repository.logout();
+  }
 }

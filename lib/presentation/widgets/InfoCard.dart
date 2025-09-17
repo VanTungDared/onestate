@@ -87,18 +87,18 @@ class InfoCard extends StatelessWidget {
                       Text(
                         listingPriceVndRent,
                         style: TextStyle(
-                          fontSize: 16.sp,
+                          fontSize: 14.sp,
                           color: Color(0xFFEF4444),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(width: 12.w),
+                      SizedBox(width: 6.w),
                       dot(),
-                      SizedBox(width: 12.w),
+                      SizedBox(width: 6.w),
                       Text(
                         "${legalAreaSqm}m2",
                         style: TextStyle(
-                          fontSize: 16.sp,
+                          fontSize: 14.sp,
                           color: Color(0xFFEF4444),
                           fontWeight: FontWeight.w600,
                         ),
@@ -126,30 +126,37 @@ class InfoCard extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            own,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              own,
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                          Text(
-                            updatedAt,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              color: Color(0xFF505050),
-                              fontWeight: FontWeight.w400,
+                            Text(
+                              updatedAt,
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Color(0xFF505050),
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                      Spacer(),
-                      Icon(Icons.favorite, size: 24.w, color: Colors.red),
-                      SizedBox(width: 8.w),
+                      Padding(
+                        padding: EdgeInsetsGeometry.all(8),
+                        child: Icon(
+                          Icons.favorite,
+                          size: 24.w,
+                          color: Colors.red,
+                        ),
+                      ),
                     ],
                   ),
                 ],

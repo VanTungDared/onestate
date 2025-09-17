@@ -315,7 +315,6 @@ class CategoryScreen extends StatelessWidget {
                                     ),
                                   ),
                                   SizedBox(height: 8),
-
                                   // Giá + Diện tích
                                   Row(
                                     children: [

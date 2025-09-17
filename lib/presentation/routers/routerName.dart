@@ -7,6 +7,7 @@ class RouterName {
   static const String search = '/search_screen';
   static const String myArticle = '/myArticle_screen';
   static const String myLike = '/myLike_screen';
+  static const String myFavourite = '/myFavourite_screen';
   static const String post = '/post_screen';
   static const String filter = '/filter_screen';
 }

@@ -1,14 +1,14 @@
 import 'package:app_real_estate/core/utils/image_utils.dart';
+import 'package:app_real_estate/presentation/views/screens/my_favourite/my_favourite_controller.dart';
 import 'package:app_real_estate/presentation/widgets/InfoCard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/utils/constants/asset_constants.dart';
-import 'my_article_controller.dart';
 
-class MyArticleScreen extends GetView<MyArticleController> {
-  const MyArticleScreen({super.key}); // sửa lại constructor
+class MyFavoutiteScreen extends GetView<MyFavouriteController> {
+  const MyFavoutiteScreen({super.key}); // sửa lại constructor
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +22,7 @@ class MyArticleScreen extends GetView<MyArticleController> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Get.back(),
         ),
-        title: const Text("Bài Đăng Của Tôi"),
+        title: const Text("Bài Đăng Yêu Thích"),
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 16.w),

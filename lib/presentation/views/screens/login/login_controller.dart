@@ -1,3 +1,5 @@
+import 'package:app_real_estate/core/utils/constants/pref_keys.dart';
+import 'package:app_real_estate/data/datasources/dblocal/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -25,12 +27,29 @@ class LoginController extends GetxController {
     super.onInit();
     phoneController.addListener(validateForm);
     passwordController.addListener(validateForm);
+    _loadSavedCredentials();
   }
 
   void validateForm() {
     final phone = phoneController.text.trim();
     final password = passwordController.text.trim();
     isFormValid.value = phone.isNotEmpty && password.isNotEmpty;
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    final savedRemember =
+        SharedPreferenceApp.handleGetBool(PrefKeys.rememberMe) ?? false;
+    rememberMe.value = savedRemember;
+
+    if (savedRemember) {
+      final savedUser =
+          SharedPreferenceApp.handleGetString(PrefKeys.username) ?? '';
+      final savedPass =
+          SharedPreferenceApp.handleGetString(PrefKeys.password) ?? '';
+
+      phoneController.text = savedUser;
+      passwordController.text = savedPass;
+    }
   }
 
   void login() async {
@@ -49,7 +68,23 @@ class LoginController extends GetxController {
         isLoading.value = false;
       },
       (data) async {
-        await Future.delayed(Duration(milliseconds: 100));
+        /// xử lý rememberMe
+        if (rememberMe.value) {
+          await SharedPreferenceApp.handleSetBool(PrefKeys.rememberMe, true);
+          await SharedPreferenceApp.handleSetString(
+            PrefKeys.username,
+            phoneController.text.trim(),
+          );
+          await SharedPreferenceApp.handleSetString(
+            PrefKeys.password,
+            passwordController.text.trim(),
+          );
+        } else {
+          await SharedPreferenceApp.handleRemove(PrefKeys.rememberMe);
+          await SharedPreferenceApp.handleRemove(PrefKeys.username);
+          await SharedPreferenceApp.handleRemove(PrefKeys.password);
+        }
+
         isLoading.value = false;
         Get.offAllNamed(RouterName.main);
       },

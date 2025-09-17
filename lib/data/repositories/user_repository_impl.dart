@@ -20,4 +20,17 @@ class UserRepositoryImpl implements UserRepository {
       },
     );
   }
+
+  @override
+  Future<Either> logout() async {
+    final result = await remoteDataSource.logout();
+    return result.fold(
+      (error) {
+        return Left(error);
+      },
+      (data) async {
+        return Right(data);
+      },
+    );
+  }
 }

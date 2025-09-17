@@ -37,7 +37,7 @@ class LoginScreen extends GetView<LoginController> {
                 ],
               ),
             ),
-            SizedBox(height: 36.h),
+            SizedBox(height: 22.h),
             Text(
               'greeting'.tr,
               style: TextStyle(fontSize: 16.sp, color: Colors.black),
@@ -51,7 +51,7 @@ class LoginScreen extends GetView<LoginController> {
                 color: Colors.black,
               ),
             ),
-            SizedBox(height: 28.h),
+            SizedBox(height: 22.h),
             TextField(
               controller: controller.phoneController,
               decoration: InputDecoration(
@@ -93,14 +93,15 @@ class LoginScreen extends GetView<LoginController> {
               ),
             ),
             SizedBox(height: 8.h),
-
             Row(
               children: [
-                Checkbox(
-                  value: controller.rememberMe.value,
-                  onChanged:
-                      (val) => controller.rememberMe.value = val ?? false,
-                  activeColor: Color(0xFFDC1C2E),
+                Obx(
+                  () => Checkbox(
+                    value: controller.rememberMe.value,
+                    onChanged:
+                        (val) => controller.rememberMe.value = val ?? false,
+                    activeColor: Color(0xFFDC1C2E),
+                  ),
                 ),
                 Text("Nhớ tài khoản"),
                 Spacer(),
@@ -148,7 +149,7 @@ class LoginScreen extends GetView<LoginController> {
                 ),
               ),
             ),
-            SizedBox(height: 16.h),
+            SizedBox(height: 12.h),
 
             /// Policy
             Text.rich(
@@ -166,16 +167,14 @@ class LoginScreen extends GetView<LoginController> {
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 16.h),
-
-
+            SizedBox(height: 12.h),
             Center(
               child: TextButton(
                 onPressed: () {},
                 child: Text.rich(
                   TextSpan(
                     text: 'Chưa là thành viên? ',
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(color: Colors.black, fontSize: 13.sp),
                     children: [
                       TextSpan(
                         text: 'Đăng ký tại đây',
