@@ -348,4 +348,8 @@ class ApiUrl {
       return '';
     }
   }
+
+  static String likeListing({required String id}) {
+    return "${apiV}listings/$id/like";
+  }
 }

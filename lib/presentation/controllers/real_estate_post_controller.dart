@@ -1,3 +1,10 @@
+import 'dart:async';
+
+import 'package:app_real_estate/core/utils/api/api_method.dart';
+import 'package:app_real_estate/core/utils/notifier.dart';
+import 'package:app_real_estate/data/models/UserModel.dart';
+import 'package:app_real_estate/data/models/district.dart';
+import 'package:app_real_estate/data/models/ward.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -34,6 +41,11 @@ class RealEstatePostController extends GetxController {
 
   var mapLatLng = Rxn<LatLng>(); // ví dụ: LatLng(10.762622, 106.660172)
 
+  final ApiMethod apiMethod = ApiMethod();
+
+  final RxList<District> districts = <District>[].obs;
+  final RxList<Ward> wards = <Ward>[].obs;
+
   List<String> propertyTypes = ['Đất nền', 'Nhà', 'Căn hộ'];
   List<String> criteriaOptions = [
     'Triệu đô',
@@ -46,6 +58,57 @@ class RealEstatePostController extends GetxController {
     'Dòng tiền ổn định',
     'Chủ cần bán gấp',
   ];
+
+  final Rxn<UserModel> userModel = Rxn<UserModel>();
+
+  final mapController = Completer<GoogleMapController>();
+
+  @override
+  void onInit() async {
+    super.onInit();
+    final data = Get.arguments;
+    if (data["userModel"] != null && data["userModel"] is UserModel) {
+      userModel.value = data["userModel"];
+    } else {
+      LoadingNotifier.showTopMessage("Không có thông tin tài khoản", false);
+    }
+  }
+
+  handleSelectProvince(String? value, String id) async {
+    selectedProvince.value = id;
+    final dataFromServer = await apiMethod.get("provinces/$id/districts");
+    if (dataFromServer.containsKey("error")) {
+      LoadingNotifier.showTopMessage("${dataFromServer['error']}", false);
+      return;
+    }
+    if (dataFromServer["data"] != null) {
+      final districtsJson = dataFromServer["data"] as List;
+
+      final districts = districtsJson.map((e) => District.fromJson(e)).toList();
+
+      // Gán danh sách quận/huyện vào biến observable trong controller
+      this.districts.assignAll(districts);
+    }
+  }
+
+  handleSelectDistrict(String? value, String id) async {
+    selectedDistrict.value = id;
+    final dataFromServer = await apiMethod.get(
+      "provinces/${selectedProvince.value}/districts/$id/wards",
+    );
+    if (dataFromServer.containsKey("error")) {
+      LoadingNotifier.showTopMessage("${dataFromServer['error']}", false);
+      return;
+    }
+    if (dataFromServer["data"] != null) {
+      final wardsJson = dataFromServer["data"] as List;
+
+      final wards = wardsJson.map((e) => Ward.fromJson(e)).toList();
+
+      // Gán danh sách quận/huyện vào biến observable trong controller
+      this.wards.assignAll(wards);
+    }
+  }
 
   Future<void> pickMultipleImages() async {
     final List<XFile>? pickedFiles = await ImagePicker().pickMultiImage(

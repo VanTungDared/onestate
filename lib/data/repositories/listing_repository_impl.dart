@@ -89,10 +89,16 @@ class ListingRepositoryImpl implements ListingRepository {
       limit: limit,
       listingType: listingType,
       propertyTypes: propertyTypes,
-        minPrice : minPrice ,
-        maxPrice : maxPrice ,
-        sort : sort
+      minPrice: minPrice,
+      maxPrice: maxPrice,
+      sort: sort,
     );
     return result.fold((error) => Left(error), (listings) => Right(listings));
+  }
+
+  @override
+  Future<Either<String, void>> likeListing({required String listingId}) async {
+    final result = await remoteDataSource.likeListing(id: listingId);
+    return result.fold((error) => Left(error), (_) => const Right(null));
   }
 }

@@ -22,13 +22,15 @@ class LabeledMultilineTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final baseStyle = Theme.of(context).textTheme.bodyMedium;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         RichText(
           text: TextSpan(
             text: label,
-            style: const TextStyle(
+            style: baseStyle!.copyWith(
               color: Colors.black87,
               fontSize: 14,
               fontWeight: FontWeight.w600,

@@ -1,3 +1,4 @@
+import 'package:app_real_estate/domain/usecases/like_listing_by_id_use_case.dart';
 import 'package:get/get.dart';
 
 import '../../../../data/datasources/remote/listing_remote_data_source.dart';
@@ -23,7 +24,10 @@ class MainBinding extends Bindings {
     Get.lazyPut(() => GetListingUseCase(Get.find()));
     Get.lazyPut(() => GetUserUseCase(Get.find()));
     Get.lazyPut(() => FilterApartmentUseCase(Get.find()));
+    Get.lazyPut(() => LikeListingUseCase(Get.find()));
 
-    Get.lazyPut(() => MainController(Get.find(), Get.find(), Get.find()));
+    Get.lazyPut(
+      () => MainController(Get.find(), Get.find(), Get.find(), Get.find()),
+    );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:app_real_estate/data/datasources/dblocal/shared_preferences.dart';
+import 'package:app_real_estate/domain/usecases/like_listing_by_id_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -22,6 +23,7 @@ enum SortOption {
 
 class MainController extends GetxController {
   final GetListingUseCase getListingUseCase;
+  final LikeListingUseCase likeListingUseCase;
   final GetUserUseCase getUserUseCase;
   final FilterApartmentUseCase filterApartmentUseCase;
   final RxList<ListingModel> dataListings = <ListingModel>[].obs;
@@ -32,6 +34,7 @@ class MainController extends GetxController {
     this.getListingUseCase,
     this.getUserUseCase,
     this.filterApartmentUseCase,
+    this.likeListingUseCase,
   );
 
   PageController pageController = PageController(initialPage: 0);
@@ -93,7 +96,6 @@ class MainController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-
     fetchMe();
     fetchListings();
     scrollController.addListener(() {
@@ -104,6 +106,24 @@ class MainController extends GetxController {
         fetchMoreListings();
       }
     });
+  }
+
+  handleFavourite(int index, String id) async {
+    final dataFavourite = await likeListingUseCase.call(listingId: id);
+    dataFavourite.fold(
+      (errorMessage) {
+        LoadingNotifier.showTopMessage(errorMessage, false);
+      },
+      (data) async {
+        dataListings[index].isLiked = !dataListings[index].isLiked;
+        if (dataListings[index].isLiked) {
+          LoadingNotifier.showTopMessage("Yêu thích thành công", true);
+        } else {
+          LoadingNotifier.showTopMessage("Bỏ yêu thích thành công", true);
+        }
+        dataListings.refresh();
+      },
+    );
   }
 
   handleCallLogout() async {

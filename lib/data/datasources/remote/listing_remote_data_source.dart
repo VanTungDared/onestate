@@ -46,6 +46,8 @@ abstract class ListingRemoteDataSource {
     int? maxPrice,
     required String sort,
   });
+
+  Future<Either<String, void>> likeListing({required String id});
 }
 
 class ListingRemoteDataSourceImpl implements ListingRemoteDataSource {
@@ -186,6 +188,22 @@ class ListingRemoteDataSourceImpl implements ListingRemoteDataSource {
         return Left(errorMessage);
       }
       //return const Left('An unexpected error occurred');
+      return Left(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<String, void>> likeListing({required String id}) async {
+    try {
+      final url = ApiUrl.likeListing(id: id);
+      await Get.find<DioClient>().post(url);
+      return const Right(null);
+    } catch (e) {
+      if (e is DioException) {
+        final errorMessage =
+            e.response?.data['message'] ?? 'Like listing failure';
+        return Left(errorMessage);
+      }
       return Left(e.toString());
     }
   }

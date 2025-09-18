@@ -134,6 +134,9 @@ class HomeScreen extends GetView<MainController> {
                           district: item.district.name,
                           own: item.authorName,
                           updatedAt: formatUpdatedAtDaysAgo(item.updatedAt),
+                          isLiked: item.isLiked,
+                          onPressFavourite:
+                              () => controller.handleFavourite(index, item.id),
                         ),
                       );
                     } else {

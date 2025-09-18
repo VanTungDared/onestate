@@ -83,7 +83,10 @@ class CustomDrawer extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Get.toNamed(RouterName.post);
+                    Get.toNamed(
+                      RouterName.post,
+                      arguments: {"userModel": userModel},
+                    );
                   },
                   child: Text(
                     "Đăng tin",

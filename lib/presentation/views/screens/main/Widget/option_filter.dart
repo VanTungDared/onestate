@@ -18,7 +18,7 @@ class OptionFilter extends GetView<MainController> {
           onTap: controller.goToFilterScreen,
           child: Container(
             height: 32.h,
-            padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
+            padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 10.w),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(6.r),
@@ -40,6 +40,7 @@ class OptionFilter extends GetView<MainController> {
             ),
           ),
         ),
+        SizedBox(width: 4.w),
         GestureDetector(
           onTap: () {
             showBottomDialog(
@@ -50,7 +51,7 @@ class OptionFilter extends GetView<MainController> {
           },
           child: Container(
             height: 32.h,
-            padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 12.w),
+            padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 10.w),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(6.r),
@@ -76,6 +77,7 @@ class OptionFilter extends GetView<MainController> {
             ),
           ),
         ),
+        SizedBox(width: 4.w),
         GestureDetector(
           onTap: () {
             showBottomDialogTypePrice(
@@ -88,7 +90,7 @@ class OptionFilter extends GetView<MainController> {
           },
           child: Container(
             height: 32.h,
-            padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 12.w),
+            padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 10.w),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(6.r),

@@ -42,4 +42,6 @@ abstract class ListingRepository {
     int? maxPrice,
     required String sort,
   });
+
+  Future<Either<String, void>> likeListing({required String listingId});
 }

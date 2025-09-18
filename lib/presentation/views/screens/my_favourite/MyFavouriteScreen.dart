@@ -71,6 +71,7 @@ class MyFavoutiteScreen extends GetView<MyFavouriteController> {
                           district: item.district.name,
                           own: item.authorName,
                           updatedAt: formatUpdatedAtDaysAgo(item.updatedAt),
+                          isLiked: item.isLiked,
                         ),
                       );
                     } else {

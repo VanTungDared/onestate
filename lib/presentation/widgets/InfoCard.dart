@@ -15,6 +15,8 @@ class InfoCard extends StatelessWidget {
   final String own;
   final String updatedAt;
   final VoidCallback onPress;
+  final VoidCallback? onPressFavourite;
+  final bool isLiked;
 
   const InfoCard({
     super.key,
@@ -22,12 +24,14 @@ class InfoCard extends StatelessWidget {
     required this.title,
     required this.description,
     required this.onPress,
+    this.onPressFavourite,
     required this.listingPriceVndRent,
     required this.legalAreaSqm,
     required this.province,
     required this.district,
     required this.own,
     required this.updatedAt,
+    required this.isLiked,
   });
 
   @override
@@ -66,8 +70,9 @@ class InfoCard extends StatelessWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  SizedBox(height: 2.h),
                   Padding(
                     padding: EdgeInsets.only(right: 8.w),
                     child: Text(
@@ -77,7 +82,7 @@ class InfoCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF2C2C2C),
                       ),
-                      maxLines: 2,
+                      maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -113,7 +118,7 @@ class InfoCard extends StatelessWidget {
                         color: Color(0xFF505050),
                         size: 16.w,
                       ),
-                      SizedBox(width: 8.w),
+                      SizedBox(width: 4.w),
                       Text(
                         "$district, $province",
                         style: TextStyle(
@@ -125,6 +130,7 @@ class InfoCard extends StatelessWidget {
                     ],
                   ),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Expanded(
                         child: Column(
@@ -137,6 +143,8 @@ class InfoCard extends StatelessWidget {
                                 color: Colors.black,
                                 fontWeight: FontWeight.w600,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             Text(
                               updatedAt,
@@ -145,16 +153,29 @@ class InfoCard extends StatelessWidget {
                                 color: Color(0xFF505050),
                                 fontWeight: FontWeight.w400,
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
+                            SizedBox(height: 2.h),
                           ],
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsetsGeometry.all(8),
-                        child: Icon(
-                          Icons.favorite,
-                          size: 24.w,
-                          color: Colors.red,
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap:
+                            () =>
+                                onPressFavourite != null
+                                    ? onPressFavourite!()
+                                    : {},
+                        child: Container(
+                          margin: EdgeInsets.all(2),
+                          padding: EdgeInsetsGeometry.all(8),
+                          child: Icon(
+                            Icons.favorite,
+                            size: 24.w,
+                            color: isLiked ? Colors.red : Colors.grey,
+                          ),
                         ),
                       ),
                     ],

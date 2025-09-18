@@ -71,6 +71,7 @@ class MyArticleScreen extends GetView<MyArticleController> {
                           district: item.district.name,
                           own: item.authorName,
                           updatedAt: formatUpdatedAtDaysAgo(item.updatedAt),
+                          isLiked: item.isLiked,
                         ),
                       );
                     } else {
