@@ -5,36 +5,45 @@ import 'package:app_real_estate/core/utils/notifier.dart';
 import 'package:app_real_estate/data/models/UserModel.dart';
 import 'package:app_real_estate/data/models/district.dart';
 import 'package:app_real_estate/data/models/ward.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
 class RealEstatePostController extends GetxController {
-  var title = ''.obs;
-  var description = ''.obs;
+  final controllerTitle = TextEditingController();
+  final controllerDescription = TextEditingController();
   var propertyType = 'Đất nền'.obs;
-  var selectedCriteria = <String>[].obs;
-  var ownerName = ''.obs;
-  var ownerPhone = ''.obs;
-  var idCard = ''.obs;
+  var listingType = 'Bán'.obs;
+  var selectedCriteria = <Map<String, dynamic>>[].obs;
+  final controllerOwnerName = TextEditingController();
+  final controllerOwnerPhoneNumber = TextEditingController();
+  final controllerIdCard = TextEditingController();
+  final controllerLegalAreaSqm = TextEditingController();
+  final controllerActualAreaSqm = TextEditingController();
+  final controllerFrontageMeters = TextEditingController();
+  final controllerWidthMeters = TextEditingController();
+  final controllerNumberOfFloors = TextEditingController();
+  final controllerNumberOfRooms = TextEditingController();
+  final controllerNumberOfBathrooms = TextEditingController();
+  final controllerNumberOfBalconies = TextEditingController();
 
-  var legalArea = ''.obs;
-  var actualArea = ''.obs;
-  var frontage = ''.obs;
-  var depth = ''.obs;
+  var provinceCode = ''.obs;
+  var districtCode = ''.obs;
+  var wardCode = ''.obs;
 
-  var floors = ''.obs;
-  var rooms = ''.obs;
-  var bathrooms = ''.obs;
-  var balconies = ''.obs;
-  var selectedProvince = ''.obs;
-  var selectedDistrict = ''.obs;
-  var selectedWard = ''.obs;
-  var streetName = ''.obs;
-  var fullAddress = ''.obs;
+  final controllerStreetName = TextEditingController();
+  final controllerFullAddress = TextEditingController();
+  final controllerLandCertificateCode = TextEditingController();
+  final controllerListingPriceVndSell = TextEditingController();
+  final controllerCommissionRatePercent = TextEditingController();
+  final controllerCommissionAmountVnd = TextEditingController();
+
   var isMapInteracting = false.obs;
+
   List<XFile> images = [];
   List<XFile> imagesLegal = [];
+
   var renderImage = 0.obs;
   var renderImageLegal = 0.obs;
   var legalDocumentsSeri = ''.obs;
@@ -47,17 +56,17 @@ class RealEstatePostController extends GetxController {
   final RxList<Ward> wards = <Ward>[].obs;
 
   List<String> propertyTypes = ['Đất nền', 'Nhà', 'Căn hộ'];
-  List<String> criteriaOptions = [
-    'Triệu đô',
-    'Lãi vốn (Rẻ)',
-    'Hẻm ô tô',
-    'Chính chủ',
-    'Thang máy',
-    'Để ở',
-    'Để kinh doanh',
-    'Dòng tiền ổn định',
-    'Chủ cần bán gấp',
-  ];
+  List<String> listingTypes = ['Bán', 'Cho thuê'];
+  final Map<String, String> criteriaOptions = {
+    'Triệu đô': 'million_dollar',
+    'Để ở': 'residential',
+    'Lãi vốn (Rẻ)': 'investment',
+    'Để kinh doanh': 'business',
+    'Hẻm ô tô': 'car_access',
+    'Đóng tiền ổn định': 'stable_cash_flow',
+    'Chính chủ': 'owner_direct',
+    'Chủ cần bán gấp': 'need_sell_fast',
+  };
 
   final Rxn<UserModel> userModel = Rxn<UserModel>();
 
@@ -75,7 +84,7 @@ class RealEstatePostController extends GetxController {
   }
 
   handleSelectProvince(String? value, String id) async {
-    selectedProvince.value = id;
+    provinceCode.value = id;
     final dataFromServer = await apiMethod.get("provinces/$id/districts");
     if (dataFromServer.containsKey("error")) {
       LoadingNotifier.showTopMessage("${dataFromServer['error']}", false);
@@ -92,9 +101,9 @@ class RealEstatePostController extends GetxController {
   }
 
   handleSelectDistrict(String? value, String id) async {
-    selectedDistrict.value = id;
+    districtCode.value = id;
     final dataFromServer = await apiMethod.get(
-      "provinces/${selectedProvince.value}/districts/$id/wards",
+      "provinces/${provinceCode.value}/districts/$id/wards",
     );
     if (dataFromServer.containsKey("error")) {
       LoadingNotifier.showTopMessage("${dataFromServer['error']}", false);
@@ -108,6 +117,10 @@ class RealEstatePostController extends GetxController {
       // Gán danh sách quận/huyện vào biến observable trong controller
       this.wards.assignAll(wards);
     }
+  }
+
+  handleSelectWard(String? value, String id) async {
+    wardCode.value = id;
   }
 
   Future<void> pickMultipleImages() async {
@@ -142,5 +155,50 @@ class RealEstatePostController extends GetxController {
   void removeImageLegal(XFile image) {
     imagesLegal.remove(image);
     renderImageLegal.value = renderImageLegal.value + 1;
+  }
+
+  @override
+  void onClose() {
+    // Giải phóng tất cả TextEditingController
+    controllerTitle.dispose();
+    controllerDescription.dispose();
+    controllerOwnerName.dispose();
+    controllerOwnerPhoneNumber.dispose();
+    controllerIdCard.dispose();
+    controllerLegalAreaSqm.dispose();
+    controllerActualAreaSqm.dispose();
+    controllerFrontageMeters.dispose();
+    controllerWidthMeters.dispose();
+    controllerNumberOfFloors.dispose();
+    controllerNumberOfRooms.dispose();
+    controllerNumberOfBathrooms.dispose();
+    controllerNumberOfBalconies.dispose();
+    controllerStreetName.dispose();
+    controllerFullAddress.dispose();
+    controllerLandCertificateCode.dispose();
+    controllerListingPriceVndSell.dispose();
+    controllerCommissionRatePercent.dispose();
+    controllerCommissionAmountVnd.dispose();
+
+    // Clear dữ liệu observable
+    provinceCode.value = '';
+    districtCode.value = '';
+    wardCode.value = '';
+    selectedCriteria.clear();
+    districts.clear();
+    wards.clear();
+    userModel.value = null;
+
+    // Clear hình ảnh
+    images.clear();
+    imagesLegal.clear();
+
+    // Reset render state
+    renderImage.value = 0;
+    renderImageLegal.value = 0;
+    legalDocumentsSeri.value = '';
+    mapLatLng.value = null;
+
+    super.onClose();
   }
 }

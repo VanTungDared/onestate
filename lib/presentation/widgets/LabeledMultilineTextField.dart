@@ -8,6 +8,7 @@ class LabeledMultilineTextField extends StatelessWidget {
   final int maxLines;
   final String? helperText;
   final ValueChanged<String>? onChanged;
+  final TextEditingController? controller;
 
   const LabeledMultilineTextField({
     Key? key,
@@ -18,6 +19,7 @@ class LabeledMultilineTextField extends StatelessWidget {
     this.maxLines = 6,
     this.helperText,
     this.onChanged,
+    this.controller,
   }) : super(key: key);
 
   @override
@@ -33,7 +35,7 @@ class LabeledMultilineTextField extends StatelessWidget {
             style: baseStyle!.copyWith(
               color: Colors.black87,
               fontSize: 14,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
             ),
             children: [
               if (isRequired)
@@ -43,10 +45,12 @@ class LabeledMultilineTextField extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         TextField(
+          controller: controller,
           minLines: minLines,
           maxLines: maxLines,
           decoration: InputDecoration(
             hintText: hintText ?? '',
+            hintStyle: TextStyle(color: Colors.grey),
             isDense: true,
             contentPadding: const EdgeInsets.symmetric(
               vertical: 8,

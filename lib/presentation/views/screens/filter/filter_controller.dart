@@ -1,4 +1,8 @@
-import 'package:app_real_estate/data/models/provinces_model.dart';
+import 'package:app_real_estate/core/utils/api/api_method.dart';
+import 'package:app_real_estate/core/utils/notifier.dart';
+import 'package:app_real_estate/data/models/UserModel.dart';
+import 'package:app_real_estate/data/models/district.dart';
+import 'package:app_real_estate/data/models/ward.dart';
 import 'package:app_real_estate/domain/usecases/get_district_use_case.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -20,16 +24,7 @@ class FilterController extends GetxController {
 
   RxBool isLoading = false.obs;
   RxBool isSelectSell = true.obs;
-  RxList<ProvincesModel> districts = <ProvincesModel>[].obs;
-  RxList<ProvincesModel> wards = <ProvincesModel>[].obs;
 
-  final Map<String, String> listCity = {"01": "Hà Nội", "79": "Hồ Chí Minh"};
-
-  RxString selectedCityId = "".obs;
-  RxString selectedDistrictCode = "".obs;
-  RxString selectedWardId = "".obs;
-  TextEditingController nameStress = TextEditingController();
-  TextEditingController address = TextEditingController();
   TextEditingController minActualAreaSqm = TextEditingController();
   TextEditingController maxActualAreaSqm = TextEditingController();
   TextEditingController minNumberOfFloors = TextEditingController();
@@ -42,18 +37,18 @@ class FilterController extends GetxController {
   final RxInt lastPage = 1.obs;
   final int pageSize = 10;
 
-  final List<String> options = [
-    'Triệu đô',
-    'Để ở',
-    'Lãi vốn (Rẻ)',
-    'Để kinh doanh',
-    'Hẻm ô tô',
-    'Đóng tiền ổn định',
-    'Chính chủ',
-    'Chủ cần bán gấp',
-  ];
+  final ApiMethod apiMethod = ApiMethod();
+  final Rxn<UserModel> userModel = Rxn<UserModel>();
+  var provinceCode = ''.obs;
+  var districtCode = ''.obs;
+  var wardCode = ''.obs;
+  final RxList<District> districts = <District>[].obs;
+  final RxList<Ward> wards = <Ward>[].obs;
 
-   Map<String, String> tagMapping = {
+  final controllerStreetName = TextEditingController();
+  final controllerFullAddress = TextEditingController();
+
+  Map<String, String> criteriaOptions = {
     'Triệu đô': 'million_dollar',
     'Để ở': 'residential',
     'Lãi vốn (Rẻ)': 'investment',
@@ -64,12 +59,65 @@ class FilterController extends GetxController {
     'Chủ cần bán gấp': 'need_sell_fast',
   };
 
+  var selectedCriteria = <Map<String, dynamic>>[].obs;
+
   RxSet<String> selectedItems = <String>{}.obs;
 
   @override
+  void onInit() async {
+    super.onInit();
+    final data = Get.arguments;
+    if (data["userModel"] != null && data["userModel"] is UserModel) {
+      userModel.value = data["userModel"];
+    } else {
+      LoadingNotifier.showTopMessage("Không có thông tin tài khoản", false);
+    }
+  }
+
+  handleSelectProvince(String? value, String id) async {
+    provinceCode.value = id;
+    final dataFromServer = await apiMethod.get("provinces/$id/districts");
+    if (dataFromServer.containsKey("error")) {
+      LoadingNotifier.showTopMessage("${dataFromServer['error']}", false);
+      return;
+    }
+    if (dataFromServer["data"] != null) {
+      final districtsJson = dataFromServer["data"] as List;
+
+      final districts = districtsJson.map((e) => District.fromJson(e)).toList();
+
+      // Gán danh sách quận/huyện vào biến observable trong controller
+      this.districts.assignAll(districts);
+    }
+  }
+
+  handleSelectDistrict(String? value, String id) async {
+    districtCode.value = id;
+    final dataFromServer = await apiMethod.get(
+      "provinces/${provinceCode.value}/districts/$id/wards",
+    );
+    if (dataFromServer.containsKey("error")) {
+      LoadingNotifier.showTopMessage("${dataFromServer['error']}", false);
+      return;
+    }
+    if (dataFromServer["data"] != null) {
+      final wardsJson = dataFromServer["data"] as List;
+
+      final wards = wardsJson.map((e) => Ward.fromJson(e)).toList();
+
+      // Gán danh sách quận/huyện vào biến observable trong controller
+      this.wards.assignAll(wards);
+    }
+  }
+
+  handleSelectWard(String? value, String id) async {
+    wardCode.value = id;
+  }
+
+  @override
   void dispose() {
-    nameStress.dispose();
-    address.dispose();
+    controllerStreetName.dispose();
+    controllerFullAddress.dispose();
     minActualAreaSqm.dispose();
     maxActualAreaSqm.dispose();
     maxNumberOfFloors.dispose();
@@ -77,58 +125,22 @@ class FilterController extends GetxController {
     super.dispose();
   }
 
-  void getDistricts() async {
-    isLoading.value = true;
-
-    final result = await getDistrictUseCase.call(
-      province: selectedCityId.value,
-    );
-
-    result.fold(
-      (error) {
-        isLoading.value = false;
-      },
-      (response) {
-        districts.assignAll(response);
-        isLoading.value = false;
-      },
-    );
-  }
-
-  void getWards() async {
-    isLoading.value = true;
-
-    final result = await getWardUseCase.call(
-      codeDistrict: selectedCityId.value,
-      codeWard: selectedDistrictCode.value,
-    );
-
-    result.fold(
-      (error) {
-        isLoading.value = false;
-      },
-      (response) {
-        wards.assignAll(response);
-        isLoading.value = false;
-      },
-    );
-  }
-
   void fetchListings() async {
     isLoadingListing.value = true;
-    final selectedTags = selectedItems
-        .where((item) => tagMapping.containsKey(item))
-        .map((item) => tagMapping[item]!)
-        .toList();
+    final selectedTags =
+        selectedItems
+            .where((item) => criteriaOptions.containsKey(item))
+            .map((item) => criteriaOptions[item]!)
+            .toList();
 
     final result = await filterUseCase.call(
       page: currentPage.value,
       limit: pageSize,
-      provinceCode: selectedCityId.value,
-      districtCode: selectedDistrictCode.value,
-      wardCode: selectedWardId.value,
+      provinceCode: provinceCode.value,
+      districtCode: districtCode.value,
+      wardCode: wardCode.value,
       tags: selectedTags,
-      streetName: nameStress.text,
+      streetName: controllerStreetName.text,
       listingType: isSelectSell.value ? 'sell' : 'rent',
       sort: 'default',
       minActualAreaSqm: double.tryParse(minActualAreaSqm.text) ?? 0,
@@ -155,8 +167,7 @@ class FilterController extends GetxController {
     );
   }
 
-  void resetFilter(){
-    Get.delete<FilterController>(force: true);
-    Get.back();
+  void resetFilter() {
+    Get.back(result: {"option": "clean"});
   }
 }

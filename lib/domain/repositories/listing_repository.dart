@@ -40,6 +40,7 @@ abstract class ListingRepository {
     List<String>? propertyTypes,
     int? minPrice,
     int? maxPrice,
+    String? title,
     required String sort,
   });
 

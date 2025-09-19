@@ -18,7 +18,7 @@ class OptionFilter extends GetView<MainController> {
           onTap: controller.goToFilterScreen,
           child: Container(
             height: 32.h,
-            padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 10.w),
+            padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 10.w),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(6.r),
@@ -26,14 +26,18 @@ class OptionFilter extends GetView<MainController> {
             ),
             child: Row(
               children: [
-                Icon(Icons.filter_alt_outlined, size: 20.w),
+                Icon(
+                  Icons.filter_alt_outlined,
+                  size: 20.w,
+                  color: Color(0xFF6B7280),
+                ),
                 SizedBox(width: 8.w),
                 Text(
                   'Lọc',
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w400,
-                    color: Colors.black,
+                    color: Color(0xFF6B7280),
                   ),
                 ),
               ],
@@ -45,7 +49,7 @@ class OptionFilter extends GetView<MainController> {
           onTap: () {
             showBottomDialog(
               context: context,
-              showResult: controller.filterByTypeHouse,
+              showResult: controller.filterByAllType,
               reset: controller.resetTypeHouse,
             );
           },
@@ -84,7 +88,7 @@ class OptionFilter extends GetView<MainController> {
               context,
               controller.minPrice,
               controller.maxPrice,
-              showResult: controller.filterByTypePrice,
+              showResult: controller.filterByAllType,
               reset: controller.resetTypePrice,
             );
           },

@@ -83,6 +83,7 @@ class CustomDrawer extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
+                    scaffoldKey.currentState?.closeEndDrawer();
                     Get.toNamed(
                       RouterName.post,
                       arguments: {"userModel": userModel},

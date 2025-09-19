@@ -8,4 +8,6 @@ class AssetConstant {
   static const String logo = "assets/images/logo.svg";
   static const String logoPng = "assets/images/logo.png";
   static const String logoZalo = "assets/images/logo_zalo.svg";
+  static const String logoApp = "assets/images/logo_onestate_2.png";
+  static const String logoTop = "assets/images/logo_onestate_1.png";
 }

@@ -1,56 +1,83 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+// ignore: must_be_immutable
 class CriteriaSelection extends StatelessWidget {
   final String label;
-  final List<String> options;
-  final RxList<String> selectedOptions;
+  TextStyle? textStyle;
+  final Map<String, String> options; // key = label, value = code
+  final RxList<Map<String, dynamic>> selectedOptions;
 
-  const CriteriaSelection({
-    Key? key,
+  CriteriaSelection({
+    super.key,
     required this.label,
+    this.textStyle,
     required this.options,
     required this.selectedOptions,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
+    final optionLabels = options.keys.toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          style:
+              textStyle ?? TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
         ),
         const SizedBox(height: 8),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, // 2 cột
-            childAspectRatio: 4, // tỉ lệ chiều ngang/dọc
+            crossAxisCount: 2,
+            childAspectRatio: 4,
             crossAxisSpacing: 8,
             mainAxisSpacing: 4,
           ),
-          itemCount: options.length,
+          itemCount: optionLabels.length,
           itemBuilder: (context, index) {
-            final criteria = options[index];
+            final criteriaLabel = optionLabels[index];
+            final criteriaValue = options[criteriaLabel]!;
+
             return Obx(() {
-              final isSelected = selectedOptions.contains(criteria);
+              final isSelected = selectedOptions.any(
+                (item) => item["value"] == criteriaValue,
+              );
+
+              void toggleSelection(bool? val) {
+                if (val == true) {
+                  selectedOptions.add({
+                    "label": criteriaLabel,
+                    "value": criteriaValue,
+                  });
+                } else {
+                  selectedOptions.removeWhere(
+                    (item) => item["value"] == criteriaValue,
+                  );
+                }
+              }
+
               return Row(
                 children: [
-                  Checkbox(
-                    value: isSelected,
-                    onChanged: (val) {
-                      if (val == true) {
-                        selectedOptions.add(criteria);
-                      } else {
-                        selectedOptions.remove(criteria);
-                      }
-                    },
-                  ),
+                  Checkbox(value: isSelected, onChanged: toggleSelection),
                   Expanded(
-                    child: Text(criteria, overflow: TextOverflow.ellipsis),
+                    child: GestureDetector(
+                      onTap: () {
+                        toggleSelection(
+                          !isSelected,
+                        ); // đảo ngược trạng thái khi bấm chữ
+                      },
+                      child: Text(
+                        criteriaLabel,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 12.sp),
+                      ),
+                    ),
                   ),
                 ],
               );

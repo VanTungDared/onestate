@@ -37,6 +37,8 @@ class MainController extends GetxController {
     this.likeListingUseCase,
   );
 
+  final controllerSearch = TextEditingController();
+
   PageController pageController = PageController(initialPage: 0);
   RxInt indexPage = 0.obs;
   final isLoadingMe = false.obs;
@@ -92,7 +94,7 @@ class MainController extends GetxController {
   ];
 
   RxSet<String> selectedTypeHouse = <String>{}.obs;
-
+  final keyword = ''.obs;
   @override
   void onInit() async {
     super.onInit();
@@ -106,6 +108,11 @@ class MainController extends GetxController {
         fetchMoreListings();
       }
     });
+
+    // debounce keyword, chỉ gọi sau 0.5s
+    debounce(keyword, (_) {
+      filterByAllType();
+    }, time: const Duration(milliseconds: 500));
   }
 
   handleFavourite(int index, String id) async {
@@ -234,15 +241,21 @@ class MainController extends GetxController {
   }
 
   void goToFilterScreen() {
-    Get.toNamed(RouterName.filter)?.then((value) {
+    Get.toNamed(
+      RouterName.filter,
+      arguments: {"userModel": userModel.value},
+    )?.then((value) {
       if (value != null) {
-        dataListings.clear();
-        dataListings.addAll(value);
+        if (value["option"] == "clean") {
+          resetAllType();
+        } else if (value is List<ListingModel>) {
+          dataListings.assignAll(value);
+        }
       }
     });
   }
 
-  void filterByTypeHouse() async {
+  void filterByAllType() async {
     isLoadingListing.value = true;
     final result = await filterApartmentUseCase.call(
       page: 1,
@@ -252,35 +265,10 @@ class MainController extends GetxController {
       sort: 'default',
       minPrice: minPrice.value == 0 ? null : minPrice.value,
       maxPrice: maxPrice.value == 0 ? null : maxPrice.value,
-    );
-
-    result.fold(
-      (error) {
-        print("Get listing failed: $error");
-        isLoadingListing.value = false;
-      },
-      (response) {
-        dataListings.clear();
-        dataListings.assignAll(response.data);
-        isLoadingListing.value = false;
-        Get.back();
-      },
-    );
-  }
-
-  void filterByTypePrice() async {
-    isLoadingListing.value = true;
-    final result = await filterApartmentUseCase.call(
-      page: 1,
-      limit: 10,
-      listingType: 'sell',
-      propertyTypes:
-          selectedTypeHouse.toList().isEmpty
-              ? null
-              : selectedTypeHouse.toList(),
-      sort: 'default',
-      minPrice: minPrice.value,
-      maxPrice: maxPrice.value,
+      title:
+          controllerSearch.text.trim() != ''
+              ? controllerSearch.text.trim()
+              : null,
     );
 
     result.fold(
@@ -299,12 +287,22 @@ class MainController extends GetxController {
 
   void resetTypeHouse() {
     selectedTypeHouse.clear();
+    filterByAllType();
     Get.back();
   }
 
   void resetTypePrice() {
     minPrice.value = 0;
     maxPrice.value = 0;
+    filterByAllType();
+    Get.back();
+  }
+
+  void resetAllType() {
+    selectedTypeHouse.clear();
+    minPrice.value = 0;
+    maxPrice.value = 0;
+    filterByAllType();
     Get.back();
   }
 }

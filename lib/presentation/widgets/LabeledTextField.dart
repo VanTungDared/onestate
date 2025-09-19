@@ -7,6 +7,7 @@ class LabeledTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final String? suffixText;
   final ValueChanged<String>? onChanged;
+  final TextEditingController? controller;
 
   const LabeledTextField({
     Key? key,
@@ -16,6 +17,7 @@ class LabeledTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.suffixText,
     this.onChanged,
+    this.controller,
   }) : super(key: key);
 
   @override
@@ -27,7 +29,7 @@ class LabeledTextField extends StatelessWidget {
           text: TextSpan(
             text: label,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
               color: Colors.black87,
             ),
             children:
@@ -43,11 +45,13 @@ class LabeledTextField extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         TextField(
+          controller: controller,
           keyboardType: keyboardType,
           decoration: InputDecoration(
             hintText: hintText,
             suffixText: suffixText,
             isDense: true,
+            hintStyle: TextStyle(color: Colors.grey),
             contentPadding: const EdgeInsets.symmetric(
               vertical: 6,
               horizontal: 12,

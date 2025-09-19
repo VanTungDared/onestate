@@ -1,3 +1,4 @@
+import 'package:app_real_estate/core/utils/constants/asset_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -28,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Center(
         child: Image.asset(
-          'assets/images/logo.png',
+          AssetConstant.logoApp,
           width: 150,
           height: 150,
           fit: BoxFit.contain,

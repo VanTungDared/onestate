@@ -52,6 +52,7 @@ dependencies:
   dartz: ^0.10.1
   carousel_slider: ^5.1.1
   flutter_launcher_icons: ^0.14.4
+  dropdown_button2: ^2.3.9
 
 dev_dependencies:
   flutter_test:
@@ -107,5 +108,5 @@ flutter:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/logo.png"
+  image_path: "assets/images/logo_onestate_2.png"
   min_sdk_android: 21 # android min sdk min:16, default 21

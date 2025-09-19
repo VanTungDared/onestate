@@ -226,6 +226,7 @@ class ApiUrl {
     List<String>? propertyTypes,
     int? minPrice,
     int? maxPrice,
+    String? title,
     required String sort,
   }) {
     try {
@@ -241,6 +242,10 @@ class ApiUrl {
       }
       if (maxPrice != null) {
         queryParams['maxPrice'] = (maxPrice * 1000000000).toString();
+      }
+
+      if (title != null) {
+        queryParams['title'] = title;
       }
 
       final baseQuery = Uri(queryParameters: queryParams).query;

@@ -73,7 +73,7 @@ class RealEstateFormScreen extends StatelessWidget {
                               label: "Tiêu đề",
                               hintText: "Tiêu đề bài viết",
                               isRequired: true,
-                              onChanged: (val) => controller.title.value = val,
+                              controller: controller.controllerTitle,
                             ),
                             SizedBox(height: 16),
                             LabeledMultilineTextField(
@@ -83,8 +83,32 @@ class RealEstateFormScreen extends StatelessWidget {
                               maxLines: 6,
                               helperText:
                                   "Tối thiểu 30 ký tự, tối đa 3000 ký tự",
-                              onChanged:
-                                  (val) => controller.description.value = val,
+                              controller: controller.controllerDescription,
+                            ),
+                            SizedBox(height: 16),
+                            Obx(
+                              () => LabeledDropdown<String>(
+                                label: "Loại bài viết",
+                                isRequired: true,
+                                hintText: "Chọn loại bài viết",
+                                value:
+                                    controller.listingType.value.isEmpty
+                                        ? null
+                                        : controller.listingType.value,
+                                items:
+                                    controller.listingTypes
+                                        .map(
+                                          (type) => DropdownMenuItem<String>(
+                                            value: type,
+                                            child: Text(type),
+                                          ),
+                                        )
+                                        .toList(),
+                                onChanged:
+                                    (val) =>
+                                        controller.listingType.value =
+                                            val ?? '',
+                              ),
                             ),
                             SizedBox(height: 16),
                             Obx(
@@ -123,23 +147,21 @@ class RealEstateFormScreen extends StatelessWidget {
                               label: "Chủ sở hữu",
                               hintText: "Họ và Tên",
                               isRequired: true,
-                              onChanged:
-                                  (val) => controller.ownerName.value = val,
+                              controller: controller.controllerOwnerName,
                             ),
                             SizedBox(height: 16),
                             LabeledTextField(
                               label: "Số điện thoại chủ sở hữu",
                               hintText: "Số điện thoại",
                               isRequired: true,
-                              onChanged:
-                                  (val) => controller.ownerPhone.value = val,
+                              controller: controller.controllerOwnerPhoneNumber,
                             ),
                             SizedBox(height: 16),
                             LabeledTextField(
                               label: "CCCD chủ sở hữu",
                               hintText: "Số điện thoại",
                               isRequired: true,
-                              onChanged: (val) => controller.idCard.value = val,
+                              controller: controller.controllerIdCard,
                             ),
                             SizedBox(height: 16),
                             Row(
@@ -150,9 +172,8 @@ class RealEstateFormScreen extends StatelessWidget {
                                     isRequired: true,
                                     keyboardType: TextInputType.number,
                                     suffixText: "m²",
-                                    onChanged:
-                                        (val) =>
-                                            controller.legalArea.value = val,
+                                    controller:
+                                        controller.controllerLegalAreaSqm,
                                   ),
                                 ),
                                 SizedBox(width: 16),
@@ -162,9 +183,8 @@ class RealEstateFormScreen extends StatelessWidget {
                                     isRequired: true,
                                     keyboardType: TextInputType.number,
                                     suffixText: "m²",
-                                    onChanged:
-                                        (val) =>
-                                            controller.actualArea.value = val,
+                                    controller:
+                                        controller.controllerActualAreaSqm,
                                   ),
                                 ),
                               ],
@@ -178,9 +198,8 @@ class RealEstateFormScreen extends StatelessWidget {
                                     hintText: "",
                                     suffixText: "m",
                                     keyboardType: TextInputType.number,
-                                    onChanged:
-                                        (val) =>
-                                            controller.frontage.value = val,
+                                    controller:
+                                        controller.controllerFrontageMeters,
                                   ),
                                 ),
                                 SizedBox(width: 16),
@@ -191,8 +210,8 @@ class RealEstateFormScreen extends StatelessWidget {
                                     isRequired: true,
                                     suffixText: "m",
                                     keyboardType: TextInputType.number,
-                                    onChanged:
-                                        (val) => controller.depth.value = val,
+                                    controller:
+                                        controller.controllerWidthMeters,
                                   ),
                                 ),
                               ],
@@ -206,8 +225,8 @@ class RealEstateFormScreen extends StatelessWidget {
                                     hintText: "",
                                     suffixText: "tầng",
                                     keyboardType: TextInputType.number,
-                                    onChanged:
-                                        (val) => controller.floors.value = val,
+                                    controller:
+                                        controller.controllerNumberOfFloors,
                                   ),
                                 ),
                                 SizedBox(width: 16),
@@ -217,8 +236,8 @@ class RealEstateFormScreen extends StatelessWidget {
                                     hintText: "",
                                     suffixText: "phòng",
                                     keyboardType: TextInputType.number,
-                                    onChanged:
-                                        (val) => controller.rooms.value = val,
+                                    controller:
+                                        controller.controllerNumberOfRooms,
                                   ),
                                 ),
                               ],
@@ -232,9 +251,8 @@ class RealEstateFormScreen extends StatelessWidget {
                                     hintText: "",
                                     suffixText: "phòng",
                                     keyboardType: TextInputType.number,
-                                    onChanged:
-                                        (val) =>
-                                            controller.bathrooms.value = val,
+                                    controller:
+                                        controller.controllerNumberOfBathrooms,
                                   ),
                                 ),
                                 SizedBox(width: 16),
@@ -244,9 +262,8 @@ class RealEstateFormScreen extends StatelessWidget {
                                     hintText: "",
                                     suffixText: "bc",
                                     keyboardType: TextInputType.number,
-                                    onChanged:
-                                        (val) =>
-                                            controller.balconies.value = val,
+                                    controller:
+                                        controller.controllerNumberOfBalconies,
                                   ),
                                 ),
                               ],
@@ -273,30 +290,31 @@ class RealEstateFormScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 16.h),
                             LabeledTextField(
-                              label: "Giá chào",
+                              label: "Giá chào (VND)",
                               hintText: "",
                               isRequired: true,
                               suffixText: "VND",
                               keyboardType: TextInputType.number,
-                              onChanged: (val) => controller.depth.value = val,
+                              controller:
+                                  controller.controllerListingPriceVndSell,
                             ),
                             SizedBox(height: 16.h),
                             LabeledTextField(
-                              label: "Phần trăm hoa hồng",
+                              label: "Phần trăm hoa hồng (%)",
                               hintText: "",
-                              isRequired: true,
                               suffixText: "%",
                               keyboardType: TextInputType.number,
-                              onChanged: (val) => controller.depth.value = val,
+                              controller:
+                                  controller.controllerCommissionRatePercent,
                             ),
                             SizedBox(height: 16.h),
                             LabeledTextField(
-                              label: "Số tiền hoa hồng",
+                              label: "Số tiền hoa hồng (VND)",
                               hintText: "",
-                              isRequired: true,
                               suffixText: "VND",
                               keyboardType: TextInputType.number,
-                              onChanged: (val) => controller.depth.value = val,
+                              controller:
+                                  controller.controllerCommissionAmountVnd,
                             ),
                           ],
                         ),
@@ -325,10 +343,10 @@ class RealEstateFormScreen extends StatelessWidget {
                                 isRequired: true,
                                 hintText: "Chọn tỉnh/thành phố",
                                 value:
-                                    controller.selectedProvince.value.isEmpty
+                                    controller.provinceCode.value.isEmpty
                                         ? null
                                         : controller
-                                            .selectedProvince
+                                            .provinceCode
                                             .value, // code: "01" hoặc "79"
                                 items:
                                     controller.userModel.value!.provinces
@@ -363,10 +381,10 @@ class RealEstateFormScreen extends StatelessWidget {
                                 isRequired: true,
                                 hintText: "Chọn quận/huyện",
                                 value:
-                                    controller.selectedDistrict.value.isEmpty
+                                    controller.districtCode.value.isEmpty
                                         ? null
                                         : controller
-                                            .selectedDistrict
+                                            .districtCode
                                             .value, // sẽ là code của district
                                 items:
                                     controller.districts
@@ -392,42 +410,52 @@ class RealEstateFormScreen extends StatelessWidget {
 
                             SizedBox(height: 12),
 
-                            LabeledDropdown<String>(
-                              label: "Phường/Xã",
-                              isRequired: true,
-                              hintText: "Chọn phường/xã",
-                              value:
-                                  controller.selectedWard.value.isEmpty
-                                      ? null
-                                      : controller.selectedWard.value,
-                              items:
-                                  ['Phường 1', 'Phường 5', 'Phường 7']
-                                      .map(
-                                        (e) => DropdownMenuItem(
-                                          value: e,
-                                          child: Text(e),
-                                        ),
-                                      )
-                                      .toList(),
-                              onChanged:
-                                  (val) =>
-                                      controller.selectedWard.value = val ?? '',
+                            Obx(
+                              () => LabeledDropdown<String>(
+                                label: "Phường/Xã",
+                                isRequired: true,
+                                hintText: "Chọn phường/xã",
+                                value:
+                                    controller.wardCode.value.isEmpty
+                                        ? null
+                                        : controller
+                                            .wardCode
+                                            .value, // sẽ là code của ward
+                                items:
+                                    controller.wards
+                                        .map(
+                                          (w) => DropdownMenuItem<String>(
+                                            value: w.code, // lưu code
+                                            child: Text(
+                                              w.fullName,
+                                            ), // hiển thị tên
+                                          ),
+                                        )
+                                        .toList(),
+                                onChanged: (val) {
+                                  final selected = controller.wards.firstWhere(
+                                    (w) => w.code == val,
+                                  );
+                                  controller.handleSelectWard(
+                                    selected.fullName,
+                                    selected.code,
+                                  );
+                                },
+                              ),
                             ),
                             SizedBox(height: 12),
                             LabeledTextField(
                               label: "Tên đường",
                               hintText: "Nhập tên đường",
                               isRequired: true,
-                              onChanged:
-                                  (val) => controller.streetName.value = val,
+                              controller: controller.controllerStreetName,
                             ),
                             SizedBox(height: 12),
                             LabeledTextField(
                               label: "Địa chỉ chi tiết",
                               hintText: "Số nhà, đường, phường/xã",
                               isRequired: true,
-                              onChanged:
-                                  (val) => controller.streetName.value = val,
+                              controller: controller.controllerFullAddress,
                             ),
                             SizedBox(height: 12),
                             _buildGoogleMapSection(),
@@ -474,12 +502,34 @@ class RealEstateFormScreen extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: 16.h),
-                            LabeledTextField(
-                              label: "Số serial sổ",
-                              hintText: "Mã số giấy tờ pháp lý",
+                            LabeledDropdown<String>(
+                              label: "Tình trạng pháp lý",
                               isRequired: true,
+                              hintText: "Chọn tình trạng",
+                              value:
+                                  controller.wardCode.value.isEmpty
+                                      ? null
+                                      : controller.wardCode.value,
+                              items:
+                                  ['Phường 1', 'Phường 5', 'Phường 7']
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e,
+                                          child: Text(e),
+                                        ),
+                                      )
+                                      .toList(),
                               onChanged:
-                                  (val) => controller.streetName.value = val,
+                                  (val) =>
+                                      controller.wardCode.value = val ?? '',
+                            ),
+                            SizedBox(height: 12),
+                            LabeledTextField(
+                              label: "Số sổ đỏ",
+                              hintText: "Nhập số sổ",
+                              isRequired: true,
+                              controller:
+                                  controller.controllerLandCertificateCode,
                             ),
                             SizedBox(height: 16),
                             _buildLabel('Hình ảnh giấy tờ pháp lý'),
@@ -751,6 +801,7 @@ class RealEstateFormScreen extends StatelessWidget {
                 controller: urlController,
                 decoration: InputDecoration(
                   hintText: "Dán URL Google Maps",
+                  hintStyle: TextStyle(color: Colors.grey),
                   contentPadding: const EdgeInsets.symmetric(
                     vertical: 6,
                     horizontal: 12,

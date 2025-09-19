@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../../../routers/routerName.dart';
 import '../../../widgets/InfoCard.dart';
 import 'Widget/custom_check_box.dart';
 import 'Widget/option_filter.dart';
@@ -35,7 +34,7 @@ class HomeScreen extends GetView<MainController> {
         centerTitle: true,
         actionsPadding: EdgeInsets.symmetric(horizontal: 16.w),
         actions: [
-          ImageUtils.loadFromAsset(AssetConstant.logoPng),
+          ImageUtils.loadFromAsset(AssetConstant.logoTop),
           Spacer(),
           GestureDetector(
             onTap: () => _scaffoldKey.currentState?.openEndDrawer(),
@@ -53,7 +52,6 @@ class HomeScreen extends GetView<MainController> {
           final hasMore =
               controller.currentPage.value < controller.lastPage.value;
           final totalItems = controller.dataListings.length;
-
           return Column(
             children: [
               // Header cố định
@@ -63,23 +61,33 @@ class HomeScreen extends GetView<MainController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     GestureDetector(
-                      onTap: () => Get.toNamed(RouterName.search),
                       child: Container(
-                        height: 40.h,
                         padding: EdgeInsets.symmetric(horizontal: 16.w),
                         decoration: BoxDecoration(
                           color: Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Icon(Icons.search, color: Colors.grey),
                             SizedBox(width: 10.w),
                             Expanded(
-                              child: Text(
-                                'Tìm kiếm bằng từ khóa',
-                                style: TextStyle(color: Colors.grey),
-                                overflow: TextOverflow.ellipsis,
+                              child: TextField(
+                                controller: controller.controllerSearch,
+                                onChanged:
+                                    (val) => controller.keyword.value = val,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                    vertical: 8.h,
+                                  ),
+                                  isDense: true,
+                                  border: InputBorder.none,
+                                  hint: Text(
+                                    "Tìm kiếm bằng từ khóa",
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                ),
                               ),
                             ),
                           ],
@@ -127,9 +135,9 @@ class HomeScreen extends GetView<MainController> {
                           description: item.description,
                           onPress: () => controller.onPressCard(id: item.id),
                           listingPriceVndRent: _formatPrice(
-                            item.listingPriceVndRent.toString(),
+                            item.listingPriceVndSell.toString(),
                           ),
-                          legalAreaSqm: item.legalAreaSqm.toString(),
+                          legalAreaSqm: formatDouble(item.legalAreaSqm),
                           province: item.province.name,
                           district: item.district.name,
                           own: item.authorName,
@@ -206,12 +214,21 @@ class HomeScreen extends GetView<MainController> {
     if (priceVnd == null) return 'Đang cập nhật';
     try {
       double price = double.parse(priceVnd);
+
+      String formatNumber(double value, double divisor, String unit) {
+        String result = (value / divisor).toStringAsFixed(1);
+        // Nếu có .0 thì bỏ đi
+        result = result.replaceAll(RegExp(r'\.0$'), '');
+        return '$result $unit';
+      }
+
       if (price >= 1000000000) {
-        return '${(price / 1000000000).toStringAsFixed(1)} tỷ';
+        return formatNumber(price, 1000000000, 'tỷ');
       } else if (price >= 1000000) {
-        return '${(price / 1000000).toStringAsFixed(1)} triệu';
+        return formatNumber(price, 1000000, 'triệu');
       } else {
-        return '${price.toStringAsFixed(0)} đ';
+        String result = price.toStringAsFixed(0);
+        return '$result đ';
       }
     } catch (e) {
       return 'Đang cập nhật';
@@ -333,5 +350,14 @@ class HomeScreen extends GetView<MainController> {
         );
       },
     );
+  }
+
+  String formatDouble(double value) {
+    if (value % 1 == 0) {
+      // nếu không có phần thập phân
+      return value.toInt().toString();
+    } else {
+      return value.toString();
+    }
   }
 }

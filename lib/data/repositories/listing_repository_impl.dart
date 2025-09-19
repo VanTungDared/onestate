@@ -82,6 +82,7 @@ class ListingRepositoryImpl implements ListingRepository {
     List<String>? propertyTypes,
     int? minPrice,
     int? maxPrice,
+    String? title,
     required String sort,
   }) async {
     final result = await remoteDataSource.filterListingByTypeHouse(
@@ -91,6 +92,7 @@ class ListingRepositoryImpl implements ListingRepository {
       propertyTypes: propertyTypes,
       minPrice: minPrice,
       maxPrice: maxPrice,
+      title: title,
       sort: sort,
     );
     return result.fold((error) => Left(error), (listings) => Right(listings));

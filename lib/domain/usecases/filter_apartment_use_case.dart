@@ -15,16 +15,18 @@ class FilterApartmentUseCase {
     List<String>? propertyTypes,
     int? minPrice,
     int? maxPrice,
-    required String sort
+    String? title,
+    required String sort,
   }) {
     return repository.filterListingByTypeHouse(
       page: page,
       limit: limit,
       listingType: listingType,
       propertyTypes: propertyTypes,
-      minPrice : minPrice ,
-      maxPrice : maxPrice ,
-      sort : sort
+      minPrice: minPrice,
+      maxPrice: maxPrice,
+      title: title,
+      sort: sort,
     );
   }
 }

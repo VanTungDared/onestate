@@ -44,6 +44,7 @@ abstract class ListingRemoteDataSource {
     List<String>? propertyTypes,
     int? minPrice,
     int? maxPrice,
+    String? title,
     required String sort,
   });
 
@@ -164,6 +165,7 @@ class ListingRemoteDataSourceImpl implements ListingRemoteDataSource {
     List<String>? propertyTypes,
     int? minPrice,
     int? maxPrice,
+    String? title,
     required String sort,
   }) async {
     try {
@@ -174,6 +176,7 @@ class ListingRemoteDataSourceImpl implements ListingRemoteDataSource {
         propertyTypes: propertyTypes,
         minPrice: minPrice,
         maxPrice: maxPrice,
+        title: title,
         sort: sort,
       );
 
