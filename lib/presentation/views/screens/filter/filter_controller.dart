@@ -2,6 +2,7 @@ import 'package:app_real_estate/core/utils/api/api_method.dart';
 import 'package:app_real_estate/core/utils/notifier.dart';
 import 'package:app_real_estate/data/models/UserModel.dart';
 import 'package:app_real_estate/data/models/district.dart';
+import 'package:app_real_estate/data/models/option.dart';
 import 'package:app_real_estate/data/models/ward.dart';
 import 'package:app_real_estate/domain/usecases/get_district_use_case.dart';
 import 'package:flutter/cupertino.dart';
@@ -48,18 +49,19 @@ class FilterController extends GetxController {
   final controllerStreetName = TextEditingController();
   final controllerFullAddress = TextEditingController();
 
-  Map<String, String> criteriaOptions = {
-    'Triệu đô': 'million_dollar',
-    'Để ở': 'residential',
-    'Lãi vốn (Rẻ)': 'investment',
-    'Để kinh doanh': 'business',
-    'Hẻm ô tô': 'car_access',
-    'Đóng tiền ổn định': 'stable_cash_flow',
-    'Chính chủ': 'owner_direct',
-    'Chủ cần bán gấp': 'need_sell_fast',
-  };
+  final criteriaOptions = <OptionModel>[
+    OptionModel(value: 'million_dollar', label: 'Triệu đô'),
+    OptionModel(value: 'residential', label: 'Để ở'),
+    OptionModel(value: 'investment', label: 'Lãi vốn (Rẻ)'),
+    OptionModel(value: 'business', label: 'Để kinh doanh'),
+    OptionModel(value: 'car_access', label: 'Hẻm ô tô'),
+    OptionModel(value: 'stable_cash_flow', label: 'Đóng tiền ổn định'),
+    OptionModel(value: 'owner_direct', label: 'Chính chủ'),
+    OptionModel(value: 'need_sell_fast', label: 'Chủ cần bán gấp'),
+  ];
 
-  var selectedCriteria = <Map<String, dynamic>>[].obs;
+  /// Selected options sẽ là list OptionModel luôn
+  final selectedCriteria = <OptionModel>[].obs;
 
   RxSet<String> selectedItems = <String>{}.obs;
 
@@ -127,11 +129,7 @@ class FilterController extends GetxController {
 
   void fetchListings() async {
     isLoadingListing.value = true;
-    final selectedTags =
-        selectedItems
-            .where((item) => criteriaOptions.containsKey(item))
-            .map((item) => criteriaOptions[item]!)
-            .toList();
+    final selectedTags = selectedCriteria.map((item) => item.value).toList();
 
     final result = await filterUseCase.call(
       page: currentPage.value,

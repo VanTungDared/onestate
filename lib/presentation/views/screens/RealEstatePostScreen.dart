@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:app_real_estate/core/utils/notifier.dart';
+import 'package:app_real_estate/data/models/option.dart';
 import 'package:app_real_estate/presentation/widgets/ButtonPrimary%20copy.dart';
 import 'package:app_real_estate/presentation/widgets/CriteriaSelection.dart';
 import 'package:app_real_estate/presentation/widgets/LabeledDropdown.dart';
@@ -87,52 +88,52 @@ class RealEstateFormScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 16),
                             Obx(
-                              () => LabeledDropdown<String>(
+                              () => LabeledDropdown<OptionModel>(
                                 label: "Loại bài viết",
                                 isRequired: true,
                                 hintText: "Chọn loại bài viết",
-                                value:
-                                    controller.listingType.value.isEmpty
-                                        ? null
-                                        : controller.listingType.value,
+                                value: controller.listingType.value,
                                 items:
                                     controller.listingTypes
                                         .map(
-                                          (type) => DropdownMenuItem<String>(
-                                            value: type,
-                                            child: Text(type),
-                                          ),
+                                          (type) =>
+                                              DropdownMenuItem<OptionModel>(
+                                                value: type,
+                                                child: Text(type.label),
+                                              ),
                                         )
                                         .toList(),
-                                onChanged:
-                                    (val) =>
-                                        controller.listingType.value =
-                                            val ?? '',
+                                onChanged: (val) {
+                                  controller.listingType.value = val;
+                                },
                               ),
                             ),
+
                             SizedBox(height: 16),
                             Obx(
-                              () => LabeledDropdown<String>(
+                              () => LabeledDropdown<OptionModel>(
                                 label: "Loại bất động sản",
                                 isRequired: true,
                                 hintText: "Chọn loại bất động sản",
-                                value:
-                                    controller.propertyType.value.isEmpty
-                                        ? null
-                                        : controller.propertyType.value,
+                                value: controller.propertyType.value,
                                 items:
                                     controller.propertyTypes
                                         .map(
-                                          (type) => DropdownMenuItem<String>(
-                                            value: type,
-                                            child: Text(type),
-                                          ),
+                                          (type) =>
+                                              DropdownMenuItem<OptionModel>(
+                                                value: type,
+                                                child: Row(
+                                                  children: [
+                                                    const SizedBox(width: 6),
+                                                    Text(type.label),
+                                                  ],
+                                                ),
+                                              ),
                                         )
                                         .toList(),
-                                onChanged:
-                                    (val) =>
-                                        controller.propertyType.value =
-                                            val ?? '',
+                                onChanged: (val) {
+                                  controller.propertyType.value = val;
+                                },
                               ),
                             ),
 
@@ -502,27 +503,28 @@ class RealEstateFormScreen extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: 16.h),
-                            LabeledDropdown<String>(
-                              label: "Tình trạng pháp lý",
-                              isRequired: true,
-                              hintText: "Chọn tình trạng",
-                              value:
-                                  controller.wardCode.value.isEmpty
-                                      ? null
-                                      : controller.wardCode.value,
-                              items:
-                                  ['Phường 1', 'Phường 5', 'Phường 7']
-                                      .map(
-                                        (e) => DropdownMenuItem(
-                                          value: e,
-                                          child: Text(e),
-                                        ),
-                                      )
-                                      .toList(),
-                              onChanged:
-                                  (val) =>
-                                      controller.wardCode.value = val ?? '',
+                            Obx(
+                              () => LabeledDropdown<OptionModel>(
+                                label: "Tình trạng pháp lý",
+                                isRequired: true,
+                                hintText: "Chọn tình trạng pháp lý",
+                                value: controller.legalStatus.value,
+                                items:
+                                    controller.legalStatusOptions
+                                        .map(
+                                          (status) =>
+                                              DropdownMenuItem<OptionModel>(
+                                                value: status,
+                                                child: Text(status.label),
+                                              ),
+                                        )
+                                        .toList(),
+                                onChanged: (val) {
+                                  controller.legalStatus.value = val;
+                                },
+                              ),
                             ),
+
                             SizedBox(height: 12),
                             LabeledTextField(
                               label: "Số sổ đỏ",
@@ -560,7 +562,10 @@ class RealEstateFormScreen extends StatelessWidget {
                   ),
                   SizedBox(width: 16),
                   Expanded(
-                    child: PrimaryButton(text: "Xác nhận", onPressed: () => {}),
+                    child: PrimaryButton(
+                      text: "Xác nhận",
+                      onPressed: () => controller.handleConfirm(),
+                    ),
                   ),
                 ],
               ),
