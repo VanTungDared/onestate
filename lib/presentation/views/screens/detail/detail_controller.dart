@@ -1,3 +1,4 @@
+import 'package:app_real_estate/core/utils/api/api_method.dart';
 import 'package:app_real_estate/domain/usecases/get_listing_by_id_use_case.dart';
 import 'package:get/get.dart';
 
@@ -13,6 +14,8 @@ class DetailController extends GetxController {
 
   final isLoading = false.obs;
   String id = "";
+
+  final ApiMethod apiMethod = ApiMethod();
 
   @override
   void onInit() async {
@@ -39,27 +42,30 @@ class DetailController extends GetxController {
       },
       (data) async {
         listingDetail.value = data;
+        if (listingDetail.value!.isLiked.id != "") {
+          isLiked.value = true;
+        }
         isLoading.value = false;
       },
     );
   }
 
   Future<void> handleLikeListing() async {
-    // try {
-    //   final result = await apiClient.likeListing(id);
-    //   if (result.containsKey('error')) {
-    //     LoadingNotifier.showTopMessage(result['error'], false);
-    //   } else {
-    //     LoadingNotifier.showTopMessage(
-    //       isLiked.value ? "Đã bỏ thích thành công" : "Đã yêu thích thành công",
-    //       true,
-    //     );
-    //     // Cập nhật dữ liệu nếu cần
-    //     isLiked.value = !isLiked.value;
-    //   }
-    // } catch (e) {
-    //   print('handleLikeListing error: $e');
-    //   Get.snackbar('Lỗi', 'Đã xảy ra lỗi khi gọi API like');
-    // }
+    try {
+      final dataFromServer = await apiMethod.like("listings/$id/like");
+      if (dataFromServer.containsKey('error')) {
+        LoadingNotifier.showTopMessage(dataFromServer['error'], false);
+      } else {
+        LoadingNotifier.showTopMessage(
+          isLiked.value ? "Đã bỏ thích thành công" : "Đã yêu thích thành công",
+          true,
+        );
+        // Cập nhật dữ liệu nếu cần
+        isLiked.value = !isLiked.value;
+      }
+    } catch (e) {
+      print('handleLikeListing error: $e');
+      Get.snackbar('Lỗi', 'Đã xảy ra lỗi khi gọi API like');
+    }
   }
 }

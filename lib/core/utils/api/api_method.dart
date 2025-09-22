@@ -129,7 +129,7 @@ class ApiMethod {
   Dio get _dioFormData => Dio(
     BaseOptions(
       baseUrl:
-          "https://file.dev.ontik.vn/re-storage", // 💡 Lấy baseUrl động mỗi lần dùng
+          "https://api.onestate-dev.ontik.vn/api/v1/", // 💡 Lấy baseUrl động mỗi lần dùng
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       contentType: "application/json",
@@ -170,6 +170,49 @@ class ApiMethod {
       Map<String, dynamic> data = response.data;
 
       if (data['statusCode'] == 200) {
+        return data;
+      } else {
+        return {"error": "${data['error']}"};
+      }
+    } catch (e) {
+      return _handleApiError(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> like(
+    String path, {
+    Map<String, dynamic>? body,
+    Map<String, dynamic>? queryParams,
+    bool isToken = true,
+  }) async {
+    try {
+      Map<String, dynamic> headers = {
+        'Content-Type': 'application/json',
+        'accept': 'application/json',
+      };
+      if (isToken == true) {
+        String? token = SharedPreferenceApp.handleGetString('accessToken');
+        if (token == null) {
+          return {"error": "Token không tồn tại. Vui lòng đăng nhập lại."};
+        }
+        headers["Authorization"] = 'Bearer $token';
+      }
+      body = cleanEmptyFields(body);
+      Log.showLoggerMapList({
+        "method": "post",
+        "queryParameters": queryParams,
+        "path": path,
+        "body": body,
+      });
+      Response response = await _dio.post(
+        queryParameters: queryParams,
+        path,
+        data: body,
+        options: Options(headers: headers),
+      );
+      Map<String, dynamic> data = response.data;
+
+      if (response.statusCode == 200) {
         return data;
       } else {
         return {"error": "${data['error']}"};
@@ -310,6 +353,7 @@ class ApiMethod {
     String path, {
     required File file,
     String fieldName = "file",
+    required String folder,
     Map<String, dynamic>? extraData, // nếu cần gửi thêm dữ liệu kèm file
     bool isToken = true,
   }) async {
@@ -342,6 +386,7 @@ class ApiMethod {
       // Gom FormData
       final formData = FormData.fromMap({
         fieldName: multipartFile,
+        "folder": folder,
         ...?extraData, // nếu có thêm data kèm theo
       });
 

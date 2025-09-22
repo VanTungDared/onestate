@@ -1,15 +1,20 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:app_real_estate/core/utils/api/api_method.dart';
 import 'package:app_real_estate/core/utils/notifier.dart';
 import 'package:app_real_estate/data/models/UserModel.dart';
 import 'package:app_real_estate/data/models/district.dart';
 import 'package:app_real_estate/data/models/option.dart';
+import 'package:app_real_estate/data/models/province.dart';
 import 'package:app_real_estate/data/models/ward.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 class RealEstatePostController extends GetxController {
   final controllerTitle = TextEditingController();
@@ -25,6 +30,8 @@ class RealEstatePostController extends GetxController {
   final controllerNumberOfRooms = TextEditingController();
   final controllerNumberOfBathrooms = TextEditingController();
   final controllerNumberOfBalconies = TextEditingController();
+
+  final countDescription = 0.obs;
 
   var provinceCode = ''.obs;
   var districtCode = ''.obs;
@@ -50,6 +57,7 @@ class RealEstatePostController extends GetxController {
 
   final ApiMethod apiMethod = ApiMethod();
 
+  final RxList<Province> provinces = <Province>[].obs;
   final RxList<District> districts = <District>[].obs;
   final RxList<Ward> wards = <Ward>[].obs;
 
@@ -100,16 +108,39 @@ class RealEstatePostController extends GetxController {
 
   final mapController = Completer<GoogleMapController>();
 
+  final imagesUrl = <OptionModel>[].obs;
+  final imagesLegalUrl = <OptionModel>[].obs;
+
   @override
   void onInit() async {
     super.onInit();
     propertyType.value = propertyTypes.firstWhere((e) => e.value == 'land');
     listingType.value = listingTypes.firstWhere((e) => e.value == 'sell');
+    legalStatus.value = legalStatusOptions.firstWhere(
+      (e) => e.value == 'has_certificate',
+    );
+    await handleFetchProvince();
     final data = Get.arguments;
     if (data["userModel"] != null && data["userModel"] is UserModel) {
       userModel.value = data["userModel"];
     } else {
       LoadingNotifier.showTopMessage("Không có thông tin tài khoản", false);
+    }
+  }
+
+  handleFetchProvince() async {
+    final dataFromServer = await apiMethod.get("provinces");
+    if (dataFromServer.containsKey("error")) {
+      LoadingNotifier.showTopMessage("${dataFromServer['error']}", false);
+      return;
+    }
+    if (dataFromServer["data"] != null) {
+      final provincesJson = dataFromServer["data"] as List;
+
+      final provinces = provincesJson.map((e) => Province.fromJson(e)).toList();
+
+      // Gán danh sách quận/huyện vào biến observable trong controller
+      this.provinces.assignAll(provinces);
     }
   }
 
@@ -153,6 +184,24 @@ class RealEstatePostController extends GetxController {
     wardCode.value = id;
   }
 
+  Future<XFile?> compressImage(XFile file) async {
+    final dir = await getTemporaryDirectory();
+    final targetPath = p.join(
+      dir.path,
+      "thumb_${DateTime.now().millisecondsSinceEpoch}.jpg",
+    );
+
+    final compressedFile = await FlutterImageCompress.compressAndGetFile(
+      file.path,
+      targetPath,
+      quality: 50,
+      minWidth: 1000,
+      minHeight: 1000,
+    );
+
+    return compressedFile;
+  }
+
   Future<void> pickMultipleImages() async {
     final List<XFile>? pickedFiles = await ImagePicker().pickMultiImage(
       imageQuality: 80, // giảm dung lượng ảnh nếu cần
@@ -160,6 +209,29 @@ class RealEstatePostController extends GetxController {
 
     if (pickedFiles != null && pickedFiles.isNotEmpty) {
       images = pickedFiles;
+      for (int i = 0; i < images.length; i++) {
+        // 🔥 nén trước khi upload
+        final compressedFile = images[i];
+        // final compressedFile = await compressImage(images[i]) ?? images[i];
+
+        var dataFromServer = await apiMethod.uploadFile(
+          "files",
+          folder: "legal-documents",
+          file: File(compressedFile.path),
+        );
+
+        if (dataFromServer.containsKey("error")) {
+          LoadingNotifier.showTopMessage("${dataFromServer['error']}", false);
+          return;
+        }
+
+        imagesUrl.add(
+          OptionModel(
+            value: dataFromServer["data"]["fileUrl"],
+            label: dataFromServer["data"]["filename"],
+          ),
+        );
+      }
       renderImage.value = renderImage.value + 1;
       // Nếu muốn upload nhiều ảnh lên server, xử lý danh sách _images
     }
@@ -172,6 +244,23 @@ class RealEstatePostController extends GetxController {
 
     if (pickedFiles != null && pickedFiles.isNotEmpty) {
       imagesLegal = pickedFiles;
+      for (int i = 0; i < imagesLegal.length; i++) {
+        var dataFromServer = await apiMethod.uploadFile(
+          "files",
+          folder: "legal-documents",
+          file: File(imagesLegal[i].path),
+        );
+        if (dataFromServer.containsKey("error")) {
+          LoadingNotifier.showTopMessage("${dataFromServer['error']}", false);
+          return;
+        }
+        imagesLegalUrl.add(
+          OptionModel(
+            value: dataFromServer["data"]["fileUrl"],
+            label: dataFromServer["data"]["filename"],
+          ),
+        );
+      }
       renderImageLegal.value = renderImageLegal.value + 1;
       // Nếu muốn upload nhiều ảnh lên server, xử lý danh sách _images
     }
@@ -241,12 +330,48 @@ class RealEstatePostController extends GetxController {
       LoadingNotifier.showTopMessage("Vui lòng nhập mô tả", false);
       return false;
     }
+    if (controllerDescription.text.trim().length < 30) {
+      LoadingNotifier.showTopMessage("Mô tả phải có ít nhất 30 ký tự", false);
+      return false;
+    }
+
+    if (controllerDescription.text.trim().length > 300) {
+      LoadingNotifier.showTopMessage(
+        "Mô tả không được vượt quá 300 ký tự",
+        false,
+      );
+      return false;
+    }
     if (controllerOwnerName.text.trim().isEmpty) {
       LoadingNotifier.showTopMessage("Vui lòng nhập tên chủ sở hữu", false);
       return false;
     }
     if (controllerOwnerPhoneNumber.text.trim().isEmpty) {
-      LoadingNotifier.showTopMessage("Vui lòng nhập số điện thoại", false);
+      LoadingNotifier.showTopMessage("Vui lòng nhập số điện thoại chủ", false);
+      return false;
+    }
+    if (controllerIdCard.text.trim().isEmpty) {
+      LoadingNotifier.showTopMessage("Vui lòng nhập CCCD chủ sở hữu", false);
+      return false;
+    }
+    if (controllerLegalAreaSqm.text.trim().isEmpty) {
+      LoadingNotifier.showTopMessage("Vui lòng nhập diện tích pháp lý", false);
+      return false;
+    }
+    if (controllerActualAreaSqm.text.trim().isEmpty) {
+      LoadingNotifier.showTopMessage("Vui lòng nhập diện tích thực tế", false);
+      return false;
+    }
+    if (controllerFrontageMeters.text.trim().isEmpty) {
+      LoadingNotifier.showTopMessage("Vui lòng nhập mặt tiền", false);
+      return false;
+    }
+    if (controllerWidthMeters.text.trim().isEmpty) {
+      LoadingNotifier.showTopMessage("Vui lòng nhập chiều sâu", false);
+      return false;
+    }
+    if (controllerListingPriceVndSell.text.trim().isEmpty) {
+      LoadingNotifier.showTopMessage("Vui lòng nhập giá chào", false);
       return false;
     }
     if (provinceCode.value.isEmpty ||
@@ -258,8 +383,27 @@ class RealEstatePostController extends GetxController {
       );
       return false;
     }
-    if (controllerListingPriceVndSell.text.trim().isEmpty) {
-      LoadingNotifier.showTopMessage("Vui lòng nhập giá bán", false);
+    if (controllerStreetName.text.trim().isEmpty) {
+      LoadingNotifier.showTopMessage("Vui lòng nhập tên đường", false);
+      return false;
+    }
+    if (controllerFullAddress.text.trim().isEmpty) {
+      LoadingNotifier.showTopMessage("Vui lòng nhập địa chỉ chi tiết", false);
+      return false;
+    }
+    if (legalStatus.value == null) {
+      LoadingNotifier.showTopMessage("Vui lòng chọn tình trạng pháp lý", false);
+      return false;
+    }
+    if (controllerLandCertificateCode.text.trim().isEmpty) {
+      LoadingNotifier.showTopMessage("Vui lòng nhập số sổ đỏ", false);
+      return false;
+    }
+    if (imagesLegalUrl.isEmpty) {
+      LoadingNotifier.showTopMessage(
+        "Vui lòng chọn hình ảnh giấy tờ pháp lý",
+        false,
+      );
       return false;
     }
 
@@ -273,10 +417,13 @@ class RealEstatePostController extends GetxController {
 
       final tags = selectedCriteria.map((e) => e.value).toList();
 
+      final imagesUrlFinal = imagesUrl.map((e) => e.value).toList();
+      final imagesLegalUrlFinal = imagesLegalUrl.map((e) => e.value).toList();
+
       final body = {
         "title": controllerTitle.text.trim(),
-        "listingType": listingType.value, // sell | rent
-        "propertyType": propertyType.value, // land | house | apartment
+        "listingType": listingType.value!.value, // sell | rent
+        "propertyType": propertyType.value!.value, // land | house | apartment
         "ownerName": controllerOwnerName.text.trim(),
         "ownerPhoneNumber": controllerOwnerPhoneNumber.text.trim(),
         "ownerCitizenId": controllerIdCard.text.trim(),
@@ -287,18 +434,24 @@ class RealEstatePostController extends GetxController {
         "widthMeters": controllerWidthMeters.text.trim(),
         "numberOfFloors": controllerNumberOfFloors.text.trim(),
         "listingPriceVndSell":
-            int.tryParse(controllerListingPriceVndSell.text.trim()) ?? 0,
+            int.tryParse(
+              controllerListingPriceVndSell.text.trim().replaceAll(".", ""),
+            ) ??
+            0,
         "listingPriceVndRent": 0, // chưa nhập thì để 0
         "commissionRatePercent":
             int.tryParse(controllerCommissionRatePercent.text.trim()) ?? 0,
         "commissionAmountVnd":
-            int.tryParse(controllerCommissionAmountVnd.text.trim()) ?? 0,
+            int.tryParse(
+              controllerCommissionAmountVnd.text.trim().replaceAll(".", ""),
+            ) ??
+            0,
         "provinceCode": provinceCode.value,
         "districtCode": districtCode.value,
         "wardCode": wardCode.value,
         "fullAddress": controllerFullAddress.text.trim(),
         "description": controllerDescription.text.trim(),
-        "imageUrls": [],
+        "imageUrls": imagesUrlFinal,
         "tags": tags,
         "latitude": mapLatLng.value?.latitude,
         "longitude": mapLatLng.value?.longitude,
@@ -306,21 +459,20 @@ class RealEstatePostController extends GetxController {
         "legalStatus": "has_certificate", // default
         "landCertificate": {
           "code": controllerLandCertificateCode.text.trim(),
-          "imageUrls": [],
+          "imageUrls": imagesLegalUrlFinal,
         },
         "numberOfRooms": controllerNumberOfRooms.text.trim(),
         "numberOfBathrooms": controllerNumberOfBathrooms.text.trim(),
         "numberOfBalconies": controllerNumberOfBalconies.text.trim(),
       };
 
-      final response = await apiMethod.post("listings", body: body);
+      final dataFromServer = await apiMethod.post("admin/listings", body: body);
 
-      if (response.containsKey("error")) {
-        LoadingNotifier.showTopMessage("${response['error']}", false);
+      if (dataFromServer.containsKey("error")) {
+        LoadingNotifier.showTopMessage("${dataFromServer['error']}", false);
         return;
       }
 
-      LoadingNotifier.showTopMessage("Đăng tin thành công", true);
       Get.back(result: true);
     } catch (e) {
       LoadingNotifier.showTopMessage("Có lỗi xảy ra: $e", false);

@@ -43,7 +43,7 @@ class FilterScreen extends GetView<FilterController> {
 
   Widget header() {
     return Padding(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.only(left: 12, bottom: 12, top: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -55,10 +55,15 @@ class FilterScreen extends GetView<FilterController> {
               color: Colors.black,
             ),
           ),
-          GestureDetector(
+          InkWell(
             onTap: () => Get.back(),
-            child: Padding(
-              padding: EdgeInsets.only(left: 12, bottom: 12, top: 12),
+            child: Container(
+              padding: EdgeInsets.only(
+                left: 12,
+                bottom: 12,
+                top: 12,
+                right: 12,
+              ),
               child: Icon(Icons.close, size: 16.w, color: Colors.grey),
             ),
           ),
@@ -135,21 +140,22 @@ class FilterScreen extends GetView<FilterController> {
                                 .provinceCode
                                 .value, // code: "01" hoặc "79"
                     items:
-                        controller.userModel.value!.provinces
+                        controller.provinces
                             .map(
                               (e) => DropdownMenuItem<String>(
-                                value: e["code"], // <-- dùng code làm value
-                                child: Text(e["name"] ?? ''),
+                                value: e.code, // <-- dùng code làm value
+                                child: Text(e.fullName),
                               ),
                             )
                             .toList(),
                     onChanged: (val) {
                       if (val != null) {
-                        final selected = controller.userModel.value!.provinces
-                            .firstWhere((p) => p["code"] == val);
+                        final selected = controller.provinces.firstWhere(
+                          (p) => p.code == val,
+                        );
                         controller.handleSelectProvince(
-                          selected["name"]!,
-                          selected["code"]!,
+                          selected.fullName,
+                          selected.code,
                         );
                       }
                     },

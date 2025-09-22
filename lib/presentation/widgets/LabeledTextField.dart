@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class LabeledTextField extends StatelessWidget {
   final String label;
@@ -8,6 +9,7 @@ class LabeledTextField extends StatelessWidget {
   final String? suffixText;
   final ValueChanged<String>? onChanged;
   final TextEditingController? controller;
+  final List<TextInputFormatter>? inputFormatters;
 
   const LabeledTextField({
     Key? key,
@@ -18,6 +20,7 @@ class LabeledTextField extends StatelessWidget {
     this.suffixText,
     this.onChanged,
     this.controller,
+    this.inputFormatters,
   }) : super(key: key);
 
   @override
@@ -45,6 +48,7 @@ class LabeledTextField extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         TextField(
+          inputFormatters: inputFormatters,
           controller: controller,
           keyboardType: keyboardType,
           decoration: InputDecoration(

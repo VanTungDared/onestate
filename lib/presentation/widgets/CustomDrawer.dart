@@ -1,3 +1,4 @@
+import 'package:app_real_estate/core/utils/notifier.dart';
 import 'package:app_real_estate/data/models/UserModel.dart';
 import 'package:app_real_estate/presentation/routers/routerName.dart';
 import 'package:flutter/material.dart';
@@ -82,12 +83,18 @@ class CustomDrawer extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     scaffoldKey.currentState?.closeEndDrawer();
-                    Get.toNamed(
+                    final result = await Get.toNamed(
                       RouterName.post,
                       arguments: {"userModel": userModel},
                     );
+                    if (result != null && result) {
+                      LoadingNotifier.showTopMessage(
+                        "Đăng tin thành công",
+                        true,
+                      );
+                    }
                   },
                   child: Text(
                     "Đăng tin",

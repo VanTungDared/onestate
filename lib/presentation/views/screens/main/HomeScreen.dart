@@ -32,14 +32,14 @@ class HomeScreen extends GetView<MainController> {
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
-        actionsPadding: EdgeInsets.symmetric(horizontal: 16.w),
+        actionsPadding: EdgeInsets.only(left: 16.w),
         actions: [
           ImageUtils.loadFromAsset(AssetConstant.logoTop),
           Spacer(),
-          GestureDetector(
+          InkWell(
             onTap: () => _scaffoldKey.currentState?.openEndDrawer(),
             child: Padding(
-              padding: EdgeInsets.fromLTRB(20.w, 10, 0, 10),
+              padding: EdgeInsets.fromLTRB(20.w, 10, 16.w, 10),
               child: Icon(Icons.menu),
             ),
           ),

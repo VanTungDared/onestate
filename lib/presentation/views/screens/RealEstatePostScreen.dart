@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:app_real_estate/core/utils/constants/convert_app.dart';
 import 'package:app_real_estate/core/utils/notifier.dart';
 import 'package:app_real_estate/data/models/option.dart';
 import 'package:app_real_estate/presentation/widgets/ButtonPrimary%20copy.dart';
@@ -8,6 +9,7 @@ import 'package:app_real_estate/presentation/widgets/LabeledDropdown.dart';
 import 'package:app_real_estate/presentation/widgets/LabeledMultilineTextField.dart';
 import 'package:app_real_estate/presentation/widgets/LabeledTextField.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -38,539 +40,557 @@ class RealEstateFormScreen extends StatelessWidget {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
         ),
       ),
-      body: NotificationListener<ScrollNotification>(
-        onNotification: (_) => false,
-        child: Column(
-          children: [
-            Expanded(
-              child: Obx(
-                () => SingleChildScrollView(
-                  physics:
-                      controller.isMapInteracting.value
-                          ? const NeverScrollableScrollPhysics()
-                          : const BouncingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: EdgeInsets.all(12),
-                        margin: EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Thông tin chính",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+      body: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (_) => false,
+          child: Column(
+            children: [
+              Expanded(
+                child: Obx(
+                  () => SingleChildScrollView(
+                    physics:
+                        controller.isMapInteracting.value
+                            ? const NeverScrollableScrollPhysics()
+                            : const BouncingScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: EdgeInsets.all(12),
+                          margin: EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Thông tin chính",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 12.h),
-                            LabeledTextField(
-                              label: "Tiêu đề",
-                              hintText: "Tiêu đề bài viết",
-                              isRequired: true,
-                              controller: controller.controllerTitle,
-                            ),
-                            SizedBox(height: 16),
-                            LabeledMultilineTextField(
-                              label: "Mô tả",
-                              hintText: "Nhập mô tả chi tiết...",
-                              minLines: 4,
-                              maxLines: 6,
-                              helperText:
-                                  "Tối thiểu 30 ký tự, tối đa 3000 ký tự",
-                              controller: controller.controllerDescription,
-                            ),
-                            SizedBox(height: 16),
-                            Obx(
-                              () => LabeledDropdown<OptionModel>(
-                                label: "Loại bài viết",
+                              SizedBox(height: 12.h),
+                              LabeledTextField(
+                                label: "Tiêu đề",
+                                hintText: "Tiêu đề bài viết",
                                 isRequired: true,
-                                hintText: "Chọn loại bài viết",
-                                value: controller.listingType.value,
-                                items:
-                                    controller.listingTypes
-                                        .map(
-                                          (type) =>
-                                              DropdownMenuItem<OptionModel>(
-                                                value: type,
-                                                child: Text(type.label),
-                                              ),
-                                        )
-                                        .toList(),
-                                onChanged: (val) {
-                                  controller.listingType.value = val;
-                                },
+                                controller: controller.controllerTitle,
                               ),
-                            ),
-
-                            SizedBox(height: 16),
-                            Obx(
-                              () => LabeledDropdown<OptionModel>(
-                                label: "Loại bất động sản",
-                                isRequired: true,
-                                hintText: "Chọn loại bất động sản",
-                                value: controller.propertyType.value,
-                                items:
-                                    controller.propertyTypes
-                                        .map(
-                                          (type) =>
-                                              DropdownMenuItem<OptionModel>(
-                                                value: type,
-                                                child: Row(
-                                                  children: [
-                                                    const SizedBox(width: 6),
-                                                    Text(type.label),
-                                                  ],
+                              SizedBox(height: 16),
+                              Obx(
+                                () => LabeledMultilineTextField(
+                                  label: "Mô tả",
+                                  hintText: "Nhập mô tả chi tiết...",
+                                  minLines: 4,
+                                  isRequired: true,
+                                  maxLines: 6,
+                                  helperText:
+                                      "Tối thiểu 30 ký tự, tối đa 3000 ký tự (${controller.countDescription.value} ký tự)",
+                                  controller: controller.controllerDescription,
+                                  onChanged:
+                                      (val) =>
+                                          controller.countDescription.value =
+                                              val.length,
+                                ),
+                              ),
+                              SizedBox(height: 16),
+                              Obx(
+                                () => LabeledDropdown<OptionModel>(
+                                  label: "Loại bài viết",
+                                  isRequired: true,
+                                  hintText: "Chọn loại bài viết",
+                                  value: controller.listingType.value,
+                                  items:
+                                      controller.listingTypes
+                                          .map(
+                                            (type) =>
+                                                DropdownMenuItem<OptionModel>(
+                                                  value: type,
+                                                  child: Text(type.label),
                                                 ),
-                                              ),
-                                        )
-                                        .toList(),
-                                onChanged: (val) {
-                                  controller.propertyType.value = val;
-                                },
+                                          )
+                                          .toList(),
+                                  onChanged: (val) {
+                                    controller.listingType.value = val;
+                                  },
+                                ),
                               ),
-                            ),
 
-                            SizedBox(height: 16),
-                            CriteriaSelection(
-                              label: "Tiêu chí",
-                              options: controller.criteriaOptions,
-                              selectedOptions: controller.selectedCriteria,
-                            ),
-                            SizedBox(height: 16),
-                            LabeledTextField(
-                              label: "Chủ sở hữu",
-                              hintText: "Họ và Tên",
-                              isRequired: true,
-                              controller: controller.controllerOwnerName,
-                            ),
-                            SizedBox(height: 16),
-                            LabeledTextField(
-                              label: "Số điện thoại chủ sở hữu",
-                              hintText: "Số điện thoại",
-                              isRequired: true,
-                              controller: controller.controllerOwnerPhoneNumber,
-                            ),
-                            SizedBox(height: 16),
-                            LabeledTextField(
-                              label: "CCCD chủ sở hữu",
-                              hintText: "Số điện thoại",
-                              isRequired: true,
-                              controller: controller.controllerIdCard,
-                            ),
-                            SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: LabeledTextField(
-                                    label: "Diện tích pháp lý",
-                                    isRequired: true,
-                                    keyboardType: TextInputType.number,
-                                    suffixText: "m²",
-                                    controller:
-                                        controller.controllerLegalAreaSqm,
-                                  ),
+                              SizedBox(height: 16),
+                              Obx(
+                                () => LabeledDropdown<OptionModel>(
+                                  label: "Loại bất động sản",
+                                  isRequired: true,
+                                  hintText: "Chọn loại bất động sản",
+                                  value: controller.propertyType.value,
+                                  items:
+                                      controller.propertyTypes
+                                          .map(
+                                            (type) =>
+                                                DropdownMenuItem<OptionModel>(
+                                                  value: type,
+                                                  child: Text(type.label),
+                                                ),
+                                          )
+                                          .toList(),
+                                  onChanged: (val) {
+                                    controller.propertyType.value = val;
+                                  },
                                 ),
-                                SizedBox(width: 16),
-                                Expanded(
-                                  child: LabeledTextField(
-                                    label: "Diện tích thực tế",
-                                    isRequired: true,
-                                    keyboardType: TextInputType.number,
-                                    suffixText: "m²",
-                                    controller:
-                                        controller.controllerActualAreaSqm,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: LabeledTextField(
-                                    label: "Mặt tiền",
-                                    hintText: "",
-                                    suffixText: "m",
-                                    keyboardType: TextInputType.number,
-                                    controller:
-                                        controller.controllerFrontageMeters,
-                                  ),
-                                ),
-                                SizedBox(width: 16),
-                                Expanded(
-                                  child: LabeledTextField(
-                                    label: "Chiều sâu",
-                                    hintText: "",
-                                    isRequired: true,
-                                    suffixText: "m",
-                                    keyboardType: TextInputType.number,
-                                    controller:
-                                        controller.controllerWidthMeters,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: LabeledTextField(
-                                    label: "Số tầng",
-                                    hintText: "",
-                                    suffixText: "tầng",
-                                    keyboardType: TextInputType.number,
-                                    controller:
-                                        controller.controllerNumberOfFloors,
-                                  ),
-                                ),
-                                SizedBox(width: 16),
-                                Expanded(
-                                  child: LabeledTextField(
-                                    label: "Số phòng",
-                                    hintText: "",
-                                    suffixText: "phòng",
-                                    keyboardType: TextInputType.number,
-                                    controller:
-                                        controller.controllerNumberOfRooms,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: LabeledTextField(
-                                    label: "Số phòng tắm/WC",
-                                    hintText: "",
-                                    suffixText: "phòng",
-                                    keyboardType: TextInputType.number,
-                                    controller:
-                                        controller.controllerNumberOfBathrooms,
-                                  ),
-                                ),
-                                SizedBox(width: 16),
-                                Expanded(
-                                  child: LabeledTextField(
-                                    label: "Số phòng ban công",
-                                    hintText: "",
-                                    suffixText: "bc",
-                                    keyboardType: TextInputType.number,
-                                    controller:
-                                        controller.controllerNumberOfBalconies,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: EdgeInsets.all(12),
-                        margin: EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Tài chính",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
                               ),
-                            ),
-                            SizedBox(height: 16.h),
-                            LabeledTextField(
-                              label: "Giá chào (VND)",
-                              hintText: "",
-                              isRequired: true,
-                              suffixText: "VND",
-                              keyboardType: TextInputType.number,
-                              controller:
-                                  controller.controllerListingPriceVndSell,
-                            ),
-                            SizedBox(height: 16.h),
-                            LabeledTextField(
-                              label: "Phần trăm hoa hồng (%)",
-                              hintText: "",
-                              suffixText: "%",
-                              keyboardType: TextInputType.number,
-                              controller:
-                                  controller.controllerCommissionRatePercent,
-                            ),
-                            SizedBox(height: 16.h),
-                            LabeledTextField(
-                              label: "Số tiền hoa hồng (VND)",
-                              hintText: "",
-                              suffixText: "VND",
-                              keyboardType: TextInputType.number,
-                              controller:
-                                  controller.controllerCommissionAmountVnd,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: EdgeInsets.all(12),
-                        margin: EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Địa chỉ",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+
+                              SizedBox(height: 16),
+                              CriteriaSelection(
+                                label: "Tiêu chí",
+                                options: controller.criteriaOptions,
+                                selectedOptions: controller.selectedCriteria,
                               ),
-                            ),
-                            SizedBox(height: 16.h),
-                            Obx(
-                              () => LabeledDropdown<String>(
-                                label: "Tỉnh/Thành phố",
+                              SizedBox(height: 16),
+                              LabeledTextField(
+                                label: "Chủ sở hữu",
+                                hintText: "Họ và Tên",
                                 isRequired: true,
-                                hintText: "Chọn tỉnh/thành phố",
-                                value:
-                                    controller.provinceCode.value.isEmpty
-                                        ? null
-                                        : controller
-                                            .provinceCode
-                                            .value, // code: "01" hoặc "79"
-                                items:
-                                    controller.userModel.value!.provinces
-                                        .map(
-                                          (e) => DropdownMenuItem<String>(
-                                            value:
-                                                e["code"], // <-- dùng code làm value
-                                            child: Text(e["name"] ?? ''),
-                                          ),
-                                        )
-                                        .toList(),
-                                onChanged: (val) {
-                                  if (val != null) {
-                                    final selected = controller
-                                        .userModel
-                                        .value!
-                                        .provinces
-                                        .firstWhere((p) => p["code"] == val);
-                                    controller.handleSelectProvince(
-                                      selected["name"]!,
-                                      selected["code"]!,
+                                controller: controller.controllerOwnerName,
+                              ),
+                              SizedBox(height: 16),
+                              LabeledTextField(
+                                keyboardType: TextInputType.phone,
+                                label: "Số điện thoại chủ sở hữu",
+                                hintText: "Số điện thoại",
+                                isRequired: true,
+                                controller:
+                                    controller.controllerOwnerPhoneNumber,
+                              ),
+                              SizedBox(height: 16),
+                              LabeledTextField(
+                                label: "CCCD chủ sở hữu",
+                                hintText: "Số điện thoại",
+                                isRequired: true,
+                                controller: controller.controllerIdCard,
+                                keyboardType: TextInputType.number,
+                              ),
+                              SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: LabeledTextField(
+                                      label: "Diện tích pháp lý",
+                                      isRequired: true,
+                                      keyboardType: TextInputType.number,
+                                      suffixText: "m²",
+                                      controller:
+                                          controller.controllerLegalAreaSqm,
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+                                  Expanded(
+                                    child: LabeledTextField(
+                                      label: "Diện tích thực tế",
+                                      isRequired: true,
+                                      keyboardType: TextInputType.number,
+                                      suffixText: "m²",
+                                      controller:
+                                          controller.controllerActualAreaSqm,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: LabeledTextField(
+                                      label: "Mặt tiền",
+                                      hintText: "",
+                                      suffixText: "m",
+                                      isRequired: true,
+                                      keyboardType: TextInputType.number,
+                                      controller:
+                                          controller.controllerFrontageMeters,
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+                                  Expanded(
+                                    child: LabeledTextField(
+                                      label: "Chiều sâu",
+                                      hintText: "",
+                                      isRequired: true,
+                                      suffixText: "m",
+                                      keyboardType: TextInputType.number,
+                                      controller:
+                                          controller.controllerWidthMeters,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: LabeledTextField(
+                                      label: "Số tầng",
+                                      hintText: "",
+                                      suffixText: "tầng",
+                                      keyboardType: TextInputType.number,
+                                      controller:
+                                          controller.controllerNumberOfFloors,
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+                                  Expanded(
+                                    child: LabeledTextField(
+                                      label: "Số phòng",
+                                      hintText: "",
+                                      suffixText: "phòng",
+                                      keyboardType: TextInputType.number,
+                                      controller:
+                                          controller.controllerNumberOfRooms,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: LabeledTextField(
+                                      label: "Số phòng tắm/WC",
+                                      hintText: "",
+                                      suffixText: "phòng",
+                                      keyboardType: TextInputType.number,
+                                      controller:
+                                          controller
+                                              .controllerNumberOfBathrooms,
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+                                  Expanded(
+                                    child: LabeledTextField(
+                                      label: "Số phòng ban công",
+                                      hintText: "",
+                                      suffixText: "bc",
+                                      keyboardType: TextInputType.number,
+                                      controller:
+                                          controller
+                                              .controllerNumberOfBalconies,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: EdgeInsets.all(12),
+                          margin: EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Tài chính",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 16.h),
+                              LabeledTextField(
+                                label: "Giá chào (VND)",
+                                hintText: "",
+                                isRequired: true,
+                                suffixText: "VND",
+                                keyboardType: TextInputType.number,
+                                controller:
+                                    controller.controllerListingPriceVndSell,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  VNDTextInputFormatter(),
+                                ],
+                              ),
+                              SizedBox(height: 16.h),
+                              LabeledTextField(
+                                label: "Phần trăm hoa hồng (%)",
+                                hintText: "",
+                                suffixText: "%",
+                                keyboardType: TextInputType.number,
+                                controller:
+                                    controller.controllerCommissionRatePercent,
+                              ),
+                              SizedBox(height: 16.h),
+                              LabeledTextField(
+                                label: "Số tiền hoa hồng (VND)",
+                                hintText: "",
+                                suffixText: "VND",
+                                keyboardType: TextInputType.number,
+                                controller:
+                                    controller.controllerCommissionAmountVnd,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  VNDTextInputFormatter(),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: EdgeInsets.all(12),
+                          margin: EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Địa chỉ",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 16.h),
+                              Obx(
+                                () => LabeledDropdown<String>(
+                                  label: "Tỉnh/Thành phố",
+                                  isRequired: true,
+                                  hintText: "Chọn tỉnh/thành phố",
+                                  value:
+                                      controller.provinceCode.value.isEmpty
+                                          ? null
+                                          : controller
+                                              .provinceCode
+                                              .value, // code: "01" hoặc "79"
+                                  items:
+                                      controller.provinces
+                                          .map(
+                                            (e) => DropdownMenuItem<String>(
+                                              value:
+                                                  e.code, // <-- dùng code làm value
+                                              child: Text(e.fullName),
+                                            ),
+                                          )
+                                          .toList(),
+                                  onChanged: (val) {
+                                    if (val != null) {
+                                      final selected = controller.provinces
+                                          .firstWhere((p) => p.code == val);
+                                      controller.handleSelectProvince(
+                                        selected.fullName,
+                                        selected.code,
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+
+                              SizedBox(height: 12),
+                              Obx(
+                                () => LabeledDropdown<String>(
+                                  label: "Quận/Huyện",
+                                  isRequired: true,
+                                  hintText: "Chọn quận/huyện",
+                                  value:
+                                      controller.districtCode.value.isEmpty
+                                          ? null
+                                          : controller
+                                              .districtCode
+                                              .value, // sẽ là code của district
+                                  items:
+                                      controller.districts
+                                          .map(
+                                            (d) => DropdownMenuItem<String>(
+                                              value: d.code, // lưu code
+                                              child: Text(
+                                                d.fullName,
+                                              ), // hiển thị tên
+                                            ),
+                                          )
+                                          .toList(),
+                                  onChanged: (val) {
+                                    final selected = controller.districts
+                                        .firstWhere((p) => p.code == val);
+                                    controller.handleSelectDistrict(
+                                      selected.fullName,
+                                      selected.code,
                                     );
-                                  }
-                                },
+                                  },
+                                ),
                               ),
-                            ),
 
-                            SizedBox(height: 12),
-                            Obx(
-                              () => LabeledDropdown<String>(
-                                label: "Quận/Huyện",
+                              SizedBox(height: 12),
+
+                              Obx(
+                                () => LabeledDropdown<String>(
+                                  label: "Phường/Xã",
+                                  isRequired: true,
+                                  hintText: "Chọn phường/xã",
+                                  value:
+                                      controller.wardCode.value.isEmpty
+                                          ? null
+                                          : controller
+                                              .wardCode
+                                              .value, // sẽ là code của ward
+                                  items:
+                                      controller.wards
+                                          .map(
+                                            (w) => DropdownMenuItem<String>(
+                                              value: w.code, // lưu code
+                                              child: Text(
+                                                w.fullName,
+                                              ), // hiển thị tên
+                                            ),
+                                          )
+                                          .toList(),
+                                  onChanged: (val) {
+                                    final selected = controller.wards
+                                        .firstWhere((w) => w.code == val);
+                                    controller.handleSelectWard(
+                                      selected.fullName,
+                                      selected.code,
+                                    );
+                                  },
+                                ),
+                              ),
+                              SizedBox(height: 12),
+                              LabeledTextField(
+                                label: "Tên đường",
+                                hintText: "Nhập tên đường",
                                 isRequired: true,
-                                hintText: "Chọn quận/huyện",
-                                value:
-                                    controller.districtCode.value.isEmpty
-                                        ? null
-                                        : controller
-                                            .districtCode
-                                            .value, // sẽ là code của district
-                                items:
-                                    controller.districts
-                                        .map(
-                                          (d) => DropdownMenuItem<String>(
-                                            value: d.code, // lưu code
-                                            child: Text(
-                                              d.fullName,
-                                            ), // hiển thị tên
-                                          ),
-                                        )
-                                        .toList(),
-                                onChanged: (val) {
-                                  final selected = controller.districts
-                                      .firstWhere((p) => p.code == val);
-                                  controller.handleSelectDistrict(
-                                    selected.fullName,
-                                    selected.code,
-                                  );
-                                },
+                                controller: controller.controllerStreetName,
                               ),
-                            ),
-
-                            SizedBox(height: 12),
-
-                            Obx(
-                              () => LabeledDropdown<String>(
-                                label: "Phường/Xã",
+                              SizedBox(height: 12),
+                              LabeledTextField(
+                                label: "Địa chỉ chi tiết",
+                                hintText: "Số nhà, đường, phường/xã",
                                 isRequired: true,
-                                hintText: "Chọn phường/xã",
-                                value:
-                                    controller.wardCode.value.isEmpty
-                                        ? null
-                                        : controller
-                                            .wardCode
-                                            .value, // sẽ là code của ward
-                                items:
-                                    controller.wards
-                                        .map(
-                                          (w) => DropdownMenuItem<String>(
-                                            value: w.code, // lưu code
-                                            child: Text(
-                                              w.fullName,
-                                            ), // hiển thị tên
-                                          ),
-                                        )
-                                        .toList(),
-                                onChanged: (val) {
-                                  final selected = controller.wards.firstWhere(
-                                    (w) => w.code == val,
-                                  );
-                                  controller.handleSelectWard(
-                                    selected.fullName,
-                                    selected.code,
-                                  );
-                                },
+                                controller: controller.controllerFullAddress,
                               ),
-                            ),
-                            SizedBox(height: 12),
-                            LabeledTextField(
-                              label: "Tên đường",
-                              hintText: "Nhập tên đường",
-                              isRequired: true,
-                              controller: controller.controllerStreetName,
-                            ),
-                            SizedBox(height: 12),
-                            LabeledTextField(
-                              label: "Địa chỉ chi tiết",
-                              hintText: "Số nhà, đường, phường/xã",
-                              isRequired: true,
-                              controller: controller.controllerFullAddress,
-                            ),
-                            SizedBox(height: 12),
-                            _buildGoogleMapSection(),
-                          ],
+                              SizedBox(height: 12),
+                              _buildGoogleMapSection(),
+                            ],
+                          ),
                         ),
-                      ),
 
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: EdgeInsets.all(12),
-                        margin: EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Hình ảnh",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: EdgeInsets.all(12),
+                          margin: EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Hình ảnh",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            _buildSelectImage(context),
-                          ],
+                              _buildSelectImage(context),
+                            ],
+                          ),
                         ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: EdgeInsets.all(12),
-                        margin: EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Pháp lý",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: EdgeInsets.all(12),
+                          margin: EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Pháp lý",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 16.h),
-                            Obx(
-                              () => LabeledDropdown<OptionModel>(
-                                label: "Tình trạng pháp lý",
+                              SizedBox(height: 16.h),
+                              Obx(
+                                () => LabeledDropdown<OptionModel>(
+                                  label: "Tình trạng pháp lý",
+                                  isRequired: true,
+                                  hintText: "Chọn tình trạng pháp lý",
+                                  value: controller.legalStatus.value,
+                                  items:
+                                      controller.legalStatusOptions
+                                          .map(
+                                            (status) =>
+                                                DropdownMenuItem<OptionModel>(
+                                                  value: status,
+                                                  child: Text(status.label),
+                                                ),
+                                          )
+                                          .toList(),
+                                  onChanged: (val) {
+                                    controller.legalStatus.value = val;
+                                  },
+                                ),
+                              ),
+
+                              SizedBox(height: 12),
+                              LabeledTextField(
+                                label: "Số sổ đỏ",
+                                hintText: "Nhập số sổ",
                                 isRequired: true,
-                                hintText: "Chọn tình trạng pháp lý",
-                                value: controller.legalStatus.value,
-                                items:
-                                    controller.legalStatusOptions
-                                        .map(
-                                          (status) =>
-                                              DropdownMenuItem<OptionModel>(
-                                                value: status,
-                                                child: Text(status.label),
-                                              ),
-                                        )
-                                        .toList(),
-                                onChanged: (val) {
-                                  controller.legalStatus.value = val;
-                                },
+                                controller:
+                                    controller.controllerLandCertificateCode,
                               ),
-                            ),
-
-                            SizedBox(height: 12),
-                            LabeledTextField(
-                              label: "Số sổ đỏ",
-                              hintText: "Nhập số sổ",
-                              isRequired: true,
-                              controller:
-                                  controller.controllerLandCertificateCode,
-                            ),
-                            SizedBox(height: 16),
-                            _buildLabel('Hình ảnh giấy tờ pháp lý'),
-                            _buildSelectImageLegal(context),
-                          ],
+                              SizedBox(height: 16),
+                              _buildLabel('Hình ảnh giấy tờ pháp lý'),
+                              _buildSelectImageLegal(context),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                border: Border(top: BorderSide(color: Colors.grey, width: 0.2)),
-                color: Colors.white,
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: PrimaryButton(
-                      text: "Lưu nháp",
-                      isOutlined: true, // viền cam, nền trắng
-                      onPressed: () => {},
-                    ),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: const BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: Colors.grey, width: 0.2),
                   ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: PrimaryButton(
-                      text: "Xác nhận",
-                      onPressed: () => controller.handleConfirm(),
+                  color: Colors.white,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: PrimaryButton(
+                        text: "Lưu nháp",
+                        isOutlined: true, // viền cam, nền trắng
+                        onPressed: () => {},
+                      ),
                     ),
-                  ),
-                ],
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: PrimaryButton(
+                        text: "Xác nhận",
+                        onPressed: () => controller.handleConfirm(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'package:app_real_estate/core/utils/notifier.dart';
 import 'package:app_real_estate/data/models/UserModel.dart';
 import 'package:app_real_estate/data/models/district.dart';
 import 'package:app_real_estate/data/models/option.dart';
+import 'package:app_real_estate/data/models/province.dart';
 import 'package:app_real_estate/data/models/ward.dart';
 import 'package:app_real_estate/domain/usecases/get_district_use_case.dart';
 import 'package:flutter/cupertino.dart';
@@ -43,6 +44,8 @@ class FilterController extends GetxController {
   var provinceCode = ''.obs;
   var districtCode = ''.obs;
   var wardCode = ''.obs;
+
+  final RxList<Province> provinces = <Province>[].obs;
   final RxList<District> districts = <District>[].obs;
   final RxList<Ward> wards = <Ward>[].obs;
 
@@ -69,10 +72,27 @@ class FilterController extends GetxController {
   void onInit() async {
     super.onInit();
     final data = Get.arguments;
+    await handleFetchProvince();
     if (data["userModel"] != null && data["userModel"] is UserModel) {
       userModel.value = data["userModel"];
     } else {
       LoadingNotifier.showTopMessage("Không có thông tin tài khoản", false);
+    }
+  }
+
+  handleFetchProvince() async {
+    final dataFromServer = await apiMethod.get("provinces");
+    if (dataFromServer.containsKey("error")) {
+      LoadingNotifier.showTopMessage("${dataFromServer['error']}", false);
+      return;
+    }
+    if (dataFromServer["data"] != null) {
+      final provincesJson = dataFromServer["data"] as List;
+
+      final provinces = provincesJson.map((e) => Province.fromJson(e)).toList();
+
+      // Gán danh sách quận/huyện vào biến observable trong controller
+      this.provinces.assignAll(provinces);
     }
   }
 
@@ -128,6 +148,8 @@ class FilterController extends GetxController {
   }
 
   void fetchListings() async {
+    final isValid = await validateForm();
+    if (!isValid) return;
     isLoadingListing.value = true;
     final selectedTags = selectedCriteria.map((item) => item.value).toList();
 
@@ -159,13 +181,34 @@ class FilterController extends GetxController {
         currentPage.value = response.currentPage;
         lastPage.value = response.lastPage;
         isLoadingListing.value = false;
-        print("Get more listings successfully");
-        Get.back(result: response.data);
+        Get.back(result: {"option": "success", "data": response.data});
       },
     );
   }
 
   void resetFilter() {
     Get.back(result: {"option": "clean"});
+  }
+
+  Future<bool> validateForm() async {
+    if (provinceCode.value.isEmpty ||
+        districtCode.value.isEmpty ||
+        wardCode.value.isEmpty) {
+      LoadingNotifier.showTopMessage(
+        "Vui lòng chọn đầy đủ Tỉnh/Quận/Huyện/Xã",
+        false,
+      );
+      return false;
+    }
+    if (controllerStreetName.text.trim().isEmpty) {
+      LoadingNotifier.showTopMessage("Vui lòng nhập tên đường", false);
+      return false;
+    }
+    if (controllerFullAddress.text.trim().isEmpty) {
+      LoadingNotifier.showTopMessage("Vui lòng nhập địa chỉ chi tiết", false);
+      return false;
+    }
+
+    return true;
   }
 }

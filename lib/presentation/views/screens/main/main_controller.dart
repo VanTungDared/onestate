@@ -248,8 +248,8 @@ class MainController extends GetxController {
       if (value != null) {
         if (value["option"] == "clean") {
           resetAllType();
-        } else if (value is List<ListingModel>) {
-          dataListings.assignAll(value);
+        } else if (value["data"] is List<ListingModel>) {
+          dataListings.assignAll(value["data"]);
         }
       }
     });
