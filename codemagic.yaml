@@ -19,7 +19,8 @@ workflows:
       - build/ios/ipa/*.ipa
     publishing:
       app_store_connect:
-        apple_id: $APPLE_ID
-        bundle_id: $BUNDLE_ID
-        submit_to_app_store: false
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        bundle_id: $APP_STORE_CONNECT_BUNDLE_ID
         submit_to_testflight: true
