@@ -6,10 +6,8 @@ workflows:
     environment:
       flutter: stable
       xcode: latest
-      vars:
-        APP_STORE_CONNECT_ISSUER_ID: Encrypted(...) # cấu hình trong Codemagic UI
-        APP_STORE_CONNECT_KEY_ID: Encrypted(...) # Key ID (10 ký tự)
-        APP_STORE_CONNECT_PRIVATE_KEY: Encrypted(...) # Nội dung file .p8
+      groups:
+        - onestate # <-- dùng nhóm biến môi trường bạn đã tạo trong Codemagic
     scripts:
       - name: Get dependencies
         script: flutter pub get
