@@ -1,15 +1,25 @@
 workflows:
-  ios-workflow:
-    name: iOS Build
-    max_build_duration: 60
+  ios-release:
+    name: iOS Release
     instance_type: mac_mini_m1
+    max_build_duration: 120
     environment:
       flutter: stable
       xcode: latest
+      vars:
+        APP_STORE_CONNECT_ISSUER_ID: Encrypted(...) # cấu hình trong Codemagic UI
+        APP_STORE_CONNECT_KEY_IDENTIFIER: Encrypted(...)
+        APP_STORE_CONNECT_PRIVATE_KEY: Encrypted(...)
     scripts:
       - name: Get dependencies
         script: flutter pub get
       - name: Build iOS
-        script: flutter build ios --release --no-codesign
+        script: flutter build ipa --release
     artifacts:
       - build/ios/ipa/*.ipa
+    publishing:
+    app_store_connect:
+      apple_id: $APPLE_ID
+      bundle_id: $BUNDLE_ID
+      submit_to_app_store: false
+      submit_to_testflight: true
