@@ -8,8 +8,8 @@ workflows:
       xcode: latest
       vars:
         APP_STORE_CONNECT_ISSUER_ID: Encrypted(...) # cấu hình trong Codemagic UI
-        APP_STORE_CONNECT_KEY_IDENTIFIER: Encrypted(...)
-        APP_STORE_CONNECT_PRIVATE_KEY: Encrypted(...)
+        APP_STORE_CONNECT_KEY_ID: Encrypted(...) # Key ID (10 ký tự)
+        APP_STORE_CONNECT_PRIVATE_KEY: Encrypted(...) # Nội dung file .p8
     scripts:
       - name: Get dependencies
         script: flutter pub get
@@ -19,6 +19,7 @@ workflows:
       - build/ios/ipa/*.ipa
     publishing:
       app_store_connect:
-        api_key: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        key_id: $APP_STORE_CONNECT_KEY_ID
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         private_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        submit_to_testflight: true
