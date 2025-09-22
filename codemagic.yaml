@@ -7,7 +7,7 @@ workflows:
       flutter: stable
       xcode: latest
       groups:
-        - onestate # <-- dùng nhóm biến môi trường bạn đã tạo trong Codemagic
+        - onestate # <-- nhóm biến môi trường bạn đã tạo
     scripts:
       - name: Get dependencies
         script: flutter pub get
@@ -19,5 +19,5 @@ workflows:
       app_store_connect:
         key_id: $APP_STORE_CONNECT_KEY_ID
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        private_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        api_key: $APP_STORE_CONNECT_API_KEY # <- thay private_key bằng api_key
         submit_to_testflight: true
