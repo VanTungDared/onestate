@@ -7,13 +7,14 @@ workflows:
       flutter: stable
       xcode: latest
       groups:
-        - onestate # <-- nhóm biến môi trường bạn đã tạo
-    code_signing:
-      certificates:
-        - onestate # tên certificate trong Codemagic UI
-      provisioning_profiles:
         - onestate
     scripts:
+      - name: Set up code signing
+        script: |
+          echo $CERTIFICATE_P12 | base64 --decode > /tmp/certificate.p12
+          echo $PROVISIONING_PROFILE | base64 --decode > /tmp/profile.mobileprovision
+          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password $CERTIFICATE_PASSWORD
+          xcode-project use-profiles --profile /tmp/profile.mobileprovision
       - name: Get dependencies
         script: flutter pub get
       - name: Build iOS
@@ -24,5 +25,5 @@ workflows:
       app_store_connect:
         key_id: $APP_STORE_CONNECT_KEY_ID
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        api_key: $APP_STORE_CONNECT_API_KEY # <- thay private_key bằng api_key
+        api_key: $APP_STORE_CONNECT_API_KEY
         submit_to_testflight: true
