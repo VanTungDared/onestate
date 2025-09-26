@@ -5,9 +5,9 @@ use_frameworks!
 use_modular_headers!
 
 target 'Runner' do
-  use_frameworks!
-  use_modular_headers!
-
   flutter_application_path = '../'
-  eval(File.read(File.join(flutter_application_path, '.flutter-plugins-dependencies')))
+  eval(File.read(File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')), binding)
+
+  # Thêm Google Maps
+  pod 'GoogleMaps'
 end
