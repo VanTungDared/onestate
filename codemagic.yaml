@@ -8,6 +8,11 @@ workflows:
       xcode: latest
       groups:
         - onestate # <-- nhóm biến môi trường bạn đã tạo
+    code_signing:
+      certificates:
+        - onestate # tên certificate trong Codemagic UI
+      provisioning_profiles:
+        - onestate
     scripts:
       - name: Get dependencies
         script: flutter pub get
