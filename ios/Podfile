@@ -1,4 +1,3 @@
-# Uncomment this line to define a global platform for your project
 platform :ios, '14.0'
 
 use_frameworks!
@@ -6,8 +5,8 @@ use_modular_headers!
 
 target 'Runner' do
   flutter_application_path = '../'
-  eval(File.read(File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')), binding)
+  eval(File.read(File.join(flutter_application_path, 'Flutter', 'podhelper.rb')), binding)
 
-  # Thêm Google Maps
+  # Thêm Google Maps SDK
   pod 'GoogleMaps'
 end
