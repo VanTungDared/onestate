@@ -15,10 +15,18 @@ workflows:
           echo $PROVISIONING_PROFILE | base64 --decode > /tmp/profile.mobileprovision
           keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password $CERTIFICATE_PASSWORD
           xcode-project use-profiles --profile /tmp/profile.mobileprovision
+
       - name: Get dependencies
         script: flutter pub get
-      - name: Build iOS
+
+      # Thêm bước build iOS trước để tạo podhelper.rb
+      - name: Pre-build iOS
+        script: |
+          flutter build ios --no-codesign
+
+      - name: Build iOS IPA
         script: flutter build ipa --release
+
     artifacts:
       - build/ios/ipa/*.ipa
     publishing:
