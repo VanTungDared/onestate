@@ -1,37 +1,5 @@
-# Đặt platform iOS tối thiểu
 platform :ios, '14.0'
 
-# Tắt CocoaPods analytics để build nhanh hơn
-ENV['COCOAPODS_DISABLE_STATS'] = 'true'
-
-project 'Runner', {
-  'Debug' => :debug,
-  'Profile' => :release,
-  'Release' => :release,
-}
-
-# Đường dẫn đến root project, dùng __dir__ cho ổn định
-flutter_application_path = File.expand_path('..', __dir__)
-load File.join(flutter_application_path, 'ios', 'Flutter', 'podhelper.rb')
-
 target 'Runner' do
-  use_frameworks!      # Required cho một số plugin
-  use_modular_headers!  # Modular headers giúp tránh lỗi dependency
-
-  # Pods cho Flutter plugin sẽ được podhelper.rb thêm tự động
-  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-end
-
-post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    flutter_additional_ios_build_settings(target)
-
-    # Bắt buộc Swift 5 nếu có plugin Swift
-    target.build_configurations.each do |config|
-      config.build_settings['SWIFT_VERSION'] = '5.0'
-
-      # Fix lỗi M1/M2 simulator (arm64)
-      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
-    end
-  end
+  use_frameworks!
 end
