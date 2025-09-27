@@ -19,6 +19,9 @@ workflows:
       - name: Get Flutter dependencies
         script: flutter pub get
 
+      - name: Pre-build iOS (tạo symlinks plugin)
+        script: flutter build ios --no-codesign
+
       - name: Pod install
         script: |
           cd ios
