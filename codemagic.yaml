@@ -22,7 +22,7 @@ workflows:
         script: |
           flutter build ipa \
             --release \
-            -t lib/main_dev.dart \
+            -t lib/main.dart \
             --export-options-plist=ExportOptions.plist
 
     artifacts:
