@@ -1,31 +1,25 @@
-# ios/Podfile
-
 platform :ios, '14.0'
 
-ENV['COCOAPODS_DISABLE_STATS'] = 'true'
-
-project 'Runner', {
-  'Debug' => :debug,
-  'Profile' => :release,
-  'Release' => :release,
-}
+use_frameworks!
+use_modular_headers!
 
 target 'Runner' do
-  use_frameworks!       # Bắt buộc cho Swift module như GoogleMaps
-  use_modular_headers!   # Giúp Swift/ObjC plugin tương thích
+  # Google Maps plugin
+  pod 'GoogleMaps', '~> 7.0'
 
-  # Cài tất cả pods của plugin Flutter tự động
-  flutter_install_all_ios_pods(File.dirname(File.realpath(__FILE__)))
+  # flutter_image_compress plugin
+  pod 'flutter_image_compress', :path => '../.symlinks/plugins/flutter_image_compress/ios'
+  pod 'flutter_image_compress_common', :path => '../.symlinks/plugins/flutter_image_compress/ios'
+
+  # Thêm các plugin khác tương tự, ví dụ:
+  # pod 'firebase_core', :path => '../.symlinks/plugins/firebase_core/ios'
 end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
-    flutter_additional_ios_build_settings(target)
-
     target.build_configurations.each do |config|
       # Swift 5
       config.build_settings['SWIFT_VERSION'] = '5.0'
-
       # Fix M1/M2 simulator
       config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
     end

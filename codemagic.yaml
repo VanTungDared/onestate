@@ -19,10 +19,12 @@ workflows:
       - name: Get Flutter dependencies
         script: flutter pub get
 
-      - name: Precache iOS
-        script: flutter precache --ios
+      - name: Pod install
+        script: |
+          cd ios
+          pod install --repo-update
 
-      - name: Build IPA (Release)
+      - name: Build IPA
         script: flutter build ipa --release
 
     artifacts:
