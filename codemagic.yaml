@@ -6,6 +6,9 @@ workflows:
     environment:
       flutter: stable
       xcode: latest
+      vars:
+        DEVELOPMENT_TEAM: "QM93WQYMPM"
+        PROVISIONING_PROFILE: "onpos"
       groups:
         - onestate
     scripts:
