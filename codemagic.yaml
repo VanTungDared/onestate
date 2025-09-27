@@ -23,7 +23,7 @@ workflows:
           flutter build ipa \
             --release \
             -t lib/main.dart \
-            --export-options-plist=ExportOptions.plist
+            --export-options-plist=ios/ExportOptions.plist
 
     artifacts:
       - build/ios/ipa/*.ipa
