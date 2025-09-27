@@ -18,6 +18,9 @@ workflows:
 
       - name: Get dependencies
         script: flutter pub get
+      - name: Pre-build iOS for Pods
+        script: |
+          flutter precache --ios
 
       # Thêm bước build iOS trước để tạo podhelper.rb
       - name: Pre-build iOS
