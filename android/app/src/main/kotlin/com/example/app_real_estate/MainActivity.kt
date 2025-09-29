@@ -1,4 +1,4 @@
-package com.example.app_real_estate
+package com.ontik.onestate
 
 import io.flutter.embedding.android.FlutterActivity
 

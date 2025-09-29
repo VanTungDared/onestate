@@ -5,7 +5,6 @@ import '../../../data/datasources/dblocal/shared_preferences.dart';
 import '../../routers/routerName.dart';
 
 class AppController extends GetxController {
-
   static Future<void> init() async {
     await AppTranslations.loadTranslations();
     await SharedPreferenceApp.init();
