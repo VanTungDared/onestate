@@ -41,7 +41,6 @@ workflows:
           flutter build ipa \
             --release \
             -t $ENTRY_POINT \
-            --export-method $EXPORT_METHOD \
             --export-options-plist=/Users/builder/export_options.plist
 
       - name: 🧾 Fix Export Options
