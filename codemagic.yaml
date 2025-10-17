@@ -18,12 +18,19 @@ workflows:
       - name: Get dependencies
         script: |
           flutter pub get
-      - name: Build IPA Dev
+      - name: Build IPA for App Store
         script: |
+          app-store-connect fetch-signing-files \
+            "com.ontik.onestate" \
+            --type IOS_APP_STORE \
+            --create
+
+          keychain add-certificates
+          xcode-project use-profiles
+
           flutter build ipa \
             --release \
-            -t lib/main.dart \
-            --export-options-plist=ios/ExportOptions.plist
+            -t lib/main.dart
 
     artifacts:
       - build/ios/ipa/*.ipa
