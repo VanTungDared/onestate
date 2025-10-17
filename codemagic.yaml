@@ -13,7 +13,6 @@ workflows:
         BUNDLE_ID: "com.ontik.onestate"
         TEAM_ID: "QM93WQYMPM" # 🔹 Thay bằng team ID chính xác của bạn
         ENTRY_POINT: "lib/main.dart"
-        EXPORT_METHOD: "app-store"
 
     scripts:
       - name: 🔐 Decode & Import Certificates
