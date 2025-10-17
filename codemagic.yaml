@@ -1,32 +1,56 @@
 workflows:
   ios-release:
-    name: iOS Release
+    name: iOS Release (App Store)
     instance_type: mac_mini_m1
     max_build_duration: 120
+
     environment:
       flutter: stable
       xcode: latest
       groups:
         - onestate
+      vars:
+        BUNDLE_ID: "com.ontik.onestate"
+        ENTRY_POINT: "lib/main.dart"
+        EXPORT_METHOD: "app-store"
+
     scripts:
-      - name: Set up code signing
+      - name: 🔐 Decode & Import Signing Files
         script: |
-          echo $CERTIFICATE_P12 | base64 --decode > /tmp/certificate.p12
-          echo $PROVISIONING_PROFILE | base64 --decode > /tmp/profile.mobileprovision
-          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password $CERTIFICATE_PASSWORD
+          echo "🔽 Decoding certificate & provisioning profile..."
+          echo "$CERTIFICATE_P12" | base64 --decode > /tmp/certificate.p12
+          echo "$PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
+
+          echo "🔑 Importing certificate into keychain..."
+          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password "$CERTIFICATE_PASSWORD"
+
+          echo "📄 Applying provisioning profile..."
           xcode-project use-profiles --profile /tmp/profile.mobileprovision
-      - name: Get dependencies
+
+          echo "✅ Code signing setup complete."
+
+      - name: 📦 Get Flutter Dependencies
         script: |
+          flutter clean
           flutter pub get
-      - name: Build IPA for App Store
+
+      - name: 🏗️ Build IPA (App Store)
         script: |
+          echo "🚀 Building release IPA for App Store..."
           flutter build ipa \
             --release \
-            -t lib/main.dart \
-            --export-method app-store
+            -t $ENTRY_POINT \
+            --export-method $EXPORT_METHOD
+
+      - name: 🧾 Verify Build Output
+        script: |
+          echo "📁 Checking build output..."
+          ls -lh build/ios/ipa || echo "⚠️ IPA file not found!"
+          ls -lh build/ios/archive || echo "⚠️ Archive folder missing!"
 
     artifacts:
       - build/ios/ipa/*.ipa
+      - build/ios/archive/*.xcarchive
 
     publishing:
       app_store_connect:
@@ -34,3 +58,4 @@ workflows:
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         api_key: $APP_STORE_CONNECT_API_KEY
         submit_to_testflight: true
+        submit_to_app_store: false
