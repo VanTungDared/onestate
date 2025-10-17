@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../core/utils/image_utils.dart';
 import '../../controllers/real_estate_post_controller.dart';
@@ -851,168 +851,168 @@ class RealEstateFormScreen extends StatelessWidget {
               ),
             ),
             SizedBox(width: 4.w),
-            Expanded(
-              child: PrimaryButton(
-                text: "Chọn",
-                onPressed: () async {
-                  final url = urlController.text.trim();
-                  final latLng = _extractLatLngFromUrl(url);
-                  if (latLng != null) {
-                    controller.mapLatLng.value = latLng;
+            // Expanded(
+            //   child: PrimaryButton(
+            //     text: "Chọn",
+            //     onPressed: () async {
+            //       final url = urlController.text.trim();
+            //       final latLng = _extractLatLngFromUrl(url);
+            //       if (latLng != null) {
+            //         controller.mapLatLng.value = latLng;
 
-                    // Di chuyển camera
-                    final googleMapController =
-                        await controller.mapController.future;
-                    googleMapController.animateCamera(
-                      CameraUpdate.newCameraPosition(
-                        CameraPosition(target: latLng, zoom: 16),
-                      ),
-                    );
-                  } else {
-                    LoadingNotifier.showTopMessage(
-                      "Không lấy được tọa độ từ URL",
-                      false,
-                    );
-                  }
-                },
-                height: 32.h,
-                borderRadius: 8,
-              ),
-            ),
+            //         // Di chuyển camera
+            //         final googleMapController =
+            //             await controller.mapController.future;
+            //         googleMapController.animateCamera(
+            //           CameraUpdate.newCameraPosition(
+            //             CameraPosition(target: latLng, zoom: 16),
+            //           ),
+            //         );
+            //       } else {
+            //         LoadingNotifier.showTopMessage(
+            //           "Không lấy được tọa độ từ URL",
+            //           false,
+            //         );
+            //       }
+            //     },
+            //     height: 32.h,
+            //     borderRadius: 8,
+            //   ),
+            // ),
           ],
         ),
 
         const SizedBox(height: 8),
 
         // Bản đồ
-        Container(
-          height: 250,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
-          ),
-          child: Listener(
-            onPointerDown: (_) => controller.isMapInteracting.value = true,
-            onPointerUp: (_) => controller.isMapInteracting.value = false,
-            child: GoogleMap(
-              onMapCreated: (GoogleMapController controllerGoogle) {
-                controller.mapController.complete(controllerGoogle);
-              },
-              initialCameraPosition: CameraPosition(
-                target:
-                    controller.mapLatLng.value ?? LatLng(10.762622, 106.660172),
-                zoom: 16,
-              ),
-              onTap: (LatLng pos) {
-                controller.mapLatLng.value = pos;
-              },
-              markers:
-                  controller.mapLatLng.value == null
-                      ? {}
-                      : {
-                        Marker(
-                          markerId: MarkerId('selected'),
-                          position: controller.mapLatLng.value!,
-                        ),
-                      },
-              zoomControlsEnabled: true,
-              compassEnabled: true,
-              myLocationEnabled: true,
-              mapToolbarEnabled: true,
-              scrollGesturesEnabled: true,
-              tiltGesturesEnabled: true,
-              rotateGesturesEnabled: true,
-            ),
-          ),
-        ),
+        // Container(
+        //   height: 250,
+        //   decoration: BoxDecoration(
+        //     border: Border.all(color: Colors.grey.shade300),
+        //   ),
+        //   child: Listener(
+        //     onPointerDown: (_) => controller.isMapInteracting.value = true,
+        //     onPointerUp: (_) => controller.isMapInteracting.value = false,
+        //     child: GoogleMap(
+        //       onMapCreated: (GoogleMapController controllerGoogle) {
+        //         controller.mapController.complete(controllerGoogle);
+        //       },
+        //       initialCameraPosition: CameraPosition(
+        //         target:
+        //             controller.mapLatLng.value ?? LatLng(10.762622, 106.660172),
+        //         zoom: 16,
+        //       ),
+        //       onTap: (LatLng pos) {
+        //         controller.mapLatLng.value = pos;
+        //       },
+        //       markers:
+        //           controller.mapLatLng.value == null
+        //               ? {}
+        //               : {
+        //                 Marker(
+        //                   markerId: MarkerId('selected'),
+        //                   position: controller.mapLatLng.value!,
+        //                 ),
+        //               },
+        //       zoomControlsEnabled: true,
+        //       compassEnabled: true,
+        //       myLocationEnabled: true,
+        //       mapToolbarEnabled: true,
+        //       scrollGesturesEnabled: true,
+        //       tiltGesturesEnabled: true,
+        //       rotateGesturesEnabled: true,
+        //     ),
+        //   ),
+        // ),
         const SizedBox(height: 8),
 
         // Hiển thị tọa độ
-        Obx(() {
-          if (controller.mapLatLng.value == null) {
-            return Text("Chưa chọn vị trí");
-          } else {
-            final lat = controller.mapLatLng.value!.latitude.toStringAsFixed(6);
-            final lng = controller.mapLatLng.value!.longitude.toStringAsFixed(
-              6,
-            );
-            return Text("Tọa độ đã chọn: $lat, $lng");
-          }
-        }),
+        // Obx(() {
+        //   if (controller.mapLatLng.value == null) {
+        //     return Text("Chưa chọn vị trí");
+        //   } else {
+        //     final lat = controller.mapLatLng.value!.latitude.toStringAsFixed(6);
+        //     final lng = controller.mapLatLng.value!.longitude.toStringAsFixed(
+        //       6,
+        //     );
+        //     return Text("Tọa độ đã chọn: $lat, $lng");
+        //   }
+        // }),
       ],
     );
   }
 
-  LatLng? _extractLatLngFromUrl(String url) {
-    if (url.trim().isEmpty) return null;
-    final decoded = Uri.decodeFull(url);
+  // LatLng? _extractLatLngFromUrl(String url) {
+  //   if (url.trim().isEmpty) return null;
+  //   final decoded = Uri.decodeFull(url);
 
-    // 1) !3d{lat}!4d{lng} (thường là toạ độ chính xác của marker)
-    final reg34 = RegExp(r'!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)');
-    final m34 = reg34.firstMatch(decoded);
-    if (m34 != null) {
-      final lat = double.tryParse(m34.group(1)!);
-      final lng = double.tryParse(m34.group(2)!);
-      if (lat != null && lng != null) return LatLng(lat, lng);
-    }
+  //   // 1) !3d{lat}!4d{lng} (thường là toạ độ chính xác của marker)
+  //   final reg34 = RegExp(r'!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)');
+  //   final m34 = reg34.firstMatch(decoded);
+  //   if (m34 != null) {
+  //     final lat = double.tryParse(m34.group(1)!);
+  //     final lng = double.tryParse(m34.group(2)!);
+  //     if (lat != null && lng != null) return LatLng(lat, lng);
+  //   }
 
-    // 2) @lat,lng,...
-    final regAt = RegExp(r'@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)(?:,|$)');
-    final mAt = regAt.firstMatch(decoded);
-    if (mAt != null) {
-      final lat = double.tryParse(mAt.group(1)!);
-      final lng = double.tryParse(mAt.group(2)!);
-      if (lat != null && lng != null) return LatLng(lat, lng);
-    }
+  //   // 2) @lat,lng,...
+  //   final regAt = RegExp(r'@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)(?:,|$)');
+  //   final mAt = regAt.firstMatch(decoded);
+  //   if (mAt != null) {
+  //     final lat = double.tryParse(mAt.group(1)!);
+  //     final lng = double.tryParse(mAt.group(2)!);
+  //     if (lat != null && lng != null) return LatLng(lat, lng);
+  //   }
 
-    // 3) ?q=lat,lng or &q=lat,lng
-    final regQ = RegExp(r'[?&]q=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)');
-    final mQ = regQ.firstMatch(decoded);
-    if (mQ != null) {
-      final lat = double.tryParse(mQ.group(1)!);
-      final lng = double.tryParse(mQ.group(2)!);
-      if (lat != null && lng != null) return LatLng(lat, lng);
-    }
+  //   // 3) ?q=lat,lng or &q=lat,lng
+  //   final regQ = RegExp(r'[?&]q=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)');
+  //   final mQ = regQ.firstMatch(decoded);
+  //   if (mQ != null) {
+  //     final lat = double.tryParse(mQ.group(1)!);
+  //     final lng = double.tryParse(mQ.group(2)!);
+  //     if (lat != null && lng != null) return LatLng(lat, lng);
+  //   }
 
-    // 4) DMS pattern: ví dụ 21°04'04.5"N 105°46'26.5"E  (hỗ trợ dấu Unicode và phân cách +, space, comma)
-    final regDMS = RegExp(
-      r'''([+-]?\d{1,3})[°\s]+(\d{1,2})['’\s]+(\d{1,2}(?:\.\d+)?)(?:["”])?\s*([NSns])[\s\+,]+([+-]?\d{1,3})[°\s]+(\d{1,2})['’\s]+(\d{1,2}(?:\.\d+)?)(?:["”])?\s*([EWew])''',
-    );
-    final mDMS = regDMS.firstMatch(decoded);
-    if (mDMS != null) {
-      double dmsToDec(String deg, String min, String sec, String hemi) {
-        final dd = double.parse(deg);
-        final mm = double.parse(min);
-        final ss = double.parse(sec);
-        var val = dd + mm / 60 + ss / 3600;
-        final h = hemi.toUpperCase();
-        if (h == 'S' || h == 'W') val = -val;
-        return val;
-      }
+  //   // 4) DMS pattern: ví dụ 21°04'04.5"N 105°46'26.5"E  (hỗ trợ dấu Unicode và phân cách +, space, comma)
+  //   final regDMS = RegExp(
+  //     r'''([+-]?\d{1,3})[°\s]+(\d{1,2})['’\s]+(\d{1,2}(?:\.\d+)?)(?:["”])?\s*([NSns])[\s\+,]+([+-]?\d{1,3})[°\s]+(\d{1,2})['’\s]+(\d{1,2}(?:\.\d+)?)(?:["”])?\s*([EWew])''',
+  //   );
+  //   final mDMS = regDMS.firstMatch(decoded);
+  //   if (mDMS != null) {
+  //     double dmsToDec(String deg, String min, String sec, String hemi) {
+  //       final dd = double.parse(deg);
+  //       final mm = double.parse(min);
+  //       final ss = double.parse(sec);
+  //       var val = dd + mm / 60 + ss / 3600;
+  //       final h = hemi.toUpperCase();
+  //       if (h == 'S' || h == 'W') val = -val;
+  //       return val;
+  //     }
 
-      final lat = dmsToDec(
-        mDMS.group(1)!,
-        mDMS.group(2)!,
-        mDMS.group(3)!,
-        mDMS.group(4)!,
-      );
-      final lng = dmsToDec(
-        mDMS.group(5)!,
-        mDMS.group(6)!,
-        mDMS.group(7)!,
-        mDMS.group(8)!,
-      );
-      return LatLng(lat, lng);
-    }
+  //     final lat = dmsToDec(
+  //       mDMS.group(1)!,
+  //       mDMS.group(2)!,
+  //       mDMS.group(3)!,
+  //       mDMS.group(4)!,
+  //     );
+  //     final lng = dmsToDec(
+  //       mDMS.group(5)!,
+  //       mDMS.group(6)!,
+  //       mDMS.group(7)!,
+  //       mDMS.group(8)!,
+  //     );
+  //     return LatLng(lat, lng);
+  //   }
 
-    // 5) Fallback: bất kỳ cặp số thập phân "lat,lng"
-    final regAny = RegExp(r'(-?\d{1,3}\.\d+),\s*(-?\d{1,3}\.\d+)');
-    final mAny = regAny.firstMatch(decoded);
-    if (mAny != null) {
-      final lat = double.tryParse(mAny.group(1)!);
-      final lng = double.tryParse(mAny.group(2)!);
-      if (lat != null && lng != null) return LatLng(lat, lng);
-    }
+  //   // 5) Fallback: bất kỳ cặp số thập phân "lat,lng"
+  //   final regAny = RegExp(r'(-?\d{1,3}\.\d+),\s*(-?\d{1,3}\.\d+)');
+  //   final mAny = regAny.firstMatch(decoded);
+  //   if (mAny != null) {
+  //     final lat = double.tryParse(mAny.group(1)!);
+  //     final lng = double.tryParse(mAny.group(2)!);
+  //     if (lat != null && lng != null) return LatLng(lat, lng);
+  //   }
 
-    return null;
-  }
+  //   return null;
+  // }
 }

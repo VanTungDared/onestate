@@ -11,7 +11,7 @@ import 'package:app_real_estate/data/models/ward.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -53,7 +53,7 @@ class RealEstatePostController extends GetxController {
   var renderImageLegal = 0.obs;
   var legalDocumentsSeri = ''.obs;
 
-  var mapLatLng = Rxn<LatLng>(); // ví dụ: LatLng(10.762622, 106.660172)
+  // var mapLatLng = Rxn<LatLng>(); // ví dụ: LatLng(10.762622, 106.660172)
 
   final ApiMethod apiMethod = ApiMethod();
 
@@ -106,7 +106,7 @@ class RealEstatePostController extends GetxController {
 
   final Rxn<UserModel> userModel = Rxn<UserModel>();
 
-  final mapController = Completer<GoogleMapController>();
+  // final mapController = Completer<GoogleMapController>();
 
   final imagesUrl = <OptionModel>[].obs;
   final imagesLegalUrl = <OptionModel>[].obs;
@@ -316,7 +316,7 @@ class RealEstatePostController extends GetxController {
     renderImage.value = 0;
     renderImageLegal.value = 0;
     legalDocumentsSeri.value = '';
-    mapLatLng.value = null;
+    // mapLatLng.value = null;
 
     super.onClose();
   }
@@ -453,8 +453,8 @@ class RealEstatePostController extends GetxController {
         "description": controllerDescription.text.trim(),
         "imageUrls": imagesUrlFinal,
         "tags": tags,
-        "latitude": mapLatLng.value?.latitude,
-        "longitude": mapLatLng.value?.longitude,
+        // "latitude": mapLatLng.value?.latitude,
+        // "longitude": mapLatLng.value?.longitude,
         "streetName": controllerStreetName.text.trim(),
         "legalStatus": "has_certificate", // default
         "landCertificate": {
