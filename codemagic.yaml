@@ -25,15 +25,16 @@ workflows:
           flutter clean
           flutter pub get
 
-      - name: 🏗️ Build IPA for App Store
+      - name: 🏗️ Build IPA (Manual Signing)
         script: |
-          echo "🚀 Building IPA..."
-          flutter build ipa \
-            --release \
-            -t $ENTRY_POINT \
-            --build-name=1.0.0 \
-            --build-number=1 \
-            --export-method app-store
+          echo "🚀 Building IPA with manual signing..."
+          xcode-project build-ipa \
+            --workspace ios/Runner.xcworkspace \
+            --scheme Runner \
+            --team-id $TEAM_ID \
+            --bundle-id $BUNDLE_ID \
+            --export-method app-store \
+            --provisioning-profile onestate_profile.mobileprovision
 
       - name: 🧾 Verify Output
         script: |
