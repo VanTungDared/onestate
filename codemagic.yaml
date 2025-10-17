@@ -9,24 +9,22 @@ workflows:
       groups:
         - onestate
     scripts:
-      - name: Fetch and configure signing
+      - name: Set up code signing
         script: |
-          app-store-connect fetch-signing-files \
-            "com.ontik.onestate" \
-            --type IOS_APP_STORE \
-            --create
-
-          keychain add-certificates
-          xcode-project use-profiles
-
-      - name: Get Flutter dependencies
-        script: flutter pub get
-
-      - name: Build iOS IPA
+          echo $CERTIFICATE_P12 | base64 --decode > /tmp/certificate.p12
+          echo $PROVISIONING_PROFILE | base64 --decode > /tmp/profile.mobileprovision
+          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password $CERTIFICATE_PASSWORD
+          xcode-project use-profiles --profile /tmp/profile.mobileprovision
+      - name: Get dependencies
+        script: |
+          flutter pub get
+      - name: Build IPA for App Store
         script: |
           flutter build ipa \
             --release \
-            -t lib/main.dart
+            -t lib/main.dart \
+            --export-method app-store \
+            --no-codesign
 
     artifacts:
       - build/ios/ipa/*.ipa
