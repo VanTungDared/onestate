@@ -1,6 +1,6 @@
 workflows:
   ios-release:
-    name: iOS Release (App Store)
+    name: iOS Release (Fix Team ID)
     instance_type: mac_mini_m1
     max_build_duration: 120
 
@@ -11,13 +11,14 @@ workflows:
         - onestate
       vars:
         BUNDLE_ID: "com.ontik.onestate"
+        TEAM_ID: "QM93WQYMPM" # 🔹 Thay bằng team ID chính xác của bạn
         ENTRY_POINT: "lib/main.dart"
         EXPORT_METHOD: "app-store"
 
     scripts:
-      - name: 🔐 Decode & Import Signing Files
+      - name: 🔐 Decode & Import Certificates
         script: |
-          echo "🔽 Decoding certificate & provisioning profile..."
+          echo "🔽 Decode certificate & provisioning profile..."
           echo "$CERTIFICATE_P12" | base64 --decode > /tmp/certificate.p12
           echo "$PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
 
@@ -29,18 +30,50 @@ workflows:
 
           echo "✅ Code signing setup complete."
 
-      - name: 📦 Get Flutter Dependencies
+      - name: 📦 Get dependencies
         script: |
           flutter clean
           flutter pub get
 
-      - name: 🏗️ Build IPA (App Store)
+      - name: 🏗️ Build IPA (Force Team ID)
         script: |
           echo "🚀 Building release IPA for App Store..."
           flutter build ipa \
             --release \
             -t $ENTRY_POINT \
-            --export-method $EXPORT_METHOD
+            --export-method $EXPORT_METHOD \
+            --export-options-plist=/Users/builder/export_options.plist
+
+      - name: 🧾 Fix Export Options
+        script: |
+          echo "🧩 Regenerating export options plist with correct Team ID..."
+          cat <<EOF > /Users/builder/export_options.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>teamID</key>
+            <string>${TEAM_ID}</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>${BUNDLE_ID}</key>
+              <string>onestate</string>
+            </dict>
+            <key>compileBitcode</key>
+            <false/>
+            <key>stripSwiftSymbols</key>
+            <true/>
+            <key>uploadBitcode</key>
+            <false/>
+          </dict>
+          </plist>
+          EOF
+
+          echo "✅ Export options created successfully"
 
       - name: 🧾 Verify Build Output
         script: |
@@ -58,4 +91,3 @@ workflows:
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         api_key: $APP_STORE_CONNECT_API_KEY
         submit_to_testflight: true
-        submit_to_app_store: false
