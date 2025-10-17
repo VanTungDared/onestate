@@ -15,10 +15,10 @@ workflows:
         ENTRY_POINT: "lib/main.dart"
 
       ios_signing:
-      provisioning_profiles:
-        com.ontik.onestate: onestate
-      certificates:
-        - onestate
+        provisioning_profiles:
+          com.ontik.onestate: onestate
+        certificates:
+          - onestate
 
     scripts:
       - name: 🔐 Setup Code Signing
