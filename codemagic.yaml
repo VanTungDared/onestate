@@ -27,14 +27,12 @@ workflows:
 
       - name: 🏗️ Build IPA (Manual Signing)
         script: |
-          echo "🚀 Building IPA with manual signing..."
+          echo "🚀 Building IPA for App Store using Codemagic Xcode helper..."
           xcode-project build-ipa \
             --workspace ios/Runner.xcworkspace \
             --scheme Runner \
-            --team-id $TEAM_ID \
-            --bundle-id $BUNDLE_ID \
-            --export-method app-store \
-            --provisioning-profile onestate_profile.mobileprovision
+            --archive-path build/ios/archive/Runner.xcarchive \
+            --export-method app-store
 
       - name: 🧾 Verify Output
         script: |
