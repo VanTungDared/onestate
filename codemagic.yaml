@@ -1,6 +1,6 @@
 workflows:
   ios-release:
-    name: iOS Release (Fix Team ID)
+    name: 🚀 iOS Release (App Store)
     instance_type: mac_mini_m1
     max_build_duration: 120
 
@@ -11,40 +11,29 @@ workflows:
         - onestate
       vars:
         BUNDLE_ID: "com.ontik.onestate"
-        TEAM_ID: "QM93WQYMPM" # 🔹 Thay bằng team ID chính xác của bạn
+        TEAM_ID: "QM93WQYMPM"
         ENTRY_POINT: "lib/main.dart"
 
+      ios_signing:
+        provisioning_profile:
+          - onestate
+        certificates:
+          - onestate
+
     scripts:
-      - name: 🔐 Decode & Import Certificates
+      - name: 🔐 Setup Code Signing
         script: |
-          echo "🔽 Decode certificate & provisioning profile..."
+          echo "🔑 Importing certificate & provisioning profile..."
           echo "$CERTIFICATE_P12" | base64 --decode > /tmp/certificate.p12
           echo "$PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
 
-          echo "🔑 Importing certificate into keychain..."
           keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password "$CERTIFICATE_PASSWORD"
+          xcode-project use-profiles --profile /tmp/profile.mobileprovision --team-id "$TEAM_ID"
+          echo "✅ Code signing setup completed."
 
-          echo "📄 Applying provisioning profile..."
-          xcode-project use-profiles --profile /tmp/profile.mobileprovision
-
-          echo "✅ Code signing setup complete."
-
-      - name: 📦 Get dependencies
+      - name: 🧩 Generate Export Options
         script: |
-          flutter clean
-          flutter pub get
-
-      - name: 🏗️ Build IPA (Force Team ID)
-        script: |
-          echo "🚀 Building release IPA for App Store..."
-          flutter build ipa \
-            --release \
-            -t $ENTRY_POINT \
-            --export-options-plist=/Users/builder/export_options.plist
-
-      - name: 🧾 Fix Export Options
-        script: |
-          echo "🧩 Regenerating export options plist with correct Team ID..."
+          echo "🧾 Creating export options plist..."
           cat <<EOF > /Users/builder/export_options.plist
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -70,13 +59,26 @@ workflows:
           </dict>
           </plist>
           EOF
+          echo "✅ Export options plist created."
 
-          echo "✅ Export options created successfully"
+      - name: 📦 Get Dependencies
+        script: |
+          flutter clean
+          flutter pub get
 
-      - name: 🧾 Verify Build Output
+      - name: 🏗️ Build IPA
+        script: |
+          echo "🚀 Building release IPA for App Store..."
+          flutter build ipa \
+            --release \
+            -t $ENTRY_POINT \
+            --export-options-plist=/Users/builder/export_options.plist
+          echo "✅ IPA build finished."
+
+      - name: 🧾 Verify Output
         script: |
           echo "📁 Checking build output..."
-          ls -lh build/ios/ipa || echo "⚠️ IPA file not found!"
+          ls -lh build/ios/ipa || echo "⚠️ IPA folder missing!"
           ls -lh build/ios/archive || echo "⚠️ Archive folder missing!"
 
     artifacts:
