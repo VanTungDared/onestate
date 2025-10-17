@@ -1,7 +1,8 @@
 workflows:
-  ios-adhoc:
-    name: iOS AdHoc Build
+  ios-release:
+    name: 🚀 iOS Release Build
     instance_type: mac_mini_m1
+    max_build_duration: 120
 
     environment:
       flutter: stable
@@ -10,7 +11,6 @@ workflows:
         - onestate
       vars:
         BUNDLE_ID: "com.ontik.onestate"
-        TEAM_ID: "QM93WQYMPM"
 
       ios_signing:
         certificates:
@@ -19,18 +19,38 @@ workflows:
           - onestate
 
     scripts:
-      - name: Setup signing
+      - name: 🔐 Setup Code Signing
         script: |
+          echo "🔑 Importing certificate & provisioning profile..."
           echo "$CERTIFICATE_P12" | base64 --decode > /tmp/cert.p12
           echo "$PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
-          keychain add-certificates --certificate /tmp/cert.p12 --certificate-password "$CERTIFICATE_PASSWORD"
-          xcode-project use-profiles --profile /tmp/profile.mobileprovision --team-id "$TEAM_ID"
 
-      - name: Build IPA (ad-hoc)
+          # Import certificate into Codemagic keychain
+          keychain add-certificates --certificate /tmp/cert.p12 --certificate-password "$CERTIFICATE_PASSWORD"
+
+          # Install provisioning profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" /tmp/profile.mobileprovision)
+          cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
+
+          echo "✅ Code signing setup completed."
+
+      - name: 📦 Get Dependencies
         script: |
           flutter clean
           flutter pub get
-          flutter build ipa --release --export-method ad-hoc
+
+      - name: 🧩 Build iOS Release IPA
+        script: |
+          echo "🚀 Building IPA (Release)..."
+          flutter build ipa --release --export-method app-store
+          echo "✅ IPA build finished."
+
+      - name: 🧾 Verify Output
+        script: |
+          echo "📁 Checking build output..."
+          ls -lh build/ios/ipa || echo "⚠️ IPA folder missing!"
 
     artifacts:
       - build/ios/ipa/*.ipa
+      - build/ios/archive/*.xcarchive
