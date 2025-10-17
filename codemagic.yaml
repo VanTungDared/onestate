@@ -1,8 +1,7 @@
 workflows:
-  ios-release:
-    name: 🚀 iOS Release (App Store)
+  ios-adhoc:
+    name: iOS AdHoc Build
     instance_type: mac_mini_m1
-    max_build_duration: 120
 
     environment:
       flutter: stable
@@ -12,7 +11,6 @@ workflows:
       vars:
         BUNDLE_ID: "com.ontik.onestate"
         TEAM_ID: "QM93WQYMPM"
-        ENTRY_POINT: "lib/main.dart"
 
       ios_signing:
         certificates:
@@ -21,73 +19,18 @@ workflows:
           - onestate
 
     scripts:
-      - name: 🔐 Setup Code Signing
+      - name: Setup signing
         script: |
-          echo "🔑 Importing certificate & provisioning profile..."
-          echo "$CERTIFICATE_P12" | base64 --decode > /tmp/certificate.p12
+          echo "$CERTIFICATE_P12" | base64 --decode > /tmp/cert.p12
           echo "$PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
-
-          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password "$CERTIFICATE_PASSWORD"
+          keychain add-certificates --certificate /tmp/cert.p12 --certificate-password "$CERTIFICATE_PASSWORD"
           xcode-project use-profiles --profile /tmp/profile.mobileprovision --team-id "$TEAM_ID"
-          echo "✅ Code signing setup completed."
 
-      - name: 🧩 Generate Export Options
-        script: |
-          echo "🧾 Creating export options plist..."
-          cat <<EOF > /Users/builder/export_options.plist
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>app-store</string>
-            <key>teamID</key>
-            <string>${TEAM_ID}</string>
-            <key>signingStyle</key>
-            <string>manual</string>
-            <key>provisioningProfiles</key>
-            <dict>
-              <key>${BUNDLE_ID}</key>
-              <string>onestate</string>
-            </dict>
-            <key>compileBitcode</key>
-            <false/>
-            <key>stripSwiftSymbols</key>
-            <true/>
-            <key>uploadBitcode</key>
-            <false/>
-          </dict>
-          </plist>
-          EOF
-          echo "✅ Export options plist created."
-
-      - name: 📦 Get Dependencies
+      - name: Build IPA (ad-hoc)
         script: |
           flutter clean
           flutter pub get
-
-      - name: 🏗️ Build IPA
-        script: |
-          echo "🚀 Building release IPA for App Store..."
-          flutter build ipa \
-            --release \
-            -t $ENTRY_POINT \
-            --export-options-plist=/Users/builder/export_options.plist
-          echo "✅ IPA build finished."
-
-      - name: 🧾 Verify Output
-        script: |
-          echo "📁 Checking build output..."
-          ls -lh build/ios/ipa || echo "⚠️ IPA folder missing!"
-          ls -lh build/ios/archive || echo "⚠️ Archive folder missing!"
+          flutter build ipa --release --export-method ad-hoc
 
     artifacts:
       - build/ios/ipa/*.ipa
-      - build/ios/archive/*.xcarchive
-
-    publishing:
-      app_store_connect:
-        key_id: $APP_STORE_CONNECT_KEY_ID
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        api_key: $APP_STORE_CONNECT_API_KEY
-        submit_to_testflight: true
