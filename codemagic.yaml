@@ -15,9 +15,9 @@ workflows:
         ENTRY_POINT: "lib/main.dart"
       ios_signing:
         certificates:
-          - onestate_certificate
+          - onestate
         provisioning_profiles:
-          - onestate_profile
+          - onestate
 
     scripts:
       - name: 📦 Clean & Get dependencies
