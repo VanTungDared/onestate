@@ -12,11 +12,11 @@ workflows:
       vars:
         BUNDLE_ID: "com.ontik.onestate"
 
-      ios_signing:
-        certificates:
-          - onestate
-        provisioning_profiles:
-          - onestate
+      # ios_signing:
+      #   certificates:
+      #     - onestate
+      #   provisioning_profiles:
+      #     - onestate
 
     scripts:
       - name: 🔐 Setup Code Signing
