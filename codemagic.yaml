@@ -21,15 +21,15 @@ workflows:
           - onestate
 
     scripts:
-      # - name: 🔐 Setup Code Signing
-      #   script: |
-      #     echo "🔑 Importing certificate & provisioning profile..."
-      #     echo "$CERTIFICATE_P12" | base64 --decode > /tmp/certificate.p12
-      #     echo "$PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
+      - name: 🔐 Setup Code Signing
+        script: |
+          echo "🔑 Importing certificate & provisioning profile..."
+          echo "$CERTIFICATE_P12" | base64 --decode > /tmp/certificate.p12
+          echo "$PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
 
-      #     keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password "$CERTIFICATE_PASSWORD"
-      #     xcode-project use-profiles --profile /tmp/profile.mobileprovision --team-id "$TEAM_ID"
-      #     echo "✅ Code signing setup completed."
+          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password "$CERTIFICATE_PASSWORD"
+          xcode-project use-profiles --profile /tmp/profile.mobileprovision --team-id "$TEAM_ID"
+          echo "✅ Code signing setup completed."
 
       - name: 🧩 Generate Export Options
         script: |
