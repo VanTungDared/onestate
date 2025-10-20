@@ -12,29 +12,13 @@ workflows:
       vars:
         BUNDLE_ID: "com.ontik.onestate"
 
-      # ios_signing:
-      #   certificates:
-      #     - onestate
-      #   provisioning_profiles:
-      #     - onestate
+      ios_signing:
+        certificates:
+          - onestate
+        provisioning_profiles:
+          - onestate
 
     scripts:
-      - name: 🔐 Setup Code Signing
-        script: |
-          echo "🔑 Importing certificate & provisioning profile..."
-          echo "$CERTIFICATE_P12" | base64 --decode > /tmp/cert.p12
-          echo "$PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
-
-          # Import certificate into Codemagic keychain
-          keychain add-certificates --certificate /tmp/cert.p12 --certificate-password "$CERTIFICATE_PASSWORD"
-
-          # Install provisioning profile
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" /tmp/profile.mobileprovision)
-          cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
-
-          echo "✅ Code signing setup completed."
-
       - name: 📦 Get Dependencies
         script: |
           flutter clean
@@ -45,11 +29,6 @@ workflows:
           echo "🚀 Building IPA (Release)..."
           flutter build ipa --release --export-method app-store
           echo "✅ IPA build finished."
-
-      - name: 🧾 Verify Output
-        script: |
-          echo "📁 Checking build output..."
-          ls -lh build/ios/ipa || echo "⚠️ IPA folder missing!"
 
     artifacts:
       - build/ios/ipa/*.ipa
