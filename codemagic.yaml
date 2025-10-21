@@ -16,22 +16,16 @@ workflows:
 
       ios_signing:
         certificates:
-          - onestate # phải là Distribution certificate
+          - onestate # Distribution certificate
         provisioning_profiles:
-          - profile_onestate # phải là App Store / Distribution profile
+          - profile_onestate # App Store provisioning profile
 
     scripts:
-      # ----------------------------
-      # 📦 1. Get Dependencies
-      # ----------------------------
       - name: 📦 Get Dependencies
         script: |
           flutter clean
           flutter pub get
 
-      # ----------------------------
-      # 🧩 2. Generate Export Options
-      # ----------------------------
       - name: 🧩 Generate Export Options
         script: |
           echo "🧾 Creating export options plist..."
@@ -62,44 +56,25 @@ workflows:
           EOF
           echo "✅ Export options plist created."
 
-      # ----------------------------
-      # 🏗️ 3. Build IPA with verbose
-      # ----------------------------
       - name: 🏗️ Build IPA (Verbose)
         script: |
           echo "🚀 Building release IPA for App Store (verbose)..."
-          set -e   # exit ngay nếu build fail
+          set -e
           flutter build ipa \
             --release \
             -t $ENTRY_POINT \
             --export-options-plist=/Users/builder/export_options.plist \
-            --build-name=1.0.0 \
-            --build-number=1 \
             -v 2>&1 | tee build/flutter_build.log
           echo "✅ IPA build finished."
 
-    # ----------------------------
-    # 📦 Artifact Export
-    # ----------------------------
     artifacts:
       - build/ios/ipa/*.ipa
       - build/ios/archive/*.xcarchive
       - build/flutter_build.log
 
-    # ----------------------------
-    # 🚀 Publish to TestFlight
-    # ----------------------------
     publishing:
       app_store_connect:
         key_id: $APP_STORE_CONNECT_KEY_ID
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         api_key: $APP_STORE_CONNECT_API_KEY
         submit_to_testflight: true
-
-    # ----------------------------
-    # ⚙️ Codemagic specific iOS build options
-    # ----------------------------
-    ios:
-      build:
-        xcode_scheme: Runner
-        configuration: Release
