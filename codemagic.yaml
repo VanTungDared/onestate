@@ -10,7 +10,7 @@ workflows:
       groups:
         - onestate # nhóm secret chứa các biến bên dưới
       vars:
-        BUNDLE_ID: "QM93WQYMPM.com.ontik.onestate"
+        BUNDLE_ID: "com.ontik.onestate"
         TEAM_ID: "QM93WQYMPM"
         ENTRY_POINT: "lib/main.dart"
 
@@ -81,13 +81,13 @@ workflows:
           <dict>
             <key>method</key>
             <string>app-store</string>
-            <key>teamID</key>
-            <string>${TEAM_ID}</string>
             <key>signingStyle</key>
             <string>manual</string>
+            <key>teamID</key>
+            <string>${TEAM_ID}</string>
             <key>provisioningProfiles</key>
             <dict>
-              <key>${BUNDLE_ID}</key>
+              <key>com.ontik.onestate</key>
               <string>onestate</string>
             </dict>
             <key>compileBitcode</key>
