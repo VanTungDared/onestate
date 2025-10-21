@@ -26,47 +26,20 @@ workflows:
 
           echo "🔧 Creating and unlocking temporary keychain..."
           security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
           security import /tmp/certificate.p12 -k ~/Library/Keychains/build.keychain -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign
-          security list-keychains -d user -s ~/Library/Keychains/build.keychain
-          security default-keychain -d user -s ~/Library/Keychains/build.keychain
-          security unlock-keychain -p "" ~/Library/Keychains/build.keychain
-          security set-keychain-settings ~/Library/Keychains/build.keychain
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" ~/Library/Keychains/build.keychain
 
-          echo "📲 Installing provisioning profile..."
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" /dev/stdin <<< "$(security cms -D -i /tmp/profile.mobileprovision)")
           cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
-          echo "✅ Profile installed: $PROFILE_UUID"
+          echo "✅ Installed provisioning profile $PROFILE_UUID.mobileprovision"
 
-          echo ""
-          echo "=============================================="
-          echo "🔍 VERIFYING CERTIFICATE (.p12)"
-          echo "=============================================="
-          openssl pkcs12 -in /tmp/certificate.p12 -info -noout -password pass:$CERTIFICATE_PASSWORD | grep "subject=" || true
-          openssl pkcs12 -in /tmp/certificate.p12 -info -noout -password pass:$CERTIFICATE_PASSWORD | grep "issuer=" || true
-
-          echo ""
-          echo "=============================================="
-          echo "🔍 VERIFYING PROVISIONING PROFILE (.mobileprovision)"
-          echo "=============================================="
+          echo "🔍 Verifying..."
           security cms -D -i /tmp/profile.mobileprovision > /tmp/profile.plist
-
-          echo "🆔 App Identifier:"
-          /usr/libexec/PlistBuddy -c "Print :Entitlements:application-identifier" /tmp/profile.plist || true
-
-          echo "👥 Team Identifier:"
-          /usr/libexec/PlistBuddy -c "Print :Entitlements:com.apple.developer.team-identifier" /tmp/profile.plist || true
-
-          echo "📱 Profile Name:"
-          /usr/libexec/PlistBuddy -c "Print :Name" /tmp/profile.plist || true
-
-          echo "📅 Expiration Date:"
-          /usr/libexec/PlistBuddy -c "Print :ExpirationDate" /tmp/profile.plist || true
-
-          echo "🔐 Certificates included:"
-          /usr/libexec/PlistBuddy -c "Print :DeveloperCertificates:0" /tmp/profile.plist | openssl x509 -noout -subject -issuer || true
-
-          echo "✅ Code signing setup completed."
+          /usr/libexec/PlistBuddy -c "Print :Name" /tmp/profile.plist
+          echo "✅ Code signing setup done."
 
       # ----------------------------
       # 🧾 2. Export Options
