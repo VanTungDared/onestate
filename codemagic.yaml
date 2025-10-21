@@ -29,6 +29,35 @@ workflows:
 
           keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password "$CERTIFICATE_PASSWORD"
           xcode-project use-profiles --profile /tmp/profile.mobileprovision --team-id "$TEAM_ID"
+
+          echo ""
+          echo "=============================================="
+          echo "🔍 VERIFYING CERTIFICATE (.p12)"
+          echo "=============================================="
+          openssl pkcs12 -in /tmp/certificate.p12 -info -noout -password pass:$CERTIFICATE_PASSWORD | grep "subject=" || true
+          openssl pkcs12 -in /tmp/certificate.p12 -info -noout -password pass:$CERTIFICATE_PASSWORD | grep "issuer=" || true
+
+          echo ""
+          echo "=============================================="
+          echo "🔍 VERIFYING PROVISIONING PROFILE (.mobileprovision)"
+          echo "=============================================="
+          security cms -D -i /tmp/profile.mobileprovision > /tmp/profile.plist
+
+          echo "🆔 App Identifier:"
+          /usr/libexec/PlistBuddy -c "Print :Entitlements:application-identifier" /tmp/profile.plist || true
+
+          echo "👥 Team Identifier:"
+          /usr/libexec/PlistBuddy -c "Print :Entitlements:com.apple.developer.team-identifier" /tmp/profile.plist || true
+
+          echo "📱 Profile Name:"
+          /usr/libexec/PlistBuddy -c "Print :Name" /tmp/profile.plist || true
+
+          echo "📅 Expiration Date:"
+          /usr/libexec/PlistBuddy -c "Print :ExpirationDate" /tmp/profile.plist || true
+
+          echo "🔐 Certificates included:"
+          /usr/libexec/PlistBuddy -c "Print :DeveloperCertificates:0" /tmp/profile.plist | openssl x509 -noout -subject -issuer || true
+
           echo "✅ Code signing setup completed."
 
       - name: 🧩 Generate Export Options
