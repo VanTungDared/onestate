@@ -14,35 +14,23 @@ workflows:
         TEAM_ID: "QM93WQYMPM"
         ENTRY_POINT: "lib/main.dart"
 
+      ios_signing:
+        certificates:
+          - onestate # certificate đã cấu hình trên Appcircle
+        provisioning_profiles:
+          - profile_onestate # provisioning profile đã cấu hình trên Appcircle
+
     scripts:
       # ----------------------------
-      # 🔐 1. Setup Code Signing (đã fix hoàn toàn)
+      # 📦 1. Get Dependencies
       # ----------------------------
-      - name: 🔐 Setup Code Signing
+      - name: 📦 Get Dependencies
         script: |
-          echo "🔑 Importing certificate & provisioning profile..."
-          echo "$CERTIFICATE_P12" | base64 --decode > /tmp/certificate.p12
-          echo "$PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
-
-          echo "🔧 Creating and unlocking temporary keychain..."
-          security create-keychain -p "" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
-          security import /tmp/certificate.p12 -k ~/Library/Keychains/build.keychain -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" ~/Library/Keychains/build.keychain
-
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" /dev/stdin <<< "$(security cms -D -i /tmp/profile.mobileprovision)")
-          cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
-          echo "✅ Installed provisioning profile $PROFILE_UUID.mobileprovision"
-
-          echo "🔍 Verifying..."
-          security cms -D -i /tmp/profile.mobileprovision > /tmp/profile.plist
-          /usr/libexec/PlistBuddy -c "Print :Name" /tmp/profile.plist
-          echo "✅ Code signing setup done."
+          flutter clean
+          flutter pub get
 
       # ----------------------------
-      # 🧾 2. Export Options
+      # 🧩 2. Generate Export Options
       # ----------------------------
       - name: 🧩 Generate Export Options
         script: |
@@ -60,8 +48,8 @@ workflows:
             <string>${TEAM_ID}</string>
             <key>provisioningProfiles</key>
             <dict>
-              <key>com.ontik.onestate</key>
-              <string>onestate</string>
+              <key>${BUNDLE_ID}</key>
+              <string>profile_onestate</string>
             </dict>
             <key>compileBitcode</key>
             <false/>
@@ -75,15 +63,7 @@ workflows:
           echo "✅ Export options plist created."
 
       # ----------------------------
-      # 📦 3. Get Dependencies
-      # ----------------------------
-      - name: 📦 Get Dependencies
-        script: |
-          flutter clean
-          flutter pub get
-
-      # ----------------------------
-      # 🏗️ 4. Build IPA
+      # 🏗️ 3. Build IPA
       # ----------------------------
       - name: 🏗️ Build IPA
         script: |
@@ -95,7 +75,7 @@ workflows:
           echo "✅ IPA build finished."
 
       # ----------------------------
-      # 📂 5. Verify Output
+      # 📂 4. Verify Output
       # ----------------------------
       - name: 🧾 Verify Output
         script: |
