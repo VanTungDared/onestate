@@ -10,7 +10,7 @@ workflows:
       groups:
         - onestate # nhóm secret chứa các biến bên dưới
       vars:
-        BUNDLE_ID: "com.ontik.onestate"
+        BUNDLE_ID: "QM93WQYMPM.com.ontik.onestate"
         TEAM_ID: "QM93WQYMPM"
         ENTRY_POINT: "lib/main.dart"
 
