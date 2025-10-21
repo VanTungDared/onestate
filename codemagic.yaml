@@ -14,17 +14,9 @@ workflows:
         TEAM_ID: "QM93WQYMPM"
         ENTRY_POINT: "lib/main.dart"
 
-      # Không dùng ios_signing ở đây vì bạn đã tự decode base64
-      # (tránh conflict khi Codemagic tự chèn)
-      # ios_signing:
-      #   certificates:
-      #     - onestate
-      #   provisioning_profiles:
-      #     - profile_onestate
-
     scripts:
       # ----------------------------
-      # 🔐 1. Setup Code Signing
+      # 🔐 1. Setup Code Signing (đã fix hoàn toàn)
       # ----------------------------
       - name: 🔐 Setup Code Signing
         script: |
@@ -32,17 +24,19 @@ workflows:
           echo "$CERTIFICATE_P12" | base64 --decode > /tmp/certificate.p12
           echo "$PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
 
-          # Import certificate (.p12)
-          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password "$CERTIFICATE_PASSWORD"
+          echo "🔧 Creating and unlocking temporary keychain..."
+          security create-keychain -p "" build.keychain
+          security import /tmp/certificate.p12 -k ~/Library/Keychains/build.keychain -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security list-keychains -d user -s ~/Library/Keychains/build.keychain
+          security default-keychain -d user -s ~/Library/Keychains/build.keychain
+          security unlock-keychain -p "" ~/Library/Keychains/build.keychain
+          security set-keychain-settings ~/Library/Keychains/build.keychain
 
-          # 🩵 Copy provisioning profile vào đúng thư mục mà Xcode nhận diện
+          echo "📲 Installing provisioning profile..."
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" /dev/stdin <<< "$(security cms -D -i /tmp/profile.mobileprovision)")
           cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
-          echo "📲 Installed provisioning profile to ~/Library/MobileDevice/Provisioning Profiles/$PROFILE_UUID.mobileprovision"
-
-          # Gán team ID & profile cho dự án Xcode
-          xcode-project use-profiles --profile /tmp/profile.mobileprovision --team-id "$TEAM_ID"
+          echo "✅ Profile installed: $PROFILE_UUID"
 
           echo ""
           echo "=============================================="
