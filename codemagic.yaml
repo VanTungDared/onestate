@@ -18,7 +18,7 @@ workflows:
         certificates:
           - onestate
         provisioning_profiles:
-          - onestate
+          - profile_onestate
 
     scripts:
       - name: 🔐 Setup Code Signing
