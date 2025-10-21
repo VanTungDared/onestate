@@ -68,6 +68,7 @@ workflows:
       - name: 🏗️ Build IPA (Verbose)
         script: |
           echo "🚀 Building release IPA for App Store (verbose)..."
+          set -e   # <-- exit ngay nếu lệnh sau fail
           flutter build ipa \
             --release \
             -t $ENTRY_POINT \
