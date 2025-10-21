@@ -851,34 +851,27 @@ class RealEstateFormScreen extends StatelessWidget {
               ),
             ),
             SizedBox(width: 4.w),
-            // Expanded(
-            //   child: PrimaryButton(
-            //     text: "Chọn",
-            //     onPressed: () async {
-            //       final url = urlController.text.trim();
-            //       final latLng = _extractLatLngFromUrl(url);
-            //       if (latLng != null) {
-            //         controller.mapLatLng.value = latLng;
-
-            //         // Di chuyển camera
-            //         final googleMapController =
-            //             await controller.mapController.future;
-            //         googleMapController.animateCamera(
-            //           CameraUpdate.newCameraPosition(
-            //             CameraPosition(target: latLng, zoom: 16),
-            //           ),
-            //         );
-            //       } else {
-            //         LoadingNotifier.showTopMessage(
-            //           "Không lấy được tọa độ từ URL",
-            //           false,
-            //         );
-            //       }
-            //     },
-            //     height: 32.h,
-            //     borderRadius: 8,
-            //   ),
-            // ),
+            Expanded(
+              child: PrimaryButton(
+                text: "Chọn",
+                onPressed: () async {
+                  final result = ConvertApp.extractLatLngFromGoogleMapsUrl(
+                    urlController.text.trim(),
+                  );
+                  if (result != null && result["lat"] != null) {
+                    controller.lat.value = result["lat"] ?? 0.0;
+                    controller.lng.value = result["lng"] ?? 0.0;
+                  } else {
+                    LoadingNotifier.showTopMessage(
+                      "Lấy vị trí không thành công",
+                      true,
+                    );
+                  }
+                },
+                height: 32.h,
+                borderRadius: 8,
+              ),
+            ),
           ],
         ),
 
@@ -927,17 +920,15 @@ class RealEstateFormScreen extends StatelessWidget {
         const SizedBox(height: 8),
 
         // Hiển thị tọa độ
-        // Obx(() {
-        //   if (controller.mapLatLng.value == null) {
-        //     return Text("Chưa chọn vị trí");
-        //   } else {
-        //     final lat = controller.mapLatLng.value!.latitude.toStringAsFixed(6);
-        //     final lng = controller.mapLatLng.value!.longitude.toStringAsFixed(
-        //       6,
-        //     );
-        //     return Text("Tọa độ đã chọn: $lat, $lng");
-        //   }
-        // }),
+        Obx(() {
+          if (controller.lat.value == 0.0 || controller.lng.value == 0.0) {
+            return Text("Chưa chọn vị trí");
+          } else {
+            final lat = controller.lat.value.toStringAsFixed(6);
+            final lng = controller.lng.value.toStringAsFixed(6);
+            return Text("Tọa độ đã chọn: $lat, $lng");
+          }
+        }),
       ],
     );
   }

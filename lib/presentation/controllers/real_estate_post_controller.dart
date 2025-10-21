@@ -52,6 +52,8 @@ class RealEstatePostController extends GetxController {
   var renderImage = 0.obs;
   var renderImageLegal = 0.obs;
   var legalDocumentsSeri = ''.obs;
+  var lat = 0.0.obs;
+  var lng = 0.0.obs;
 
   // var mapLatLng = Rxn<LatLng>(); // ví dụ: LatLng(10.762622, 106.660172)
 
@@ -453,8 +455,8 @@ class RealEstatePostController extends GetxController {
         "description": controllerDescription.text.trim(),
         "imageUrls": imagesUrlFinal,
         "tags": tags,
-        // "latitude": mapLatLng.value?.latitude,
-        // "longitude": mapLatLng.value?.longitude,
+        "latitude": lat.value,
+        "longitude": lng.value,
         "streetName": controllerStreetName.text.trim(),
         "legalStatus": "has_certificate", // default
         "landCertificate": {

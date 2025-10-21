@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/utils/constants/api_url.dart';
@@ -14,6 +16,35 @@ import '../../../widgets/ButtonPrimary.dart';
 
 class DetailScreen extends GetView<DetailController> {
   const DetailScreen({super.key});
+
+  void openImageGallery(
+    BuildContext context,
+    List<String> images,
+    int initialIndex,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (_) => Scaffold(
+              appBar: AppBar(),
+              body: PhotoViewGallery.builder(
+                itemCount: images.length,
+                pageController: PageController(initialPage: initialIndex),
+                builder: (context, index) {
+                  return PhotoViewGalleryPageOptions(
+                    imageProvider: CachedNetworkImageProvider(images[index]),
+                    minScale: PhotoViewComputedScale.contained,
+                    maxScale: PhotoViewComputedScale.covered * 3,
+                  );
+                },
+                scrollPhysics: const BouncingScrollPhysics(),
+                backgroundDecoration: const BoxDecoration(color: Colors.black),
+              ),
+            ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,16 +83,28 @@ class DetailScreen extends GetView<DetailController> {
                     ),
                     items:
                         item.imageUrls.map((url) {
+                          int index = item.imageUrls.indexOf(url);
                           return Builder(
                             builder: (BuildContext context) {
-                              return ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: CachedNetworkImage(
-                                  imageUrl: "${ApiUrl.baseUrlImage}/$url",
-                                  errorWidget:
-                                      (context, url, error) =>
-                                          const Icon(Icons.error),
-                                  fit: BoxFit.cover,
+                              return GestureDetector(
+                                onTap: () {
+                                  openImageGallery(
+                                    context,
+                                    item.imageUrls
+                                        .map((u) => "${ApiUrl.baseUrlImage}/$u")
+                                        .toList(),
+                                    index,
+                                  );
+                                },
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: CachedNetworkImage(
+                                    imageUrl: "${ApiUrl.baseUrlImage}/$url",
+                                    errorWidget:
+                                        (context, url, error) =>
+                                            const Icon(Icons.error),
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               );
                             },
@@ -138,6 +181,25 @@ class DetailScreen extends GetView<DetailController> {
                             callBack: () => controller.handleLikeListing(),
                             color: controller.isLiked.value ? Colors.red : null,
                           ),
+                        ),
+                        SizedBox(width: 12.w),
+                        _actionButton(
+                          Icons.location_on,
+                          "",
+                          callBack: () async {
+                            final googleMapsUrl = Uri.parse(
+                              'https://www.google.com/maps/search/?api=1&query=${controller.listingDetail.value!.latitude},${controller.listingDetail.value!.longitude}',
+                            );
+                            if (await canLaunchUrl(googleMapsUrl)) {
+                              await launchUrl(googleMapsUrl);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Could not open Google Maps'),
+                                ),
+                              );
+                            }
+                          },
                         ),
                       ],
                     ),

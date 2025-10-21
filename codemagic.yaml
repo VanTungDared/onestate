@@ -8,7 +8,7 @@ workflows:
       flutter: stable
       xcode: latest
       groups:
-        - onestate # nhóm secret chứa các biến bên dưới
+        - onestate
       vars:
         BUNDLE_ID: "com.ontik.onestate"
         TEAM_ID: "QM93WQYMPM"
@@ -16,9 +16,9 @@ workflows:
 
       ios_signing:
         certificates:
-          - onestate # certificate đã cấu hình trên Appcircle
+          - onestate
         provisioning_profiles:
-          - profile_onestate # provisioning profile đã cấu hình trên Appcircle
+          - profile_onestate
 
     scripts:
       # ----------------------------
@@ -63,15 +63,16 @@ workflows:
           echo "✅ Export options plist created."
 
       # ----------------------------
-      # 🏗️ 3. Build IPA
+      # 🏗️ 3. Build IPA with verbose
       # ----------------------------
-      - name: 🏗️ Build IPA
+      - name: 🏗️ Build IPA (Verbose)
         script: |
-          echo "🚀 Building release IPA for App Store..."
+          echo "🚀 Building release IPA for App Store (verbose)..."
           flutter build ipa \
             --release \
             -t $ENTRY_POINT \
-            --export-options-plist=/Users/builder/export_options.plist
+            --export-options-plist=/Users/builder/export_options.plist \
+            -v 2>&1 | tee build/flutter_build.log
           echo "✅ IPA build finished."
 
       # ----------------------------
@@ -82,6 +83,23 @@ workflows:
           echo "📁 Checking build output..."
           ls -lh build/ios/ipa || echo "⚠️ IPA folder missing!"
           ls -lh build/ios/archive || echo "⚠️ Archive folder missing!"
+          echo "📂 Contents of archive folder:"
+          find build/ios/archive -type f
+
+      # ----------------------------
+      # 🏗️ 5. Optional: xcodebuild verbose (debugging)
+      # ----------------------------
+      #- name: 🏗️ Xcodebuild verbose (optional)
+      #  script: |
+      #    xcodebuild \
+      #      -workspace ios/Runner.xcworkspace \
+      #      -scheme Runner \
+      #      -configuration Release \
+      #      -archivePath build/ios/archive/Runner.xcarchive \
+      #      clean archive \
+      #      CODE_SIGN_STYLE=Manual \
+      #      DEVELOPMENT_TEAM=$TEAM_ID \
+      #      -verbose 2>&1 | tee build/xcodebuild.log
 
     # ----------------------------
     # 📦 Artifact Export
@@ -89,6 +107,8 @@ workflows:
     artifacts:
       - build/ios/ipa/*.ipa
       - build/ios/archive/*.xcarchive
+      - build/flutter_build.log
+      #- build/xcodebuild.log   # bỏ comment nếu dùng xcodebuild verbose
 
     # ----------------------------
     # 🚀 Publish to TestFlight
