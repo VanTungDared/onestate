@@ -16,9 +16,9 @@ workflows:
 
       ios_signing:
         certificates:
-          - onestate
+          - onestate # phải là Distribution certificate
         provisioning_profiles:
-          - onestate
+          - profile_onestate # phải là App Store / Distribution profile
 
     scripts:
       # ----------------------------
@@ -68,39 +68,15 @@ workflows:
       - name: 🏗️ Build IPA (Verbose)
         script: |
           echo "🚀 Building release IPA for App Store (verbose)..."
-          set -e   # <-- exit ngay nếu lệnh sau fail
+          set -e   # exit ngay nếu build fail
           flutter build ipa \
             --release \
             -t $ENTRY_POINT \
             --export-options-plist=/Users/builder/export_options.plist \
+            --build-name=1.0.0 \
+            --build-number=1 \
             -v 2>&1 | tee build/flutter_build.log
           echo "✅ IPA build finished."
-
-      # ----------------------------
-      # 📂 4. Verify Output
-      # ----------------------------
-      - name: 🧾 Verify Output
-        script: |
-          echo "📁 Checking build output..."
-          ls -lh build/ios/ipa || echo "⚠️ IPA folder missing!"
-          ls -lh build/ios/archive || echo "⚠️ Archive folder missing!"
-          echo "📂 Contents of archive folder:"
-          find build/ios/archive -type f
-
-      # ----------------------------
-      # 🏗️ 5. Optional: xcodebuild verbose (debugging)
-      # ----------------------------
-      #- name: 🏗️ Xcodebuild verbose (optional)
-      #  script: |
-      #    xcodebuild \
-      #      -workspace ios/Runner.xcworkspace \
-      #      -scheme Runner \
-      #      -configuration Release \
-      #      -archivePath build/ios/archive/Runner.xcarchive \
-      #      clean archive \
-      #      CODE_SIGN_STYLE=Manual \
-      #      DEVELOPMENT_TEAM=$TEAM_ID \
-      #      -verbose 2>&1 | tee build/xcodebuild.log
 
     # ----------------------------
     # 📦 Artifact Export
@@ -109,7 +85,6 @@ workflows:
       - build/ios/ipa/*.ipa
       - build/ios/archive/*.xcarchive
       - build/flutter_build.log
-      #- build/xcodebuild.log   # bỏ comment nếu dùng xcodebuild verbose
 
     # ----------------------------
     # 🚀 Publish to TestFlight
@@ -120,3 +95,11 @@ workflows:
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         api_key: $APP_STORE_CONNECT_API_KEY
         submit_to_testflight: true
+
+    # ----------------------------
+    # ⚙️ Codemagic specific iOS build options
+    # ----------------------------
+    ios:
+      build:
+        xcode_scheme: Runner
+        configuration: Release
