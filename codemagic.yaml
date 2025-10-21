@@ -8,26 +8,40 @@ workflows:
       flutter: stable
       xcode: latest
       groups:
-        - onestate
+        - onestate # nhóm secret chứa các biến bên dưới
       vars:
         BUNDLE_ID: "com.ontik.onestate"
         TEAM_ID: "QM93WQYMPM"
         ENTRY_POINT: "lib/main.dart"
 
-      ios_signing:
-        certificates:
-          - onestate
-        provisioning_profiles:
-          - profile_onestate
+      # Không dùng ios_signing ở đây vì bạn đã tự decode base64
+      # (tránh conflict khi Codemagic tự chèn)
+      # ios_signing:
+      #   certificates:
+      #     - onestate
+      #   provisioning_profiles:
+      #     - profile_onestate
 
     scripts:
+      # ----------------------------
+      # 🔐 1. Setup Code Signing
+      # ----------------------------
       - name: 🔐 Setup Code Signing
         script: |
           echo "🔑 Importing certificate & provisioning profile..."
           echo "$CERTIFICATE_P12" | base64 --decode > /tmp/certificate.p12
           echo "$PROVISIONING_PROFILE" | base64 --decode > /tmp/profile.mobileprovision
 
+          # Import certificate (.p12)
           keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password "$CERTIFICATE_PASSWORD"
+
+          # 🩵 Copy provisioning profile vào đúng thư mục mà Xcode nhận diện
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" /dev/stdin <<< "$(security cms -D -i /tmp/profile.mobileprovision)")
+          cp /tmp/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$PROFILE_UUID.mobileprovision
+          echo "📲 Installed provisioning profile to ~/Library/MobileDevice/Provisioning Profiles/$PROFILE_UUID.mobileprovision"
+
+          # Gán team ID & profile cho dự án Xcode
           xcode-project use-profiles --profile /tmp/profile.mobileprovision --team-id "$TEAM_ID"
 
           echo ""
@@ -60,6 +74,9 @@ workflows:
 
           echo "✅ Code signing setup completed."
 
+      # ----------------------------
+      # 🧾 2. Export Options
+      # ----------------------------
       - name: 🧩 Generate Export Options
         script: |
           echo "🧾 Creating export options plist..."
@@ -90,11 +107,17 @@ workflows:
           EOF
           echo "✅ Export options plist created."
 
+      # ----------------------------
+      # 📦 3. Get Dependencies
+      # ----------------------------
       - name: 📦 Get Dependencies
         script: |
           flutter clean
           flutter pub get
 
+      # ----------------------------
+      # 🏗️ 4. Build IPA
+      # ----------------------------
       - name: 🏗️ Build IPA
         script: |
           echo "🚀 Building release IPA for App Store..."
@@ -104,16 +127,25 @@ workflows:
             --export-options-plist=/Users/builder/export_options.plist
           echo "✅ IPA build finished."
 
+      # ----------------------------
+      # 📂 5. Verify Output
+      # ----------------------------
       - name: 🧾 Verify Output
         script: |
           echo "📁 Checking build output..."
           ls -lh build/ios/ipa || echo "⚠️ IPA folder missing!"
           ls -lh build/ios/archive || echo "⚠️ Archive folder missing!"
 
+    # ----------------------------
+    # 📦 Artifact Export
+    # ----------------------------
     artifacts:
       - build/ios/ipa/*.ipa
       - build/ios/archive/*.xcarchive
 
+    # ----------------------------
+    # 🚀 Publish to TestFlight
+    # ----------------------------
     publishing:
       app_store_connect:
         key_id: $APP_STORE_CONNECT_KEY_ID
